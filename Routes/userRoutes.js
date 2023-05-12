@@ -6,15 +6,43 @@ const router = express.Router();
 const auth = require('../Controllers/auth')
 
 router.get('/signup',(req,res)=>{
-    res.render('signup')
+    res.render('user/signup')
 })
 
 
 router.get('/', (req, res) => {
-    res.render('home')
+    // if(req.session.userId){
+        console.log(req.session.userId)
+        res.render('user/home')
+    // }else{
+    //     res.redirect('http://127.0.0.1:3000/api/v1/user/login')
+    // }
   });
-//   auth.handleSignupErrors
+
+
+router.get('/login',(req,res)=>{
+    // if(req.session.userId){
+    //     res.redirect('http://127.0.0.1:3000/api/v1/user')
+    // }else{
+        res.render('user/login')
+    // }
+})
+
+router.get('/otp-login',(req,res)=>{
+    // if(req.session.userId){
+    //     res.redirect('http://127.0.0.1:3000/api/v1/user')
+    // }else{ 
+        res.render('user/index')
+    // }
+})
+
+
+
 router.post('/signup',auth.signup)
+
+
+router.post('/generate-otp',auth.generateOTP)
+
 
 
 // Render the OTP verification form

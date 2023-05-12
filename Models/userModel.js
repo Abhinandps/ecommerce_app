@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
   },
   mobile: {
     type: String,
-    required: [true, 'Please provide a mobile number'],
+    required: [true, "Please provide a mobile number"],
     unique: true,
   },
   password: {
@@ -25,13 +25,17 @@ const userSchema = new mongoose.Schema({
   },
   otp: {
     type: String,
-  default:null
+    default: null,
   },
 });
 
 userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    return next();
+  }
   // Hash the password with cost of 12
   this.password = await bcrypt.hash(this.password, 12);
+  console.log("hashed password -> " + this.password);
   next();
 });
 
@@ -39,6 +43,7 @@ userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
 ) {
+  console.log(candidatePassword, userPassword);
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 

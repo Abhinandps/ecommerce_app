@@ -15,7 +15,7 @@ const signToken = (id) =>
     { expiresIn: process.env.JWT_EXPIRES_IN }
   );
 
-const sendOTP = (otp,user) => {
+const sendOTP = (otp, user) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -69,7 +69,6 @@ const createSendToken = (user, statusCode, res) => {
 
 // User signup
 exports.signup = catchAsync(async (req, res, next) => {
-
   // Save requested data and hashed password to the database
   const newUser = await User.create(req.body);
 
@@ -83,18 +82,13 @@ exports.signup = catchAsync(async (req, res, next) => {
   await newUser.save();
 
   // Send the OTP to the user's email address
-  sendOTP(otp,newUser);
-
-  res.status(200).json({
-    status: "success",
-    otp: newUser.otp,
-  });
-},ErrorHandler);
+  sendOTP(otp, newUser);
+}, ErrorHandler);
 
 // Render verify-otp
 exports.renderVerifyOTP = (req, res) => {
-  const { email } = req.query;
-  res.render("otp", { email });
+  const email = req.query.email;
+  res.render("user/otp", { email });
 };
 
 // Verify the OTP
@@ -120,7 +114,6 @@ exports.verifyOTP = async (req, res, next) => {
   req.session.userId = 1;
 };
 
-
 // User Login
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
@@ -142,6 +135,32 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // Create a new session for the user
   req.session.userId = 1;
+},ErrorHandler);
+
+// User generateOTP
+exports.generateOTP = catchAsync(async (req, res, next) => {
+  const email = req.body.email;
+
+  // 2) Check if user exist
+  const user = await User.findOne({ email }).select("+password");
+
+  if (user) {
+    // Generate an OTP and store it in the user object
+    const otp = otpGenerator.generate(6, {
+      digits: true,
+      alphabets: false,
+      upperCase: false,
+    });
+    user.otp = otp;
+    await user.save();
+
+    // Send the OTP to the user's email address
+    sendOTP(otp, user);
+
+    res.json({
+      status: "success",
+    });
+  }
 });
 
 // User Logout
