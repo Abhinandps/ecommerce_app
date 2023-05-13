@@ -1,4 +1,5 @@
 const User = require("../Models/userModel");
+
 const jwt = require("jsonwebtoken");
 
 const otpGenerator = require("otp-generator");
@@ -130,6 +131,10 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError(`Incorrect email or password`, 401));
   }
 
+  if(user.isBlock){
+    return next(new AppError(`Your account has been blocked. Please contact support`, 401));
+  }
+
   // 3) if everything ok, send token to client
   createSendToken(user, 200, res);
 
@@ -174,3 +179,6 @@ exports.logout = (req, res) => {
   // Send a response indicating success
   res.status(200).json({ status: "success" });
 };
+
+
+

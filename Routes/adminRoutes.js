@@ -1,23 +1,77 @@
-const express = require('express')
+const express = require("express");
 const router = express.Router();
 
-const adminAuth = require("../Controllers/adminAuth")
+const multer = require("multer");
 
-router.get('/login',(req,res)=>{
-    res.render('admin/login')
-})
+const adminAuth = require("../Controllers/adminAuth");
+const {
+  getAllUsers,
+  toggleBlock,
+  addCategory,
+  updateCategory,
+  deleteCategory,
+  getAllCategories,
+  addProduct,
+  updateProduct,
+  deleteProduct,
+  getAllProducts
+} = require("../Controllers/adminController");
 
-router.get('/',(req,res)=>{
-    res.render('admin/dashboard')
-})
+// multer storage engine
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+      cb(null, "public/assets/images/");
+    } else if (file.mimetype === "image/svg+xml") {
+      cb(null, "public/assets/icons/");
+    } else {
+      cb(new Error("Invalid file type"));
+    }
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname); // set unique filename
+  },
+});
 
+// multer middleware
+const upload = multer({ storage });
 
-router.post('/register',adminAuth.register)
-router.post('/login',adminAuth.login)
-router.get('/logout',adminAuth.logout)
+router.get("/login", (req, res) => {
+  res.render("admin/login");
+});
 
+router.get("/", (req, res) => {
+  res.render("admin/dashboard");
+});
 
+router.post("/register", adminAuth.register);
+router.post("/login", adminAuth.login);
+router.get("/logout", adminAuth.logout);
 
-  
+// Users
 
-module.exports = router
+router.get("/users", getAllUsers);
+
+router.put("/:id/block", toggleBlock);
+
+// Categories
+
+router.get("/categories", getAllCategories);
+
+router.post("/category", upload.single("icon"), addCategory);
+
+router.put("/category/:id", upload.single("icon"), updateCategory);
+
+router.delete("/category/:id", deleteCategory);
+
+// Products
+
+router.get("/products", getAllProducts);
+
+router.post("/product", upload.single("image"), addProduct);
+
+router.put("/product/:id", upload.single("image"), updateProduct);
+
+router.delete("/product/:id", deleteProduct);
+
+module.exports = router;
