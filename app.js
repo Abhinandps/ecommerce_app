@@ -7,6 +7,7 @@ const AppError = require("./utils/appError");
 const globalErrorHandler = require('./Controllers/errorController')
 const userRouter = require("./Routes/userRoutes");
 const adminRouter = require("./Routes/adminRoutes");
+const viewRouter = require("./Routes/viewRoutes");
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -28,6 +29,7 @@ app.use(
 app.use(express.json());
 
 // All Routes
+app.use("/", viewRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/admin", adminRouter);
 

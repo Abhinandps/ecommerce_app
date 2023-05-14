@@ -5,6 +5,7 @@ const Category = require("../Models/category");
 
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const ErrorHandler = require("../Controllers/errorController");
 
 exports.getAllUsers = catchAsync(async (req, res) => {
   const users = await User.find();
@@ -14,6 +15,17 @@ exports.getAllUsers = catchAsync(async (req, res) => {
     data: { users },
   });
 });
+
+
+exports.getOneCategory = catchAsync(async (req, res) => {
+  const categories = await Category.findOne({_id:req.params.id});
+  res.status(200).json({
+    status: "success",
+    result: categories.length,
+    data: { categories },
+  });
+});
+
 
 exports.getAllCategories = catchAsync(async (req, res) => {
   const categories = await Category.find();
@@ -46,7 +58,7 @@ exports.addCategory = catchAsync(async (req, res, next) => {
     icon: req.file.path,
   });
   res.json(category);
-});
+},ErrorHandler);
 
 exports.updateCategory = catchAsync(async (req, res, next) => {
   const { name, description } = req.body;

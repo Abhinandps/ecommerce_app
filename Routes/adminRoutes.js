@@ -7,6 +7,7 @@ const adminAuth = require("../Controllers/adminAuth");
 const {
   getAllUsers,
   toggleBlock,
+  getOneCategory,
   addCategory,
   updateCategory,
   deleteCategory,
@@ -59,6 +60,8 @@ router.put("/:id/block", toggleBlock);
 router.get("/categories", getAllCategories);
 
 router.post("/category", upload.single("icon"), addCategory);
+
+router.get("/category/:id", getOneCategory);
 
 router.put("/category/:id", upload.single("icon"), updateCategory);
 
