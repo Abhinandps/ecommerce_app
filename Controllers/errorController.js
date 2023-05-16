@@ -30,7 +30,7 @@ module.exports = (err, req, res, next) => {
       // Return the error as JSON
       return res.status(400).json({
         status: "fail",
-        message: message,
+        message: {email:message},
       });
     }
 

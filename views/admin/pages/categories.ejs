@@ -1,0 +1,145 @@
+<%- include ('../../layouts/adminHeader.ejs') %>
+
+
+    <div class="main-panel">
+        <div class="content-wrapper">
+            <div class="page-header">
+                <h3 class="page-title">All Categories</h3>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#">Tables</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Basic tables</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body" id="card-body">
+                            
+                            <form class="forms-sample" id="category-form" enctype="multipart/form-data">
+                                <h4 class="card-title">Add Category</h4>
+                                <div class="form-group">
+                                    <label for="exampleInputName1">Category Name</label>
+                                    <input type="text" class="form-control" name="name" id="category-name"
+                                        placeholder="Name">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Upload Icon</label> <br>
+                                    <input type="file" name="icon" class="file-upload-info">
+                                    <!-- <div class="input-group col-xs-12">
+                                        <input type="text" class="form-control file-upload-info" disabled
+                                            placeholder="Upload Icon">
+                                        <span class="input-group-append">
+                                            <button class="file-upload-browse btn btn-primary"
+                                                type="button">Upload</button>
+                                        </span>
+                                    </div> -->
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exampleTextarea1">Description</label>
+                                    <textarea class="form-control" name="description" id="category-desc"
+                                        rows="4"></textarea>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                                <button type="reset" class="btn btn-dark">Cancel</button>
+                            </form>
+
+                            <form class="forms-sample" id="edit-category-form" style="display: none;"
+                                enctype="multipart/form-data">
+                                <h4 class="card-title">Update Category</h4>
+                                <div class="form-group">
+                                    <label for="exampleInputName1">Category Name</label>
+                                    <input type="text" class="form-control" name="name" id="name" placeholder="Name">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Upload Icon</label> <br>
+                                    <input type="file" id="category-icon" name="icon" class="file-upload-info">
+                                    <!-- <div class="input-group col-xs-12">
+                                        <input type="text" class="form-control file-upload-info" disabled
+                                            placeholder="Upload Icon">
+                                        <span class="input-group-append">
+                                            <button class="file-upload-browse btn btn-primary"
+                                                type="button">Upload</button>
+                                        </span>
+                                    </div> -->
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exampleTextarea1">Description</label>
+                                    <textarea class="form-control" id="description" name="description"
+                                        id="category-desc" rows="4"></textarea>
+                                </div>
+
+                                <button type="submit" class="btn btn-success mr-2">Save</button>
+                                <button type="reset" class="btn btn-dark">Cancel</button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">List Categories</h4>
+                            <p class="card-description"> You can <code class="text-primary">edit</code> and
+                                <code>delete</code> Categories
+                            </p>
+                            <div class="table-responsive">
+                                <table class="table" id="user-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Category</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <script>
+
+            const cardBody = document.getElementById('card-body');
+            const form = document.getElementById('category-form');
+
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                try {
+                    const formData = new FormData(form);
+                    const response = await axios.post('http://127.0.0.1:3000/api/v1/admin/category', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    })
+                    await getAllCategories();
+                    console.log(response)
+                } catch (error) {
+                    console.error(error);
+                }
+            });
+
+           
+        </script>
+
+        <script>
+            window.onload = async function () {
+                await getAllCategories();
+            };
+        </script>
+
+        <%- include ('../../layouts/adminFooter.ejs') %>

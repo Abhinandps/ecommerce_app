@@ -84,13 +84,11 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   // Send the OTP to the user's email address
   sendOTP(otp, newUser);
+
+  res.json({ status: "success" });
 }, ErrorHandler);
 
-// Render verify-otp
-exports.renderVerifyOTP = (req, res) => {
-  const email = req.query.email;
-  res.render("user/otp", { email });
-};
+
 
 // Verify the OTP
 exports.verifyOTP = async (req, res, next) => {
@@ -98,6 +96,7 @@ exports.verifyOTP = async (req, res, next) => {
   const user = await User.findOne({ email });
 
   if (!user) {
+    console.log("not found")
     return next(new AppError(`User not found`, 400));
   }
 
@@ -110,9 +109,6 @@ exports.verifyOTP = async (req, res, next) => {
 
   // Send Token To Client
   createSendToken(user, 200, res);
-
-  // Create a new session for the user
-  req.session.userId = 1;
 };
 
 // User Login
@@ -131,8 +127,10 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError(`Incorrect email or password`, 401));
   }
 
-  if(user.isBlock){
-    return next(new AppError(`Your account has been blocked. Please contact support`, 401));
+  if (user.isBlock) {
+    return next(
+      new AppError(`Your account has been blocked. Please contact support`, 401)
+    );
   }
 
   // 3) if everything ok, send token to client
@@ -140,7 +138,7 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // Create a new session for the user
   req.session.userId = 1;
-},ErrorHandler);
+}, ErrorHandler);
 
 // User generateOTP
 exports.generateOTP = catchAsync(async (req, res, next) => {
@@ -148,6 +146,17 @@ exports.generateOTP = catchAsync(async (req, res, next) => {
 
   // 2) Check if user exist
   const user = await User.findOne({ email }).select("+password");
+
+  if (!user) {
+    return next(new AppError(`User not found`, 400));
+  }
+
+  
+  if (user.isBlock) {
+    return next(
+      new AppError(`Your account has been blocked. Please contact support`, 401)
+    );
+  }
 
   if (user) {
     // Generate an OTP and store it in the user object
@@ -173,12 +182,14 @@ exports.logout = (req, res) => {
   // Remove the JWT from the client's local storage
   res.clearCookie("token");
 
-  // Destroy the user's session
-  req.session.destroy();
-
   // Send a response indicating success
   res.status(200).json({ status: "success" });
 };
+
+
+
+
+
 
 
 

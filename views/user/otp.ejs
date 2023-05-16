@@ -1,0 +1,87 @@
+<%- include ('../layouts/header.ejs') %>
+    <!-- 
+    <form id="otp-form">
+        <label for="email">
+            <%= email %>
+        </label>
+        <input type="email" id="email" name="email" value="<%= email %>" readonly>
+
+        <label for="otp">OTP:</label>
+        <input type="text" id="otp" name="otp" required>
+
+        <button type="submit">Verify OTP</button>
+    </form> -->
+
+    <div class="container">
+        <form id="otp-form" class="form-otp">
+            <div class="row">
+                <div class="col-md-6 my-3">
+                    here a design will come
+                    <!-- <img src="/assets/src/banner-1.png" alt=""> -->
+                </div>
+                <div class="col-md-6 my-3">
+
+                    <div class="form-group">
+
+                        <input type="hidden" id="email" name="email" value="<%= email %>" class="form-control" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="otp">OTP:</label>
+                        <div class="input-group">
+                            <input type="text" id="otp" name="otp" class="form-control" maxlength="6" autocomplete="off"
+                                required>
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button" id="resend-otp">Resend OTP</button>
+                            </div>
+                        </div>
+                        <div id="otp-error" class="invalid"></div>
+                    </div>
+
+                    <button class="btn btn-primary" type="submit">Verify OTP</button>
+
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    <!-- balalnce down -->
+    </div>
+    </div>
+    </div>
+    <!-- Navbar End -->
+
+
+    <script>
+
+        const otpForm = document.getElementById('otp-form');
+        const otpError = document.getElementById('otp-error')
+        otpForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            try {
+                const email = document.getElementById('email').value;
+                const otp = document.getElementById('otp').value;
+
+                const res = await axios.post(`http://127.0.0.1:3000/api/v1/user/verify-otp`, {
+                    email,
+                    otp
+                });
+
+                if (res.data.status === "success") {
+                    location.assign(`/`);
+                } else {
+                    console.log(res.data.status);
+                }
+            } catch (error) {
+                if (error.response) {
+                    otpError.textContent = error.response.data.message
+                } else {
+                    otpError.textContent =''
+                }
+            }
+        });
+    </script>
+
+
+    <%- include ('../layouts/footer.ejs') %>

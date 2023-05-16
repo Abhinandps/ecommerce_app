@@ -1,0 +1,108 @@
+<%- include ('../layouts/header.ejs') %>
+<!-- 
+    <form id="signup-form">
+        <h1>Signup Form</h1>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="username" required>
+        <br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <br>
+        <label for="mobile">Mobile:</label>
+        <input type="text" id="mobile" name="mobile" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="text" id="pass" name="password" required>
+        <br>
+        <input type="submit" value="Sign up">
+        <br>
+        <p href="#">Alredy have an account <a href="/login">Login Here</a></p>
+    </form> -->
+
+    <div class="container border p-5">
+        <form id="signup-form" class="form-signin">
+            <div class="row">
+                <div class="col-md-6 my-3">
+                    here a design will come
+                    <!-- <img src="/assets/src/banner-1.png" alt=""> -->
+                </div>
+                <div class="col-md-6 my-3">
+                    <h1 class="h3 mb-3 font-weight-normal">Signup Form</h1>
+                    <div class="form-group">
+                        <input type="text" id="name" placeholder="Name" name="username" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="email" placeholder="Email" name="email" class="form-control" required>
+                        <div id="email-error" class="invalid"></div>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="mobile" placeholder="Mobile" name="mobile" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="pass" placeholder="Password" name="password" class="form-control" required>
+                        <div id="password-error" class="invalid"></div>
+                    </div>
+                    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign up</button>
+                    <p class="my-4">Already have an account? <a href="/login">Login Here</a></p>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- balalnce down -->
+    </div>
+    </div>
+    </div>
+    <!-- Navbar End -->
+
+
+    <script>
+        const signupForm = document.getElementById('signup-form');
+
+        signupForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const emailError = document.getElementById('email-error')
+            const passError = document.getElementById('password-error')
+
+           try{
+            const username = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('pass').value;
+            const mobile = document.getElementById('mobile').value;
+            
+
+            const res = await axios({
+                method: 'POST',
+                url: 'http://127.0.0.1:3000/api/v1/user/signup',
+                data: {
+                    username, email, password, mobile
+                },
+            });
+
+
+            if (res.data.status == "success") {
+                location.assign(`/verify-otp?email=${email}`)
+            } 
+            else {
+                console.log(res.data);
+            }
+           }catch(err){
+            const errData = err.response.data.message
+            if(errData.email){
+                emailError.textContent = errData.email
+            }else{
+                emailError.textContent = ''
+            }
+            if(errData.password){
+                passError.textContent = errData.password
+            }
+            else{
+                passError.textContent = ''
+            }
+           }
+        });
+    </script>
+
+
+    <%- include ('../layouts/footer.ejs') %>

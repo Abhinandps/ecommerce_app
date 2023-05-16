@@ -1,0 +1,190 @@
+<%- include ('../../layouts/adminHeader.ejs') %>
+
+
+    <div class="main-panel">
+        <div class="content-wrapper">
+            <div class="page-header">
+                <h3 class="page-title">Products</h3>
+                <!-- <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#">Tables</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Basic tables</li>
+                    </ol>
+                </nav> -->
+            </div>
+            <div class="row">
+
+                <div class="col-12 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+
+                            <form class="forms-sample" id="product-form" enctype="multipart/form-data">
+                                <h4 class="card-title">Add New Products</h4>
+                                <div class="form-group">
+                                    <label for="exampleInputName1">Product Name</label>
+                                    <input type="text" class="form-control" name="name" id="exampleInputName1"
+                                        placeholder="Name" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exampleSelectGender">Category</label>
+                                    <select class="form-control" id="category-dropdown" name="category" required>
+
+                                        <option></option>
+
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Upload Image</label> <br>
+                                    <input type="file" id="product-img" name="image" class="file-upload-info" required>
+                                    <!-- <div class="input-group col-xs-12">
+                                <input type="text" class="form-control file-upload-info" disabled
+                                    placeholder="Upload Icon">
+                                <span class="input-group-append">
+                                    <button class="file-upload-browse btn btn-primary"
+                                        type="button">Upload</button>
+                                </span>
+                            </div> -->
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exampleInputCity1">Product Price</label>
+                                    <input type="number" name="price" class="form-control" id="exampleInputCity1"
+                                        placeholder="price" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputCity1">Stock</label>
+                                    <input type="number" name="stock" class="form-control" id="exampleInputCity1"
+                                        placeholder="stock" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exampleTextarea1">Description</label>
+                                    <textarea class="form-control" name="description" id="exampleTextarea1" rows="4"
+                                        required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                                <button type="reset" class="btn btn-dark">Cancel</button>
+                            </form>
+
+                            <!-- Hidden form  -->
+                            <form class="forms-sample" id="edit-product-form" style="display:none"
+                                enctype="multipart/form-data">
+                                <h4 class="card-title">Update Products</h4>
+                                <div class="form-group">
+                                    <label for="exampleInputName1">Product Name</label>
+                                    <input type="text" class="form-control" name="name" id="product_name"
+                                        placeholder="Name" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exampleSelectGender">Category</label>
+                                    <select class="form-control" id="product_dropdown" name="category">
+
+                                        <option></option>
+
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Upload Image</label> <br>
+                                    <input type="file" id="product-img" name="image" class="file-upload-info" required>
+                                    <!-- <div class="input-group col-xs-12">
+                                <input type="text" class="form-control file-upload-info" disabled
+                                    placeholder="Upload Icon">
+                                <span class="input-group-append">
+                                    <button class="file-upload-browse btn btn-primary"
+                                        type="button">Upload</button>
+                                </span>
+                            </div> -->
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exampleInputCity1">Product Price</label>
+                                    <input type="number" name="price" class="form-control" id="product_price"
+                                        placeholder="price" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputCity1">Stock</label>
+                                    <input type="number" name="stock" class="form-control" id="product_stock"
+                                        placeholder="stock" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exampleTextarea1">Description</label>
+                                    <textarea class="form-control" name="description" id="product_desc" rows="4"
+                                        required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-success mr-2">Save</button>
+                                <button type="reset" class="btn btn-dark">Cancel</button>
+                            </form>
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-12 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Products List</h4>
+                            <p class="card-description"> You can <code class="text-info">Manage</code>product list
+                            </p>
+                            <div class="table-responsive">
+                                <table class="table table-striped" id="prodcut-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Category</th>
+                                            <th>Description</th>
+                                            <th>Stock</th>
+                                            <th>Price</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+        <script>
+            window.onload = async function () {
+
+                await getAllProducts();
+                await getDropdownCategories();
+            };
+
+
+
+            const form = document.getElementById('product-form');
+
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                try {
+                    const formData = new FormData(form);
+                    const response = await axios.post('http://127.0.0.1:3000/api/v1/admin/product', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    })
+                    await getAllProducts();
+                    console.log(response)
+                } catch (error) {
+                    console.error(error);
+                }
+            });
+
+        </script>
+
+        <%- include ('../../layouts/adminFooter.ejs') %>

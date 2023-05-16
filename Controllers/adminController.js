@@ -114,19 +114,28 @@ exports.getAllProducts = catchAsync(async (req, res) => {
     const products = await Product.find();
     res.status(200).json({
       status: "success",
-      result: products.length,
       data: { products },
     });
   });
 
+
+  exports.getOneProduct = catchAsync(async (req, res) => {
+    const products = await Product.findOne({_id:req.params.id});
+    res.status(200).json({
+      status: "success",
+      data: { products },
+    });
+  });
+  
 exports.addProduct = catchAsync(async (req, res, next) => {
-  const { name, price, category, description } = req.body;
+  const { name, price, category, description,stock } = req.body;
   // create a new product object
   const product = new Product({
     name,
     price,
     category,
     description,
+    stock,
     image: req.file.path,
   });
 

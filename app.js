@@ -1,7 +1,7 @@
 const path = require('path');
 const express = require("express");
 const app = express();
-const session = require("express-session");
+const cookieParser = require('cookie-parser');
 
 const AppError = require("./utils/appError");
 const globalErrorHandler = require('./Controllers/errorController')
@@ -16,15 +16,12 @@ app.set('views', path.join(__dirname, 'views'));
 // load static assets
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Session Middleware
-app.use(
-  session({
-    secret: "my-secret-key",
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false }, // set to true for HTTPS
-  })
-);
+app.use(cookieParser())
+
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+  next()
+})
 
 app.use(express.json());
 
@@ -35,7 +32,8 @@ app.use("/api/v1/admin", adminRouter);
 
 // Error Route
 app.all("*", (req, res, next) => {
-  next(new AppError(`Can't find the ${req.originalUrl} on this server!`, 404));
+  // next(new AppError(`Can't find the ${req.originalUrl} on this server!`, 404));
+  res.render("user/404.ejs")
 });
 
 app.use(globalErrorHandler);

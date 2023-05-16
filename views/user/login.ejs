@@ -1,0 +1,94 @@
+<%- include ('../layouts/header.ejs') %>
+
+
+    <!-- <form id="login-form">
+        <h1>Login Form</h1>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <input type="submit" value="Login">
+        <br>
+        <a href="#">forgot password?</a>
+        <p>Create an account <a href="/signup">signup</a></p>
+    </form> -->
+
+    <div class="container border p-5">
+        <form id="login-form" class="form-signin">
+            <div class="row">
+                <div class="col-md-6 my-3">
+                    here a design will come
+                    <!-- <img src="/assets/src/banner-1.png" alt=""> -->
+                </div>
+                <div class="col-md-6 my-3">
+                    <h1 class="h3 mb-3 font-weight-normal">Login Form</h1>
+
+                    <label for="email" class="sr-only">Email</label>
+                    <input type="email" id="email" name="email" class="form-control my-3" placeholder="Email" required
+                        autofocus>
+                    <label for="password" class="sr-only">Password</label>
+                    <input type="password" id="password" name="password" class="form-control my-3"
+                        placeholder="Password" required>
+
+                    <div id="message-error" class="invalid my-3"></div>
+
+                    <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+                    <a href="#">Forgot password?</a>
+                    <p class="my-3">Create an account <a href="/signup">signup</a></p>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    <!-- balalnce down -->
+    </div>
+    </div>
+    </div>
+    <!-- Navbar End -->
+
+    <script>
+        const loginForm = document.getElementById('login-form');
+
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const msgError = document.getElementById('message-error')
+
+            try {
+                const res = await axios({
+                    method: 'POST',
+                    url: 'http://127.0.0.1:3000/api/v1/user/login',
+                    data: {
+                        email, password
+                    },
+                });
+
+
+                if (res.data.status == "success") {
+                    location.assign('/')
+
+                } else {
+                    const errorData = res.data;
+                    console.error(errorData);
+                }
+            } catch (err) {
+                const errData = err.response.data.message
+                if (errData) {
+                    msgError.textContent = errData
+                } else {
+                    msgError.textContent = ''
+                }
+            }
+
+
+        });
+    </script>
+
+
+
+    <%- include ('../layouts/footer.ejs') %>

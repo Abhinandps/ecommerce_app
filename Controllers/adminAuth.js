@@ -1,5 +1,7 @@
 const Admin = require("../Models/adminModel");
 const jwt = require("jsonwebtoken");
+const { promisify } = require('util');
+
 
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
@@ -85,9 +87,38 @@ exports.logout = (req, res) => {
   // Remove the JWT from the client's local storage
   res.clearCookie("admin");
 
-  // Destroy the admin's session
-  req.session.destroy();
-
   // Send a response indicating success
   res.status(200).json({ status: "success" });
 };
+
+
+// Authentication
+
+exports.isAdmin = async (req, res, next) => {
+  if (req.cookies.admin) {
+   
+    try {
+      // 1) verify token
+      const decoded = await promisify(jwt.verify)(
+        req.cookies.admin,
+        process.env.JWT_SECRET
+      );
+
+      // 2) Check if admin still exists
+      const currentAdmin = await Admin.findById(decoded.id);
+      if (!currentAdmin) {
+        return next();
+      }
+
+      // THERE IS A LOGGED IN Admin
+      req.admin = currentAdmin;
+      res.locals.admin = currentAdmin;
+      return next();
+    } catch (err) {
+      return next();
+    }
+  }
+  next();
+};
+
+
