@@ -61,7 +61,6 @@ router.put("/:id/block", toggleBlock);
 
 router.get("/categories", isAuthenticate,isAdmin, getAllCategories);
 
-
 router.post("/category", upload.single("icon"), addCategory);
 
 router.get("/category/:id", getOneCategory);

@@ -4,33 +4,75 @@ const Admin = require("../Models/adminModel");
 const User = require("../Models/userModel");
 
 // User auth
+// exports.isAuthenticate = async (req, res, next) => {
+//   if (req.cookies && req.cookies.token) {
+//     try {
+//       // 1) Verify user token or admin token
+//       let decoded;
+//       let currentUser;
+//       if (req.cookies.token) {
+//         decoded = await promisify(jwt.verify)(
+//           req.cookies.token,
+//           process.env.JWT_SECRET
+//         );
+//         currentUser = await User.findById(decoded.id);
+//       }
+
+//       if (currentUser.isBlock) {
+//         res.clearCookie("token");
+
+//         // Send a response indicating success
+//         res.status(200).json({ message: 'Your account is blocked. Please contact the administrator.' });
+//       }
+
+//       // 2) Check if user or admin still exists
+//       if (!currentUser) {
+//         return next();
+//       }
+
+//       // THERE IS A LOGGED IN USER/ADMIN
+
+//       req.user = currentUser;
+//       res.locals.user = currentUser;
+//       return next();
+//     } catch (err) {
+//       return next();
+//     }
+//   }
+//   next();
+// };
+
+
+// User auth
 exports.isAuthenticate = async (req, res, next) => {
-  if (req.cookies && req.cookies.token) {
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies && req.cookies.token) {
+    token = req.cookies.token;
+  }
+
+  if (token) {
     try {
-      // 1) Verify user token or admin token
-      let decoded;
-      let currentUser;
-      if (req.cookies.token) {
-        decoded = await promisify(jwt.verify)(
-          req.cookies.token,
-          process.env.JWT_SECRET
-        );
-        currentUser = await User.findById(decoded.id);
-      }
+      let decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+      let currentUser = await User.findById(decoded.id);
 
       if (currentUser.isBlock) {
         res.clearCookie("token");
 
         // Send a response indicating success
-        res.status(200).json({ message: 'Your account is blocked. Please contact the administrator.' });
+        res.status(200).json({
+          message: "Your account is blocked. Please contact the administrator.",
+        });
       }
-
-      // 2) Check if user or admin still exists
       if (!currentUser) {
         return next();
       }
 
-      // THERE IS A LOGGED IN USER/ADMIN
+      // THERE IS A LOGGED IN USER
 
       req.user = currentUser;
       res.locals.user = currentUser;

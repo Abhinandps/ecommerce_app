@@ -12,5 +12,5 @@ const port = process.env.PORT || 4000;
 
 
 app.listen(port, () => {
-  console.log(`server listening to the port http://localhost:${port}`);
+  console.log(`server listening to the port http://127.0.0.1:${port}`);
 });
