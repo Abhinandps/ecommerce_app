@@ -6,6 +6,7 @@ const Category = require("../Models/category");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const ErrorHandler = require("../Controllers/errorController");
+const Order = require("../Models/orders");
 
 exports.getAllUsers = catchAsync(async (req, res) => {
   const users = await User.find();
@@ -16,16 +17,14 @@ exports.getAllUsers = catchAsync(async (req, res) => {
   });
 });
 
-
 exports.getOneCategory = catchAsync(async (req, res) => {
-  const categories = await Category.findOne({_id:req.params.id});
+  const categories = await Category.findOne({ _id: req.params.id });
   res.status(200).json({
     status: "success",
     result: categories.length,
     data: { categories },
   });
 });
-
 
 exports.getAllCategories = catchAsync(async (req, res) => {
   const categories = await Category.find();
@@ -58,7 +57,7 @@ exports.addCategory = catchAsync(async (req, res, next) => {
     icon: req.file.path,
   });
   res.json(category);
-},ErrorHandler);
+}, ErrorHandler);
 
 exports.updateCategory = catchAsync(async (req, res, next) => {
   const { name, description } = req.body;
@@ -109,26 +108,24 @@ exports.deleteCategory = catchAsync(async (req, res, next) => {
   res.status(204).json({ message: "Category deleted" });
 });
 
-
 exports.getAllProducts = catchAsync(async (req, res) => {
-    const products = await Product.find();
-    res.status(200).json({
-      status: "success",
-      data: { products },
-    });
+  const products = await Product.find({deleted:false});
+  res.status(200).json({
+    status: "success",
+    data: { products },
   });
+});
 
-
-  exports.getOneProduct = catchAsync(async (req, res) => {
-    const products = await Product.findOne({_id:req.params.id});
-    res.status(200).json({
-      status: "success",
-      data: { products },
-    });
+exports.getOneProduct = catchAsync(async (req, res) => {
+  const products = await Product.findOne({ _id: req.params.id });
+  res.status(200).json({
+    status: "success",
+    data: { products },
   });
-  
+});
+
 exports.addProduct = catchAsync(async (req, res, next) => {
-  const { name, price, category, description,stock } = req.body;
+  const { name, price, category, description, stock } = req.body;
   // create a new product object
   const product = new Product({
     name,
@@ -146,57 +143,105 @@ exports.addProduct = catchAsync(async (req, res, next) => {
   res.json(product);
 });
 
-
-
 exports.updateProduct = catchAsync(async (req, res, next) => {
-    const { name,price,category,description} = req.body;
-    // 1 find the product for update
-    const product = await Product.findById(req.params.id);
-  
-    // 2 if the product exist
-    if (product) {
-      product.name = name || product.name;
-      product.price = price || product.price;
-      product.description = description || product.description;
-      product.category = category || product.category;
-  
-      // Remove the old icon file if a new file is uploaded
-      if (req.file) {
-        if (product.image) {
-          fs.unlink(product.image, (err) => {
-            if (err) console.log(err);
-          });
-        }
-        product.image = req.file.path;
+  const { name, price, category, description } = req.body;
+  // 1 find the product for update
+  const product = await Product.findById(req.params.id);
+
+  // 2 if the product exist
+  if (product) {
+    product.name = name || product.name;
+    product.price = price || product.price;
+    product.description = description || product.description;
+    product.category = category || product.category;
+
+    // Remove the old icon file if a new file is uploaded
+    if (req.file) {
+      if (product.image) {
+        fs.unlink(product.image, (err) => {
+          if (err) console.log(err);
+        });
       }
-  
-      // Save the updated product
-      await product.save();
-  
-      res.json(product);
-    } else {
-      return next(new AppError("product not found", 404));
+      product.image = req.file.path;
     }
+
+    // Save the updated product
+    await product.save();
+
+    res.json(product);
+  } else {
+    return next(new AppError("product not found", 404));
+  }
+});
+
+exports.deleteProduct = catchAsync(async (req, res, next) => {
+  const product = await Product.findById(req.params.id);
+
+  if (!product) {
+    return next(new AppError("Product not found", 404));
+  }
+  
+  // Set the deleted field to true
+  product.deleted = true;
+  await product.save();
+
+  res.status(204).json({ message: "Product deleted" });
+});
+
+// Orders
+
+exports.getAllOrders = catchAsync(async (req, res, next) => {
+  const orders = await Order.find();
+  res.status(200).json({
+    status: "success",
+    data: { orders },
   });
+});
 
-
-
-  exports.deleteProduct = catchAsync(async (req, res, next) => {
-    const product = await Product.findById(req.params.id);
-  
-    if (!product) {
-      return next(new AppError("Product not found", 404));
-    }
-  
-    // Remove the product from the database
-    await Product.findByIdAndDelete(req.params.id);
-  
-    // Delete the icon file from storage
-    if (product.image) {
-      fs.unlink(product.image, (err) => {
-        if (err) console.log(err);
-      });
-    }
-  
-    res.status(204).json({ message: "Product deleted" });
+exports.getOrder = catchAsync(async (req, res, next) => {
+  const { orderID } = req.params;
+  const order = await Order.findOne({ orderID });
+  if (!order) {
+    return next(new AppError("Order not found", 404));
+  }
+  res.status(200).json({
+    status: "success",
+    data: { order },
   });
+});
+
+exports.updateOrderStatus = catchAsync(async (req, res, next) => {
+  const { orderID } = req.params;
+  const { status } = req.body;
+
+  const order = await Order.findOneAndUpdate(
+    { orderID },
+    { status },
+    { new: true }
+  );
+
+  if (!order) {
+    return next(new AppError("Order not found", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: { order },
+  });
+});
+
+exports.orderCancel = catchAsync(async (req, res, next) => {
+  const { orderID } = req.params;
+  const order = await Order.findOneAndUpdate(
+    { orderID },
+    { status: "cancelled" },
+    { new: true }
+  );
+  if (!order) {
+    return next(new AppError("Order not found", 404));
+  }
+  if (order.status === "cancelled") {
+    return next(new AppError("Order is already cancelled", 400));
+  }
+  res.json({ message: "Order canceled successfully." });
+});

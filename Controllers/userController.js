@@ -8,14 +8,12 @@ const ErrorHandler = require("../Controllers/errorController");
 const User = require("../Models/userModel");
 const Order = require("../Models/orders");
 
-
-
 const generateOrderID = () => {
   const date = new Date();
   const timestamp = date.getTime();
-  const random = Math.floor(Math.random() * 10000); 
+  const random = Math.floor(Math.random() * 10000);
 
-  const orderID = `ORD-${timestamp}-${random}`; 
+  const orderID = `ORD-${timestamp}-${random}`;
   return orderID;
 };
 
@@ -28,7 +26,7 @@ exports.getHomeProducts = catchAsync(async (req, res) => {
 });
 
 exports.getAllProducts = catchAsync(async (req, res) => {
-  const products = await Product.find().populate("category"); // Populate category field with full category document
+  const products = await Product.find({deleted:false}).populate("category"); // Populate category field with full category document
 
   res.json(products);
 });
@@ -138,6 +136,7 @@ exports.purchaseItem = catchAsync(async (req, res, next) => {
     country,
     zipCode,
     alterMobile,
+    totalPrice,
   } = req.body;
 
   // Retrieve the user
@@ -199,7 +198,7 @@ exports.purchaseItem = catchAsync(async (req, res, next) => {
   }
 
   // Generate a unique order ID
-const orderID = generateOrderID();
+  const orderID = generateOrderID();
 
   // Create a new order
   const order = new Order({
@@ -217,6 +216,7 @@ const orderID = generateOrderID();
       alterMobile,
     },
     paymentMethod: "COD",
+    totalPrice,
   });
 
   await order.save();
@@ -227,5 +227,48 @@ const orderID = generateOrderID();
   res.json({ message: "Purchase successful." });
 });
 
+// Orders
+
+exports.orderHistory = catchAsync(async (req, res, next) => {
+
+  const orders = await Order.find({user:req.user._id})
+
+  if (!orders) {
+    return next(new AppError("Order not found", 404));
+  }
+
+  res.status(200).json({
+    success: "success",
+    data: orders,
+  });
+});
+
+exports.getOrderDetails = catchAsync(async (req, res, next) => {
+  const { orderID } = req.params;
+  const order = await Order.findOne({ orderID, user:req.user._id });
+  if (!order) {
+    return next(new AppError("Order not found", 404));
+  }
+  res.status(200).json({
+    success: "success",
+    data: order,
+  });
+});
+
+exports.orderCancel = catchAsync(async (req, res, next) => {
+  const { orderID } = req.params;
+  const order = await Order.findOneAndUpdate(
+    { orderID },
+    { status: "cancelled" },
+    { new: true }
+  );
+  if (!order) {
+    return next(new AppError("Order not found", 404));
+  }
+  if (order.status === "cancelled") {
+    return next(new AppError("Order is already cancelled", 400));
+  }
+  res.json({ message: "Order canceled successfully." });
+});
 
 

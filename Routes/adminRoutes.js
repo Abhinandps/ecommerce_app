@@ -16,9 +16,13 @@ const {
   updateProduct,
   deleteProduct,
   getAllProducts,
-  getOneProduct
+  getOneProduct,
+  getAllOrders,
+  getOrder,
+  updateOrderStatus,
+  orderCancel
 } = require("../Controllers/adminController");
-const { isAuthenticate,isAdmin } = require("../middleware/auth");
+const { isAuthenticate, isAdmin } = require("../middleware/auth");
 
 // multer storage engine
 const storage = multer.diskStorage({
@@ -59,7 +63,7 @@ router.put("/:id/block", toggleBlock);
 
 // Categories
 
-router.get("/categories", isAuthenticate,isAdmin, getAllCategories);
+router.get("/categories", isAuthenticate, isAdmin, getAllCategories);
 
 router.post("/category", upload.single("icon"), addCategory);
 
@@ -71,9 +75,9 @@ router.delete("/category/:id", deleteCategory);
 
 // Products
 
-router.get("/products",isAuthenticate,isAdmin,getAllProducts);
+router.get("/products", isAuthenticate, isAdmin, getAllProducts);
 
-router.get("/product/:id", isAuthenticate,isAdmin,getOneProduct);
+router.get("/product/:id", isAuthenticate, isAdmin, getOneProduct);
 
 router.post("/product", upload.single("image"), addProduct);
 
@@ -81,5 +85,14 @@ router.put("/product/:id", upload.single("image"), updateProduct);
 
 router.delete("/product/:id", deleteProduct);
 
-module.exports = router;
+// Orders
 
+router.get("/orders", isAdmin, getAllOrders);
+
+router.route("/orders/:orderID")
+  .get(isAdmin, getOrder)
+  .put(isAdmin,updateOrderStatus)
+  .delete(isAdmin,orderCancel)
+
+
+module.exports = router;

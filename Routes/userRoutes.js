@@ -11,7 +11,10 @@ const {
   addToCart,
   updateCartItem,
   removeCartItem,
-  purchaseItem
+  purchaseItem,
+  orderCancel,
+  orderHistory,
+  getOrderDetails
 } = require("../Controllers/userController");
 
 const { getAllCategories } = require("../Controllers/adminController");
@@ -49,6 +52,15 @@ router.route("/cart").get(isAuthenticate,getCart).post(isAuthenticate,addToCart)
 router.route("/cart/:productId").put(isAuthenticate,updateCartItem).delete(isAuthenticate,removeCartItem);
 
 router.post("/cart/purchase", isAuthenticate, purchaseItem)
+
+
+// Orders
+
+router.get('/orders', isAuthenticate, orderHistory)
+
+router.route('/orders/:orderID')
+  .get(isAuthenticate,getOrderDetails )
+  .delete(isAuthenticate, orderCancel)
 
 module.exports = router;
 
