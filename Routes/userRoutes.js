@@ -10,10 +10,12 @@ const {
   getCart,
   addToCart,
   updateCartItem,
-  removeCartItem
+  removeCartItem,
+  purchaseItem
 } = require("../Controllers/userController");
 
 const { getAllCategories } = require("../Controllers/adminController");
+const User = require("../Models/userModel");
 
 router.get("/otp-login", (req, res) => {
   // if(req.session.userId){
@@ -34,6 +36,7 @@ router.post("/login", auth.login);
 
 router.get("/logout", auth.logout);
 
+
 // Product
 
 router.get("/products", getAllProducts);
@@ -45,4 +48,8 @@ router.route("/cart").get(isAuthenticate,getCart).post(isAuthenticate,addToCart)
 
 router.route("/cart/:productId").put(isAuthenticate,updateCartItem).delete(isAuthenticate,removeCartItem);
 
+router.post("/cart/purchase", isAuthenticate, purchaseItem)
+
 module.exports = router;
+
+

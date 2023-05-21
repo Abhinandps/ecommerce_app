@@ -1,8 +1,23 @@
 const Product = require("../Models/products");
-const Cart  = require("../Models/cart");
+const Cart = require("../Models/Cart");
 const catchAsync = require("../utils/catchAsync");
 
 const AppError = require("../utils/appError");
+const ErrorHandler = require("../Controllers/errorController");
+
+const User = require("../Models/userModel");
+const Order = require("../Models/orders");
+
+
+
+const generateOrderID = () => {
+  const date = new Date();
+  const timestamp = date.getTime();
+  const random = Math.floor(Math.random() * 10000); 
+
+  const orderID = `ORD-${timestamp}-${random}`; 
+  return orderID;
+};
 
 exports.getHomeProducts = catchAsync(async (req, res) => {
   const products = await Product.find()
@@ -18,9 +33,9 @@ exports.getAllProducts = catchAsync(async (req, res) => {
   res.json(products);
 });
 
+// cart management
 
-
-exports.getCart = catchAsync(async (req,res)=>{
+exports.getCart = catchAsync(async (req, res) => {
   const cart = await Cart.findOne({ user: req.user._id });
   const { productSum, totalPrice } = await cart.calculatePrices();
 
@@ -30,64 +45,187 @@ exports.getCart = catchAsync(async (req,res)=>{
     productSum,
     totalPrice,
   });
-})
+});
 
+exports.addToCart = catchAsync(async (req, res) => {
+  const { productId, quantity } = req.body;
 
-exports.addToCart = catchAsync(async (req,res)=>{
-  const { productId,quantity } = req.body
-  
-  let cart = await Cart.findOne({user:req.user._id})
+  let cart = await Cart.findOne({ user: req.user._id });
 
   if (!cart) {
     // Create a new cart if it doesn't exist for the user
     cart = new Cart({ user: req.user._id, items: [] });
   }
 
-   // Check if the product already exists in the cart
-   const existingItem = cart.items.find((item) => item.product.toString() === productId);
-   if(existingItem){
-    existingItem.quantity+=Number(quantity)
-   }else{
-    cart.items.push({product:productId, quantity})
-   }
+  // Check if the product already exists in the cart
+  const existingItem = cart.items.find(
+    (item) => item.product.toString() === productId
+  );
+  if (existingItem) {
+    existingItem.quantity += Number(quantity);
+  } else {
+    cart.items.push({ product: productId, quantity });
+  }
 
-   await cart.save()
+  await cart.save();
 
-   const { productSum, totalPrice } = await cart.calculatePrices();
+  const { productSum, totalPrice } = await cart.calculatePrices();
 
-   res.status(201).json({status:"success",message:"Item added to cart successfully",cart,productSum,totalPrice})
-})
+  res.status(201).json({
+    status: "success",
+    message: "Item added to cart successfully",
+    cart,
+    productSum,
+    totalPrice,
+  });
+});
 
+exports.updateCartItem = catchAsync(async (req, res) => {
+  const { productId } = req.params;
+  const { quantity } = req.body;
+  const cart = await Cart.findOne({ user: req.user._id });
 
-exports.updateCartItem = catchAsync(async (req,res)=>{
-      const { productId } = req.params;
-      const { quantity } = req.body;
-      const cart = await Cart.findOne({ user: req.user._id });
-  
-      // Update the quantity of the specified product in the cart
-      const cartItem = cart.items.find((item) => item.product.toString() === productId);
-      cartItem.quantity = quantity;
-  
-      await cart.save();
+  // Update the quantity of the specified product in the cart
+  const cartItem = cart.items.find(
+    (item) => item.product.toString() === productId
+  );
+  cartItem.quantity = quantity;
 
-      const { productSum, totalPrice } = await cart.calculatePrices();
+  await cart.save();
 
-      res.status(201).json({status:"success",message:"Cart item updated successfully.",cart,productSum,totalPrice})
-})
+  const { productSum, totalPrice } = await cart.calculatePrices();
 
+  res.status(201).json({
+    status: "success",
+    message: "Cart item updated successfully.",
+    cart,
+    productSum,
+    totalPrice,
+  });
+});
 
-exports.removeCartItem = catchAsync(async (req,res)=>{
-      const { productId } = req.params;
-      const cart = await Cart.findOne({ user: req.user._id });
-  
-      // Update the quantity of the specified product in the cart
-      cart.items = cart.items.filter((item) => item.product.toString() !== productId);
-  
-      await cart.save();
+exports.removeCartItem = catchAsync(async (req, res) => {
+  const { productId } = req.params;
+  const cart = await Cart.findOne({ user: req.user._id });
 
-      const { productSum, totalPrice } = await cart.calculatePrices();
+  // Update the quantity of the specified product in the cart
+  cart.items = cart.items.filter(
+    (item) => item.product.toString() !== productId
+  );
 
-      res.status(204).json({status:"success",message:"Cart item removed successfully.",cart,productSum,totalPrice})
-})
+  await cart.save();
+
+  const { productSum, totalPrice } = await cart.calculatePrices();
+
+  res.status(204).json({
+    status: "success",
+    message: "Cart item removed successfully.",
+    cart,
+    productSum,
+    totalPrice,
+  });
+});
+
+// purchase
+
+exports.purchaseItem = catchAsync(async (req, res, next) => {
+  const {
+    custName,
+    mobile,
+    address,
+    city,
+    state,
+    country,
+    zipCode,
+    alterMobile,
+  } = req.body;
+
+  // Retrieve the user
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    return next(new AppError("User Not Found", 404));
+  }
+
+  // Retrieve the cart items
+  const cart = await Cart.findOne({ user: req.user._id });
+  if (!cart) {
+    return next(new AppError("Cart Not Found", 404));
+  }
+
+  // purchase logic
+
+  // validate if the cart is empty
+  if (cart.items.length === 0) {
+    return next(
+      new AppError("Cart is empty. Cannot process the purchase", 400)
+    );
+  }
+
+  // Validate if the user's address is available for COD
+  if (!custName || !address || !city || !zipCode) {
+    return next(new AppError("Please provide all the required fields", 400));
+  }
+
+  // Validate if the product quantities are available
+
+  const unavailableItems = [];
+  for (const item of cart.items) {
+    const productId = item.product;
+    const quantity = item.quantity;
+
+    const product = await Product.findById({ _id: productId });
+
+    console.log(
+      `${product.name} -> ${quantity} no.of stocks = ${product.stock}`
+    );
+
+    if (product.stock < quantity) {
+      unavailableItems.push(product.name);
+      break;
+    } else {
+      product.stock -= quantity;
+      await product.save();
+    }
+  }
+
+  if (unavailableItems.length > 0) {
+    return next(
+      new AppError(
+        "The following items are no longer available: " +
+          unavailableItems.join(", "),
+        400
+      )
+    );
+  }
+
+  // Generate a unique order ID
+const orderID = generateOrderID();
+
+  // Create a new order
+  const order = new Order({
+    orderID: orderID,
+    user: user._id,
+    items: cart.items,
+    shippingAddress: {
+      name: custName,
+      mobile,
+      address,
+      city,
+      state,
+      country,
+      zipCode,
+      alterMobile,
+    },
+    paymentMethod: "COD",
+  });
+
+  await order.save();
+
+  // Clear the cart after the purchase
+  cart.items = [];
+  await cart.save();
+  res.json({ message: "Purchase successful." });
+});
+
 
 
