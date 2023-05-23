@@ -35,6 +35,10 @@ cartSchema.virtual('totalPrice').get(async function () {
   return total;
 })
 
+// Count the total unique products
+cartSchema.virtual('totalProducts').get(async function() {
+  return this.items.length;
+});
 
 
 // Define a method to calculate the product sum and total price

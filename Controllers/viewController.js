@@ -100,6 +100,23 @@ exports.getProductDetails = (req,res)=>{
   }
 }
 
+exports.getCartPage = (req,res)=>{
+  if(req.user){
+    res.render("user/cart")
+  }else{
+    res.render("user/demo/cart.ejs")
+  }
+}
+
+exports.getCheckoutPage = (req,res)=>{
+  if(req.user){
+    res.render("user/checkout.ejs")
+  }
+  else{
+    
+  }
+}
+
 exports.getErrorPage = (req,res)=>{
   res.render("404.ejs")
 }

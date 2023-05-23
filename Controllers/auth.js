@@ -9,6 +9,16 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const ErrorHandler = require("../Controllers/errorController");
 
+
+function generateNumericOTP(length) {
+  const digits = '0123456789';
+  let otp = '';
+  for (let i = 0; i < length; i++) {
+    otp += digits.charAt(Math.floor(Math.random() * digits.length));
+  }
+  return otp;
+}
+
 const signToken = (id) =>
   jwt.sign(
     { id: id }, // payload
@@ -160,11 +170,7 @@ exports.generateOTP = catchAsync(async (req, res, next) => {
 
   if (user) {
     // Generate an OTP and store it in the user object
-    const otp = otpGenerator.generate(6, {
-      digits: true,
-      alphabets: false,
-      upperCase: false,
-    });
+    const otp = generateNumericOTP(4)
     user.otp = otp;
     await user.save();
 

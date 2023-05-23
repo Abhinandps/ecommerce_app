@@ -67,7 +67,7 @@ router.get("/categories", isAuthenticate, isAdmin, getAllCategories);
 
 router.post("/category", upload.single("icon"), addCategory);
 
-router.get("/category/:id", getOneCategory);
+router.get("/category/:id",isAuthenticate,isAdmin, getOneCategory);
 
 router.put("/category/:id", upload.single("icon"), updateCategory);
 

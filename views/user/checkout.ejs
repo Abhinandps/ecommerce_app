@@ -1,0 +1,131 @@
+<%- include ('../layouts/header.ejs') %>
+
+
+    <div class="container wrapper">
+
+        <div class="carts">
+            <div class="cart-head">
+                <h2 class="cart-title">Checkout</h2>
+                <button class="carrt-button">
+                    <i></i>
+                    Address
+                </button>
+            </div>
+
+            <div class="cart-items">
+
+                <div class="cart-product checkout">
+                    <div class="banner">Delivery Address</div>
+
+                    <div class="address-details">
+                        <input type="radio">
+                        <div class="box">
+                            <div class="user-data">
+                                <p>Name</p>
+                                <p>Number</p>
+                            </div>
+                            <div class="address">
+                                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis, at.69845</p>
+                            </div>
+                        </div>
+                        <button>EDIT</button>
+
+                    </div>
+
+                    <div class="address-details">
+                        <input type="radio">
+                        <div class="box">
+                            <div class="user-data">
+                                <p>Name</p>
+                                <p>Number</p>
+                            </div>
+                            <div class="address">
+                                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis, at.69845</p>
+                            </div>
+                        </div>
+                        <button>EDIT</button>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <button id="saveAddress">Add New Address</button>
+        </div>
+
+        <div class="proceedSidebar">
+            <div class="desc">
+                <p>how are shipping costs calculated? shipping have been applied to your order</p>
+            </div>
+            <div class="sidebar-heading">
+                <h2>Order Summary</h2>
+            </div>
+            <div class="sidebar-details">
+                <div class="group-data">
+                    <div class="data-title">Items(2):</div>
+                    <div class="title-value">$2980.23</div>
+                </div>
+                <div class="group-data">
+                    <div class="data-title"> shipping & handling:</div>
+                    <div class="title-value">$98.00</div>
+                </div>
+                <div class="group-data">
+                    <div class="data-title">Delivery Charges:</div>
+                    <div class="title-value">$2980</div>
+                </div>
+                <div class="group-data">
+                    <div class="data-total">total Payable:</div>
+                    <div class="title-value">$8333.00</div>
+                </div>
+                <button class="btn-proceed">Checkout</button>
+            </div>
+        </div>
+
+    </div>
+
+    <form id="add-new-address" class="container" action="#">
+        <div class="input-fields">
+            <div class="form-group">
+                <input type="text" name="custName" placeholder="Name" required>
+            </div>
+            <div class="form-group">
+                <input type="text" name="mobile" placeholder="10-digit mobile number" required>
+            </div>
+        </div>
+        <div class="input-fields">
+            <div class="form-group">
+                <input type="text" name="zipCode" placeholder="zipCode" required>
+            </div>
+            <div class="form-group">
+                <input type="text" placeholder="Locality">
+            </div>
+        </div>
+        <div class="input-fields text-area">
+            <div class="form-group">
+                <textarea name="address" placeholder="Address (Area and Street)" required id="" cols="30"
+                    rows="10"></textarea>
+            </div>
+        </div>
+        <div class="input-fields">
+            <div class="form-group">
+                <input name="city" type="text" placeholder="City/District/Town">
+            </div>
+            <div class="form-group">
+                <input name="country" type="text" placeholder="Country" required>
+            </div>
+        </div>
+        <div class="input-fields">
+            <div class="form-group">
+                <input type="text" placeholder="State">
+            </div>
+            <div class="form-group">
+                <input type="text" placeholder="Alternate Phone (optional)">
+            </div>
+        </div>
+        <button id="saveAddress">Save Address</button>
+
+        </div>
+
+    </form>
+
+    <%- include ('../layouts/footer.ejs') %>

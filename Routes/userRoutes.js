@@ -11,6 +11,7 @@ const {
   addToCart,
   updateCartItem,
   removeCartItem,
+  saveShippingAddress,
   purchaseItem,
   orderCancel,
   orderHistory,
@@ -28,6 +29,8 @@ router.get("/otp-login", (req, res) => {
   // }
 });
 
+
+
 router.post("/signup", auth.signup);
 
 router.post("/generate-otp", auth.generateOTP);
@@ -42,7 +45,7 @@ router.get("/logout", auth.logout);
 
 // Product
 
-router.get("/products", getAllProducts);
+router.get("/products",isAuthenticate,getAllProducts);
 
 
 // Cart Management
@@ -50,6 +53,8 @@ router.get("/products", getAllProducts);
 router.route("/cart").get(isAuthenticate,getCart).post(isAuthenticate,addToCart);
 
 router.route("/cart/:productId").put(isAuthenticate,updateCartItem).delete(isAuthenticate,removeCartItem);
+
+router.post('/address', isAuthenticate, saveShippingAddress )
 
 router.post("/cart/purchase", isAuthenticate, purchaseItem)
 

@@ -13,7 +13,9 @@ const {
   getHome,
   getOtpForm,
   getShoppingPage,
-  getProductDetails
+  getProductDetails,
+  getCartPage,
+  getCheckoutPage
 } = require("../Controllers/viewController");
 
 const { isAuthenticate ,isAdmin} = require("../middleware/auth");
@@ -50,5 +52,10 @@ router.get("/",isAuthenticate , getHome);
 router.get("/shop",isAuthenticate , getShoppingPage);
 
 router.get("/details",isAuthenticate , getProductDetails);
+
+
+router.get("/cart",isAuthenticate , getCartPage);
+
+router.get("/checkout",isAuthenticate , getCheckoutPage);
 
 module.exports = router;

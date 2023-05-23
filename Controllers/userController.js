@@ -28,7 +28,7 @@ exports.getHomeProducts = catchAsync(async (req, res) => {
 exports.getAllProducts = catchAsync(async (req, res) => {
   const products = await Product.find({deleted:false}).populate("category"); // Populate category field with full category document
 
-  res.json(products);
+  res.json({status:"success",data:products});
 });
 
 // cart management
@@ -123,6 +123,11 @@ exports.removeCartItem = catchAsync(async (req, res) => {
     totalPrice,
   });
 });
+
+
+exports.saveShippingAddress = catchAsync( async(req,res)=>{
+  
+})
 
 // purchase
 
