@@ -237,14 +237,85 @@ const getCart = () => {
   });
 };
 
-
-const goToChekOut = ()=>{
+const goToChekOut = () => {
   window.location.href = "/checkout";
-}
+};
 
+const getCheckOut = () => {
+  const row = $(".address_list");
+  const totalPrice = document.querySelector("#totalPrice");
+  const totalPayable = document.querySelector("#totalPayable");
+  const productCount = document.querySelector("[item-count]");
+  const pay = document.querySelector("[proceed-pay]");
+  const shippingHandlingFee = 98;
 
+  const text = totalPrice.querySelector("span");
 
+  $.ajax({
+    type: "GET",
+    url: "/api/v1/user/cart",
+    success: function (response) {
+      const { cart } = response;
+      const data = cart.shippingAddress;
+      row.empty();
 
+      data.forEach((address) => {
+        const addressList = `
+        <div class="address-details">
+        <div class="box">
+       <div class="group">
+       <input type="radio" id="${address._id}" name="user-info" value="${address._id}">
+       <div class="user-data">
+           <p>${address.custName}</p>
+           <p>${address.mobile}</p>
+       </div>
+       </div>
+            <div class="address">
+                <p> ${address.address}, ${address.city}, ${address.state}, ${address.zipCode}</p>
+            </div>
+        </div>
+        <button>EDIT</button>
+
+    </div>
+        `;
+        row.append(addressList);
+      });
+
+      pay.addEventListener("click", () => {
+        const selectedAddressId = $('input[name="user-info"]:checked').val();
+        console.log(`Selected address ID: ${selectedAddressId}`);
+        placeOrder(selectedAddressId,response);
+      });
+      
+
+      function placeOrder(addressId,response) {
+        console.log(addressId,response.totalPrice);
+        $.ajax({
+          type: "POST",
+          url: "/api/v1/user/cart/purchase",
+          data: {
+            shippingAddress: addressId,
+            totalPrice:1000
+            // totalPrice: response.totalPrice + shippingHandlingFee,
+          },
+          success: function (response) {
+            console.log(response);
+            console.log("Order placed successfully");
+          },
+          error: function (error) {
+            console.error("Error placing order:", error);
+          },
+        });
+      }
+
+      text.textContent = response.totalPrice;
+      totalPayable.textContent = response.totalPrice + shippingHandlingFee;
+      productCount.textContent = response.cart.items.length;
+    },
+  });
+};
+
+getCheckOut();
 
 // Handle click event on product card
 $(document).on("click", ".view-details", function (event) {
@@ -260,3 +331,5 @@ $(document).on("click", ".view-details", function (event) {
   // Redirect to the product page
   window.location.href = "/details";
 });
+
+// Event listener for address selection

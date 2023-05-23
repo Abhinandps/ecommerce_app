@@ -54,7 +54,9 @@ router.route("/cart").get(isAuthenticate,getCart).post(isAuthenticate,addToCart)
 
 router.route("/cart/:productId").put(isAuthenticate,updateCartItem).delete(isAuthenticate,removeCartItem);
 
+
 router.post('/address', isAuthenticate, saveShippingAddress )
+
 
 router.post("/cart/purchase", isAuthenticate, purchaseItem)
 

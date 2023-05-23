@@ -26,37 +26,9 @@ const orderSchema = new mongoose.Schema(
       },
     ],
     shippingAddress: {
-      name: {
-        type: String,
-        required: [true, "user must have a name"],
-      },
-      mobile: {
-        type: Number,
-        required: [true, "user must have a mobile number"],
-      },
-      address: {
-        type: String,
-        required: [true, "user must have a address"],
-      },
-      city: {
-        type: String,
-        required: true,
-      },
-      state: {
-        type: String,
-        required: true,
-      },
-      country: {
-        type: String,
-        required: true,
-      },
-      zipCode: {
-        type: String,
-        required: true,
-      },
-      alterMobile: {
-        type: Number,
-      },
+      type:mongoose.Schema.Types.ObjectId,
+      ref:'Cart',
+      require:true
     },
     paymentMethod: {
       type: String,

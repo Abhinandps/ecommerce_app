@@ -92,7 +92,7 @@ button {
   cursor: pointer;
 }
 
-textarea{
+textarea {
   width: 100%;
 }
 
@@ -3805,8 +3805,21 @@ footer {
 
 .address-details {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
   align-items: flex-start;
-  padding: 10px;
+}
+
+.group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .address-details input {
@@ -3820,7 +3833,7 @@ footer {
 }
 
 .address {
-  padding: 15px 0px;
+  padding: 15px 35px;
   font-size: var(--fs-8);
   color: var(--davys-gray);
 }
@@ -3842,15 +3855,13 @@ footer {
   background: var(--ocean-green);
 }
 
-
-#add-new-address{
+#add-new-address {
   min-width: 300px;
   background: whitesmoke;
   margin-top: 20px;
-  padding:20px 10px;
+  padding: 20px 10px;
   border-radius: 7px;
 }
-
 
 .input-fields {
   font-size: var(--fs-9);
@@ -3859,6 +3870,3 @@ footer {
   align-items: center;
   outline: none;
 }
-
-
-

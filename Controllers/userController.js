@@ -26,9 +26,9 @@ exports.getHomeProducts = catchAsync(async (req, res) => {
 });
 
 exports.getAllProducts = catchAsync(async (req, res) => {
-  const products = await Product.find({deleted:false}).populate("category"); // Populate category field with full category document
+  const products = await Product.find({ deleted: false }).populate("category"); // Populate category field with full category document
 
-  res.json({status:"success",data:products});
+  res.json({ status: "success", data: products });
 });
 
 // cart management
@@ -125,24 +125,27 @@ exports.removeCartItem = catchAsync(async (req, res) => {
 });
 
 
-exports.saveShippingAddress = catchAsync( async(req,res)=>{
-  
-})
+exports.saveShippingAddress = catchAsync(async (req, res) => {
+  const cart = await Cart.findOne({ user: req.user._id });
+  cart.shippingAddress.push(req.body) 
+  await cart.save();
+  res.status(201).json({
+    status: "success",
+    message: "Shipping address saved successfully.",
+    cart,
+  })
+});
+
 
 // purchase
 
 exports.purchaseItem = catchAsync(async (req, res, next) => {
   const {
-    custName,
-    mobile,
-    address,
-    city,
-    state,
-    country,
-    zipCode,
-    alterMobile,
-    totalPrice,
+    shippingAddress,
+    totalPrice
   } = req.body;
+
+  console.log(req.body)
 
   // Retrieve the user
   const user = await User.findById(req.user._id);
@@ -166,7 +169,7 @@ exports.purchaseItem = catchAsync(async (req, res, next) => {
   }
 
   // Validate if the user's address is available for COD
-  if (!custName || !address || !city || !zipCode) {
+  if (!shippingAddress) {
     return next(new AppError("Please provide all the required fields", 400));
   }
 
@@ -210,16 +213,7 @@ exports.purchaseItem = catchAsync(async (req, res, next) => {
     orderID: orderID,
     user: user._id,
     items: cart.items,
-    shippingAddress: {
-      name: custName,
-      mobile,
-      address,
-      city,
-      state,
-      country,
-      zipCode,
-      alterMobile,
-    },
+    shippingAddress,
     paymentMethod: "COD",
     totalPrice,
   });
@@ -235,8 +229,7 @@ exports.purchaseItem = catchAsync(async (req, res, next) => {
 // Orders
 
 exports.orderHistory = catchAsync(async (req, res, next) => {
-
-  const orders = await Order.find({user:req.user._id})
+  const orders = await Order.find({ user: req.user._id });
 
   if (!orders) {
     return next(new AppError("Order not found", 404));
@@ -250,7 +243,7 @@ exports.orderHistory = catchAsync(async (req, res, next) => {
 
 exports.getOrderDetails = catchAsync(async (req, res, next) => {
   const { orderID } = req.params;
-  const order = await Order.findOne({ orderID, user:req.user._id });
+  const order = await Order.findOne({ orderID, user: req.user._id });
   if (!order) {
     return next(new AppError("Order not found", 404));
   }
@@ -275,5 +268,3 @@ exports.orderCancel = catchAsync(async (req, res, next) => {
   }
   res.json({ message: "Order canceled successfully." });
 });
-
-

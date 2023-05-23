@@ -16,37 +16,9 @@
 
                 <div class="cart-product checkout">
                     <div class="banner">Delivery Address</div>
-
-                    <div class="address-details">
-                        <input type="radio">
-                        <div class="box">
-                            <div class="user-data">
-                                <p>Name</p>
-                                <p>Number</p>
-                            </div>
-                            <div class="address">
-                                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis, at.69845</p>
-                            </div>
-                        </div>
-                        <button>EDIT</button>
-
+                    <div class="address_list">
+                        <!-- DYNAMIC DATA  -->
                     </div>
-
-                    <div class="address-details">
-                        <input type="radio">
-                        <div class="box">
-                            <div class="user-data">
-                                <p>Name</p>
-                                <p>Number</p>
-                            </div>
-                            <div class="address">
-                                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis, at.69845</p>
-                            </div>
-                        </div>
-                        <button>EDIT</button>
-
-                    </div>
-
                 </div>
 
             </div>
@@ -62,22 +34,22 @@
             </div>
             <div class="sidebar-details">
                 <div class="group-data">
-                    <div class="data-title">Items(2):</div>
-                    <div class="title-value">$2980.23</div>
+                    <div class="data-title">Items( <span item-count>  </span> ):</div>
+                    <div id="totalPrice" class="title-value">₹<span></span></div>
                 </div>
                 <div class="group-data">
                     <div class="data-title"> shipping & handling:</div>
-                    <div class="title-value">$98.00</div>
+                    <div class="title-value">₹98.00</div>
                 </div>
                 <div class="group-data">
                     <div class="data-title">Delivery Charges:</div>
-                    <div class="title-value">$2980</div>
+                    <div class="title-value">₹0.00</div>
                 </div>
                 <div class="group-data">
                     <div class="data-total">total Payable:</div>
-                    <div class="title-value">$8333.00</div>
+                    <div id="totalPayable" class="title-value"></div>
                 </div>
-                <button class="btn-proceed">Checkout</button>
+                <button class="btn-proceed" proceed-pay>Proceed to Payment</button>
             </div>
         </div>
 
