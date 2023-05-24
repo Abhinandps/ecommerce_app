@@ -15,7 +15,10 @@ const {
   getShoppingPage,
   getProductDetails,
   getCartPage,
-  getCheckoutPage
+  getCheckoutPage,
+  getOrdersPage,
+  getOrderPage,
+  getAllOrders
 } = require("../Controllers/viewController");
 
 const { isAuthenticate ,isAdmin} = require("../middleware/auth");
@@ -33,6 +36,10 @@ router.get("/category",isAdmin, getAllCategories);
 
 router.get("/products",isAdmin, getAllProducts);
 
+router.get("/orders", isAdmin, getAllOrders)
+
+
+router.get("/order",isAdmin , getOrderPage);
 
 
 
@@ -53,9 +60,11 @@ router.get("/shop",isAuthenticate , getShoppingPage);
 
 router.get("/details",isAuthenticate , getProductDetails);
 
-
 router.get("/cart",isAuthenticate , getCartPage);
 
 router.get("/checkout",isAuthenticate , getCheckoutPage);
+
+router.get("/orders",isAuthenticate , getOrdersPage);
+
 
 module.exports = router;

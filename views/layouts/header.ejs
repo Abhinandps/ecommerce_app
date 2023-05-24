@@ -51,11 +51,16 @@
                 <!-- login start -->
                 <form id="otp-login-form">
                     <h2>Login</h2>
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" placeholder="email" required>
+                        <input type="email" id="email" name="email" placeholder="email" email-field required>
+                    </div> -->
+                    <div class="form-group">
+                        <label for="email1">Email:</label>
+                        <input type="email" id="email1" name="email" email-field required>
+                        <span class="invalid" data-email-error></span>
                     </div>
-                    <div id="email-error" class="invalid"></div>
+                    <!-- <div email-error class="invalid"></div> -->
 
                     <div class="form-group">
                         <button type="submit" class="btn" onclick="showOTPForm()">Request otp</button>
@@ -98,41 +103,53 @@
                     <h2>Sign Up</h2>
 
                     <div class="form-group">
-                        <label for="email">Username:</label>
+                        <label for="email">Name:</label>
                         <input type="text" id="username" name="username" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" required>
+                        <label for="email2">Email:</label>
+                        <input type="email" id="email2" name="email" email-field required>
+                        <span class="invalid" email-error  data-email-error></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mobile">Mobile:</label>
+                        <input type="mobile" id="mobile" name="mobile" required>
                     </div>
 
                     <div class="form-group">
                         <label for="password">password:</label>
-                        <input type="password" id="password" name="password" required>
+                        <input type="password" id="pass2" name="password" required>
+                        <span class="invalid" password-error data-email-error></span>
+
                     </div>
+
 
 
                     <div class="form-group">
-                        <button type="button" class="btn-black" onclick="showOTPForm()">Next</button>
+                        <button type="submit" class="btn-black">Next</button>
                     </div>
 
-                    <button class="links" onclick="showLoginForm()">Alredy have an account</button>
+                    <button class="links" onclick="showLoginForm()">Already have an account</button>
                 </form>
 
                 <!-- login  -->
-                <form id="login">
+                <form id="login" method="POST">
                     <h2>Log In</h2>
 
                     <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" required>
+                        <label for="email3">Email:</label>
+                        <input type="email" id="email3" name="email" email-field required>
+                        <span class="invalid" data-email-error></span>
                     </div>
 
                     <div class="form-group">
                         <label for="password">password:</label>
-                        <input type="password" id="password" name="password" required>
+                        <input type="password" id="pass1" name="password" required>
                     </div>
+
+                    <div id="message-error" class="invalid"></div>
 
                     <div class="form-group">
                         <button class="btn-black" type="submit">Log In</button>
@@ -149,7 +166,7 @@
 
     <!-- message toast  -->
 
-    <div class="toast">
+    <!-- <div class="toast">
         <div class="toast-content">
             <i class="fas fa-solid fa-check check"></i>
 
@@ -161,7 +178,7 @@
         <i class="fa-solid fa-xmark close"></i>
 
         <div class="progress"></div>
-    </div>
+    </div> -->
 
     <!--
     - HEADER
@@ -511,32 +528,12 @@
                         </ul>
                     </li>
 
-                    <li class="menu-category">
-                        <a href="#" class="menu-title">Perfume</a>
-
-                        <ul class="dropdown-list">
-
-                            <li class="dropdown-item">
-                                <a href="#">Clothes Perfume</a>
-                            </li>
-
-                            <li class="dropdown-item">
-                                <a href="#">Deodorant</a>
-                            </li>
-
-                            <li class="dropdown-item">
-                                <a href="#">Flower Fragrance</a>
-                            </li>
-
-                            <li class="dropdown-item">
-                                <a href="#">Air Freshener</a>
-                            </li>
-
-                        </ul>
+                    <li li class="menu-category">
+                        <a href="/shop" class="menu-title">Shops</a>
                     </li>
 
-                    <li class="menu-category">
-                        <a href="/shop" class="menu-title">Shops</a>
+                    <li li class="menu-category">
+                        <a href="/orders" class="menu-title">Orders</a>
                     </li>
 
                     <li class="menu-category">
@@ -831,102 +828,227 @@
 
     </header>
 
-        <script>
-            window.onload = async () => {
-                await getCategories()
-            }
-            const logoutButtons = document.querySelectorAll('.logout');
+    <script>
+        window.onload = async () => {
+            await getCategories()
+        }
+        const logoutButtons = document.querySelectorAll('.logout');
 
-            if (logoutButtons.length > 0) {
-                logoutButtons.forEach(button => {
-                    button.addEventListener('click', async () => {
-                        try {
-                            await logout();
-                        } catch (error) {
-                            console.error('Error occurred during logout:', error);
-                        }
-                    });
+        if (logoutButtons.length > 0) {
+            logoutButtons.forEach(button => {
+                button.addEventListener('click', async () => {
+                    try {
+                        await logout();
+                    } catch (error) {
+                        console.error('Error occurred during logout:', error);
+                    }
                 });
+            });
+        }
+    </script>
+
+
+    <script>
+        const loginForm = document.getElementById('login');
+        const emailFields = document.querySelectorAll('[email-field]');
+
+
+
+        // const password = document.querySelector('[password-field]');
+        const msgError = document.getElementById('message-error')
+        const otpLoginForm = document.getElementById('otp-login-form');
+        const emailError = document.querySelector('[email-error]')
+        const passError = document.querySelector('[password-error]')
+        const signupForm = document.getElementById('signup-form');
+        let globalEmailAccess;
+
+        const otpForm = document.getElementById('otp-form');
+        const otpError = document.getElementById('otp-error')
+
+
+
+        // OTP LOGIN
+        otpLoginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const email = document.getElementById('email1').value;
+
+            try {
+                const res = await axios({
+                    method: 'POST',
+                    url: 'http://127.0.0.1:3000/api/v1/user/generate-otp',
+                    data: {
+                        email
+                    },
+                });
+
+                console.log(res)
+
+                if (res.data.status == "success") {
+                    globalEmailAccess = email
+                    // location.assign(`/verify-otp?email=${email}`)
+                } else {
+                    const errorData = response.data;
+                    console.error(errorData);
+                }
+
+            } catch (err) {
+                if (err.response) {
+                    emailError.textContent = err.response.data.message
+                } else {
+                    emailError.textContent = ''
+                }
             }
-        </script>
+        });
+
+        otpForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            try {
+                const email = globalEmailAccess && globalEmailAccess;
+
+                // const email = document.getElementById('email').value;
+                const otpInputs = document.querySelectorAll('.otp');
+                let otp = "";
+                for (let i = 0; i < otpInputs.length; i++) {
+                    otp += otpInputs[i].value;
+                }
+
+                const res = await axios.post(`http://127.0.0.1:3000/api/v1/user/verify-otp`, {
+                    email,
+                    otp
+                });
 
 
-        <script>
-            const otpLoginForm = document.getElementById('otp-login-form');
-            const emailError = document.getElementById('email-error')
-            let globalEmailAccess;
+                if (res.data.status === "success") {
+                    console.log(email, otp)
+                    location.assign('/')
+                } else {
+                    console.log("Failed");
+                }
+            } catch (error) {
+                if (error.response) {
+                    otpError.textContent = error.response.data.message
+                } else {
+                    otpError.textContent = ''
+                }
+            }
+        });
 
-            const otpForm = document.getElementById('otp-form');
-            const otpError = document.getElementById('otp-error')
+        // LOGIN 
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const email = document.querySelector("#email3")
+            const password = document.querySelector("#pass1")
+
+            const emailValue = email.value.trim();
+            const passwordValue = password.value.trim();
+            try {
+                const res = await axios({
+                    method: 'POST',
+                    url: '/api/v1/user/login',
+                    data: {
+                        email: emailValue, password: passwordValue
+                    },
+                });
+
+                if (res.data.status == "success") {
+                    location.assign('/')
+                } else {
+                    const errorData = res.data;
+                    console.error(errorData);
+                }
+            } catch (err) {
+                const errData = err.response.data.message
+                if (errData) {
+                    msgError.textContent = errData
+                } else {
+                    msgError.textContent = ''
+                }
+            }
+        });
 
 
-            otpLoginForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
+        // SIGN UP
+        signupForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+           
+            try {
+                const username = document.getElementById('username').value;
+                const email = document.getElementById('email2').value;
+                const mobile = document.getElementById('mobile').value;
+                const password = document.getElementById('pass2').value;
 
-                const email = document.getElementById('email').value;
+                // const emailError = document.getElementById('[email-error]')
+                // const passError = document.getElementById('[password-error]')
 
+
+                const res = await axios({
+                    method: 'POST',
+                    url: 'http://127.0.0.1:3000/api/v1/user/signup',
+                    data: {
+                        username, email, password, mobile
+                    },
+                });
+
+
+                if (res.data.status == "success") {
+                    showOTPForm()
+                }
+                else {
+                    console.log(res.data);
+                }
+            }
+            catch (err) {
+                const errData = err.response.data.message
+                if (errData.email) {
+                    console.log(emailError)
+                    emailError.textContent = errData.email
+                } else {
+                    emailError.textContent = ''
+                }
+                if (errData.password) {
+                    passError.textContent = errData.password
+                }
+                else {
+                    passError.textContent = ''
+                }
+            }
+        });
+
+       
+
+
+        emailFields.forEach((field) => {
+            const emailError = field.parentNode.querySelector('[data-email-error]');
+
+            field.addEventListener('input', async (e) => {
+                const currentEmail = e.target.value;
                 try {
                     const res = await axios({
                         method: 'POST',
-                        url: 'http://127.0.0.1:3000/api/v1/user/generate-otp',
+                        url: '/api/v1/user/login/validate',
                         data: {
-                            email
+                            email: currentEmail,
                         },
                     });
 
-                    console.log(res)
-
-                    if (res.data.status == "success") {
-                        globalEmailAccess = email
-                        // location.assign(`/verify-otp?email=${email}`)
+                    if (res.data.status === 'success') {
+                        emailError.textContent = '';
                     } else {
-                        const errorData = response.data;
-                        console.error(errorData);
+                        emailError.textContent = res.data.message; 
                     }
-
                 } catch (err) {
-                    if (err.response) {
-                        emailError.textContent = err.response.data.message
+                    if (err.response && err.response.status === 401) {
+                        emailError.textContent = err.response.data.message; 
                     } else {
-                        emailError.textContent = ''
+                        emailError.textContent = ''; 
                     }
                 }
             });
-
-
-            otpForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                try {
-                    const email = globalEmailAccess && globalEmailAccess;
-
-                    // const email = document.getElementById('email').value;
-                    const otpInputs = document.querySelectorAll('.otp');
-                    let otp = "";
-                    for (let i = 0; i < otpInputs.length; i++) {
-                        otp += otpInputs[i].value;
-                    }
-
-                    const res = await axios.post(`http://127.0.0.1:3000/api/v1/user/verify-otp`, {
-                        email,
-                        otp
-                    });
-
-
-                    if (res.data.status === "success") {
-                        console.log(email, otp)
-                        location.assign('/')
-                    } else {
-                        console.log(res.data.status);
-                    }
-                } catch (error) {
-                    if (error.response) {
-                        otpError.textContent = error.response.data.message
-                    } else {
-                        otpError.textContent = ''
-                    }
-                }
-            });
+        });
 
 
 
-        </script>
+
+    </script>

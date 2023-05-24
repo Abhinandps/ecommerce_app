@@ -9,10 +9,9 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const ErrorHandler = require("../Controllers/errorController");
 
-
 function generateNumericOTP(length) {
-  const digits = '0123456789';
-  let otp = '';
+  const digits = "0123456789";
+  let otp = "";
   for (let i = 0; i < length; i++) {
     otp += digits.charAt(Math.floor(Math.random() * digits.length));
   }
@@ -84,11 +83,9 @@ exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body);
 
   // Generate an OTP and store it in the user object
-  const otp = otpGenerator.generate(6, {
-    digits: true,
-    alphabets: false,
-    upperCase: false,
-  });
+
+  const otp = generateNumericOTP(4)
+
   newUser.otp = otp;
   await newUser.save();
 
@@ -98,15 +95,13 @@ exports.signup = catchAsync(async (req, res, next) => {
   res.json({ status: "success" });
 }, ErrorHandler);
 
-
-
 // Verify the OTP
 exports.verifyOTP = async (req, res, next) => {
   const { email, otp } = req.body;
   const user = await User.findOne({ email });
 
   if (!user) {
-    console.log("not found")
+    console.log("not found");
     return next(new AppError(`User not found`, 400));
   }
 
@@ -120,6 +115,24 @@ exports.verifyOTP = async (req, res, next) => {
   // Send Token To Client
   createSendToken(user, 200, res);
 };
+
+// validate
+
+exports.validate = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    return next(new AppError(`User not found`, 400));
+  }
+
+  if (user.isBlock) {
+    return next(
+      new AppError(`Your account has been blocked. Please contact support`, 401)
+    );
+  }
+
+  res.status(200).json({ status: "success" });
+}, ErrorHandler);
 
 // User Login
 exports.login = catchAsync(async (req, res, next) => {
@@ -143,6 +156,12 @@ exports.login = catchAsync(async (req, res, next) => {
     );
   }
 
+  
+  if (typeof user.otp === 'string' && user.otp.trim() !== '') {
+    return next(new AppError('Something wrong login through OTP'));
+  }
+
+
   // 3) if everything ok, send token to client
   createSendToken(user, 200, res);
 
@@ -161,7 +180,6 @@ exports.generateOTP = catchAsync(async (req, res, next) => {
     return next(new AppError(`User not found`, 400));
   }
 
-  
   if (user.isBlock) {
     return next(
       new AppError(`Your account has been blocked. Please contact support`, 401)
@@ -170,7 +188,7 @@ exports.generateOTP = catchAsync(async (req, res, next) => {
 
   if (user) {
     // Generate an OTP and store it in the user object
-    const otp = generateNumericOTP(4)
+    const otp = generateNumericOTP(4);
     user.otp = otp;
     await user.save();
 
@@ -191,11 +209,3 @@ exports.logout = (req, res) => {
   // Send a response indicating success
   res.status(200).json({ status: "success" });
 };
-
-
-
-
-
-
-
-

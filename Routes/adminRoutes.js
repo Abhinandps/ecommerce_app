@@ -6,6 +6,7 @@ const multer = require("multer");
 const adminAuth = require("../Controllers/adminAuth");
 const {
   getAllUsers,
+  getOneUsers,
   toggleBlock,
   getOneCategory,
   addCategory,
@@ -58,6 +59,8 @@ router.get("/logout", adminAuth.logout);
 // Users
 
 router.get("/users", getAllUsers);
+
+router.get("/users/:id",isAdmin, getOneUsers);
 
 router.put("/:id/block", toggleBlock);
 

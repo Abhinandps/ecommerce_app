@@ -1,0 +1,140 @@
+<%- include ('../layouts/header.ejs') %>
+
+
+    <div class="container">
+        <div class="header">
+            <p>Tracking My Order</p>
+            <nav>
+                <ul>
+                    <li><a href="/orders">Orders(3 items)</a></li>
+                    <li><a href="#">Deliverd</a></li>
+                    <li><a href="#">Return</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <main orders-history>
+           <!-- DYNAMIC DATA COMES  -->
+        </main>
+
+
+    </div>
+
+
+    <script>
+
+        const getOrders = () => {
+            const row = document.querySelector('[orders-history]')
+            console.log(row)
+            $.ajax({
+                type: "GET",
+                url: "/api/v1/user/orders",
+                success: function (response) {
+                    const { data } = response
+
+                    data.forEach((order) => {
+                        order.items.forEach((product) => {
+                            const { product: productID } = product
+                            $.ajax({
+                                type: "GET",
+                                url: `api/v1/admin/product/${productID}`,
+                                success: function (response) {
+                                    // Stored the first response
+                                    const { products } = response.data;
+                                    $.ajax({
+                                        type: "GET",
+                                        url: "/api/v1/user/cart",
+                                        success: function (response) {
+                                            const { cart } = response
+                                            console.log(cart)
+                                            console.log(products)
+                                            
+                                            let shippingAddress = cart.shippingAddress.find(address=>address._id === order.shippingAddress)
+                                            if(!shippingAddress){
+                                                console.log("no address found")
+                                            }
+
+                                            const imagePath = products.image;
+                                            const newPath = imagePath.replace("public", "");
+
+                                            const MAX_DESCRIPTION_LENGTH = 50;
+
+                                            let truncatedDescription = products.description;
+                                            if (truncatedDescription.length > MAX_DESCRIPTION_LENGTH) {
+                                                truncatedDescription = truncatedDescription.substring(0, MAX_DESCRIPTION_LENGTH) + '...';
+                                            }
+
+                                            const orderedDetailsCard = `<div class="row">
+                                        <div class="product_details">
+                                            <div class="product_image">
+                                                <img src=${newPath} alt="">
+                                            </div>
+                                            <div class="product_name">
+                                                <p>${products.name}</p>
+                                            </div>
+                                            <div class="product_desc">
+                                                <p>${truncatedDescription}</p>
+                                            </div>
+                                            <div class="rating">
+                                                5 start
+                                            </div>
+                                            <div class="product_price">
+                                                <p>MRP <span>${products.price}/-</span></p>
+                                            </div>
+                                        </div>
+
+                                        <div class="tracking_status">
+                                            status
+                                        </div>
+
+                                        <div class="delivery_address">
+                                           <div class="header">
+                                            <p>Delivery Address</p>
+                                            </div>
+                                            <div class="address">
+                                                <p name>${shippingAddress.custName}</p>
+                                                <address>${shippingAddress.address},${shippingAddress.city},${shippingAddress.state},${shippingAddress.country},${shippingAddress.zipCode}</address>
+                                            </div>
+                                            <div class="conatact">
+                                                <p>${shippingAddress.mobile}</p>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="payment_details">
+                                            <p payment-status>Payment Successfull method</p>
+                                            <p payment-method>UPI ID</p>
+                                            <p payment_bank>
+                                                Banking ICICI
+                                            </p>
+                                            <button invoice>Invoice</button>
+                                        </div>
+                                    </div>`
+                                            const tempElement = document.createElement('div');
+                                            tempElement.innerHTML = orderedDetailsCard;
+                                            row.append(tempElement)
+
+
+
+                                        }
+                                    })
+
+
+                                }
+                            })
+
+
+                        })
+
+                    })
+                }
+            })
+        }
+
+
+        window.onload = function () {
+            getOrders()
+        }
+    </script>
+
+    <%- include ('../layouts/footer.ejs') %>

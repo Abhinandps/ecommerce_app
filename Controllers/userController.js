@@ -145,8 +145,6 @@ exports.purchaseItem = catchAsync(async (req, res, next) => {
     totalPrice
   } = req.body;
 
-  console.log(req.body)
-
   // Retrieve the user
   const user = await User.findById(req.user._id);
   if (!user) {
@@ -223,7 +221,7 @@ exports.purchaseItem = catchAsync(async (req, res, next) => {
   // Clear the cart after the purchase
   cart.items = [];
   await cart.save();
-  res.json({ message: "Purchase successful." });
+  res.status(200).json({ message: "Purchase successful." });
 });
 
 // Orders

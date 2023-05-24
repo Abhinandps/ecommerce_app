@@ -50,43 +50,7 @@
     <!-- Navbar End -->
 
     <script>
-        const loginForm = document.getElementById('login-form');
-
-        loginForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const msgError = document.getElementById('message-error')
-
-            try {
-                const res = await axios({
-                    method: 'POST',
-                    url: 'http://127.0.0.1:3000/api/v1/user/login',
-                    data: {
-                        email, password
-                    },
-                });
-
-
-                if (res.data.status == "success") {
-                    location.assign('/')
-
-                } else {
-                    const errorData = res.data;
-                    console.error(errorData);
-                }
-            } catch (err) {
-                const errData = err.response.data.message
-                if (errData) {
-                    msgError.textContent = errData
-                } else {
-                    msgError.textContent = ''
-                }
-            }
-
-
-        });
+       
     </script>
 
 

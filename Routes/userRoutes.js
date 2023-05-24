@@ -38,6 +38,8 @@ router.post("/generate-otp", auth.generateOTP);
 // Verify the OTP
 router.post("/verify-otp", auth.verifyOTP);
 
+router.post("/login/validate", auth.validate);
+
 router.post("/login", auth.login);
 
 router.get("/logout", auth.logout);

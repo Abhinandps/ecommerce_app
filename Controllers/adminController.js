@@ -17,6 +17,14 @@ exports.getAllUsers = catchAsync(async (req, res) => {
   });
 });
 
+exports.getOneUsers = catchAsync(async(req,res)=>{
+  const user = await User.findOne({_id: req.params.id})
+  res.status(200).json({
+    status:"success",
+    data:user
+  })
+})
+
 exports.getOneCategory = catchAsync(async (req, res) => {
   const categories = await Category.findOne({ _id: req.params.id });
   res.status(200).json({

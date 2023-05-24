@@ -281,31 +281,25 @@ const getCheckOut = () => {
         row.append(addressList);
       });
 
-      pay.addEventListener("click", () => {
+      pay.addEventListener("click", async () => {
         const selectedAddressId = $('input[name="user-info"]:checked').val();
         console.log(`Selected address ID: ${selectedAddressId}`);
-        placeOrder(selectedAddressId,response);
+        await placeOrder(selectedAddressId, response);
       });
-      
 
-      function placeOrder(addressId,response) {
-        console.log(addressId,response.totalPrice);
-        $.ajax({
-          type: "POST",
-          url: "/api/v1/user/cart/purchase",
-          data: {
+      async function placeOrder(addressId, response) {
+        try {
+          const axiosResponse = await axios.post("/api/v1/user/cart/purchase", {
             shippingAddress: addressId,
-            totalPrice:1000
+            totalPrice: 1000,
             // totalPrice: response.totalPrice + shippingHandlingFee,
-          },
-          success: function (response) {
-            console.log(response);
-            console.log("Order placed successfully");
-          },
-          error: function (error) {
-            console.error("Error placing order:", error);
-          },
-        });
+          });
+          console.log(axiosResponse.data);
+          console.log("Order placed successfully");
+          alert("Order placed successfully");
+        } catch (error) {
+          console.error("Error placing order:", error);
+        }
       }
 
       text.textContent = response.totalPrice;
@@ -316,6 +310,14 @@ const getCheckOut = () => {
 };
 
 getCheckOut();
+
+// getOrders function included in order.ejs 
+
+
+
+
+
+
 
 // Handle click event on product card
 $(document).on("click", ".view-details", function (event) {

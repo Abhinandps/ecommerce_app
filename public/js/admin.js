@@ -1,12 +1,9 @@
-
-
 const adminlogout = async () => {
   const res = await axios.get("http://127.0.0.1:3000/api/v1/admin/logout");
   if (res.data.status === "success") {
-  location.reload(true)
+    location.reload(true);
   }
 };
-
 
 // Get All Users
 const getUsers = async () => {
@@ -61,8 +58,6 @@ const handleClick = (event) => {
       },
     });
   }
-
-  
 };
 
 const handleFormEdit = (event) => {
@@ -201,7 +196,7 @@ const getAllProducts = async () => {
     const res = await axios.get("http://127.0.0.1:3000/api/v1/admin/products");
     const { data } = res.data;
     const products = data.products;
-  
+
     const tableBody = document.getElementsByTagName("tbody")[0];
     tableBody.innerHTML = "";
 
@@ -233,10 +228,6 @@ const getAllProducts = async () => {
           console.error(err);
         },
       });
-
-
-
-
     });
   } catch (err) {
     console.error(err);
@@ -332,8 +323,103 @@ const handleProductDelete = (event) => {
   }
 };
 
+// Orders
+
+const getAllOrders = async () => {
+  try {
+    const res = await axios.get("/api/v1/admin/orders");
+    const { data } = res.data;
+    const orders = data.orders;
+    // console.log(orders)
+    // orders.forEach((order)=>{
+    //   console.log(order)
+    // })
+    const tableBody = document.getElementsByTagName("tbody")[0];
+    // tableBody.innerHTML = "";
+
+    orders.forEach((order) => {
+      let statusColor;
+      // // Determine the color based on the order status
+      if (order.status === "pending") {
+        statusColor = "warning";
+      } else if (order.status === "delivered") {
+        statusColor = "success";
+      } else if (order.status === "shipped") {
+        statusColor = "primary";
+      } else if (order.status === "confirmed") {
+        statusColor = "info";
+      } else {
+        statusColor = "danger";
+      }
+
+      console.log(statusColor);
+
+      order.items.forEach((item) => {
+        // Find User
+        $.ajax({
+          type: "GET",
+          url: `/api/v1/admin/users/${order.user}`,
+          success: function (response) {
+            const { data } = response;
+            const userData = data;
+
+            // Find product details
+            $.ajax({
+              type: "GET",
+              url: `/api/v1/admin/product/${item.product}`,
+              success: function (response) {
+                const { data } = response;
+                const { products } = data;
+                const dateString = products.updatedAt;
+
+                // Splitting the string at the 'T' character
+                const datePart = dateString.split("T")[0];
+
+                console.log(userData.email);
+                console.log(products.name);
+                console.log(order.totalPrice);
+                console.log(datePart);
+                console.log(order.status);
+
+                const row = document.createElement("tr");
+
+                const statusBadge = `<span class="badge badge-${statusColor}">${order.status}</span>`;
+                const editBtn = `<label id="view" type="button"  class="badge badge-primary" data-order-id="${order.orderID}" onclick="handleOrders(event)"> <i class="mdi mdi-eye" muted></i></label>`;
+
+                row.innerHTML = `
+                <td> ${products.name} </td>
+                <td> ${userData.email} </td>
+                <td> ₹${order.totalPrice} </td>
+                <td> ${order.paymentMethod} </td>
+                <td> ${datePart} </td>
+                <td> ${statusBadge}</td>
+                <td> ${editBtn}</td>
+                `;
+                tableBody.innerHTML += row.outerHTML;
+              },
+            });
+            // console.log(item);
+          },
+        });
+      });
+    });
+  } catch (err) {}
+};
 
 
-
-
+const handleOrders = (event) => {
+  const orderID = event.target.dataset.orderId;
+  // console.log(orderID)
+  $.ajax({
+    type: "GET",
+    url: `api/v1/admin/orders/${orderID}`,
+    success: function (response) {
+      const { data } = response;
+      const { order } = data;
+      localStorage.setItem("order", JSON.stringify(order));
+      // Redirect to the order page
+      window.location.href = "/order";
+    },
+  });
+};
 

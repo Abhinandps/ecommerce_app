@@ -249,6 +249,19 @@ body::-webkit-scrollbar-thumb:hover {
   pointer-events: all;
 }
 
+.invalid {
+  font-size: var(--fs-9);
+  color: #ff0000f0;
+  padding: 10px 0;
+}
+#otp-error {
+  padding: 0 25px;
+}
+
+#message-error {
+  padding: 0 20px;
+}
+
 /**
  * MODAL 
  */

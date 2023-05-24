@@ -40,6 +40,25 @@ exports.getAllProducts = (req, res) => {
   }
 };
 
+
+exports.getAllOrders = (req,res)=>{
+  if(req.admin){
+    res.render("admin/pages/orders");
+  }else{
+    res.redirect('/admin/login')
+  }
+}
+
+
+exports.getOrderPage = (req,res)=>{
+  if(req.admin){
+    res.render("admin/pages/orderDetails.ejs")
+    }else{
+      res.redirect('/admin/login')
+    }
+}
+
+
 // USER
 
 exports.getUserLogin = (req, res) => {
@@ -112,10 +131,16 @@ exports.getCheckoutPage = (req,res)=>{
   if(req.user){
     res.render("user/checkout.ejs")
   }
-  else{
-    
+}
+
+
+exports.getOrdersPage = (req,res)=>{
+  if(req.user){
+    res.render("user/order.ejs")
   }
 }
+
+
 
 exports.getErrorPage = (req,res)=>{
   res.render("404.ejs")

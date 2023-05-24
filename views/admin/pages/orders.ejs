@@ -1,0 +1,56 @@
+<%- include ('../../layouts/adminHeader.ejs') %>
+
+
+
+    <div class="main-panel">
+        <div class="content-wrapper">
+
+            <div class="page-header">
+                <h3 class="page-title"> Basic Tables </h3>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#">Tables</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Basic tables</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Basic Table</h4>
+                            <p class="card-description"> Add class <code>.table</code>
+                            </p>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Total</th>
+                                            <th>Payment Method</th>
+                                            <th>Date</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                       
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <script>
+            window.onload = async function(){
+                await getAllOrders()
+            }
+        </script>
+
+
+    <%- include ('../../layouts/adminFooter.ejs') %>
