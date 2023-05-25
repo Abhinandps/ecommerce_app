@@ -3883,3 +3883,14 @@ footer {
   align-items: center;
   outline: none;
 }
+
+
+.exit-btn{
+      position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--bittersweet);
+    padding: 3px;
+    border-radius: 3px;
+    color: var(--cultured);
+}

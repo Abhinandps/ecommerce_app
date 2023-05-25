@@ -64,7 +64,7 @@ router.get("/cart",isAuthenticate , getCartPage);
 
 router.get("/checkout",isAuthenticate , getCheckoutPage);
 
-router.get("/orders",isAuthenticate , getOrdersPage);
+router.get("/myorders",isAuthenticate , getOrdersPage);
 
 
 module.exports = router;

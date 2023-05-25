@@ -167,7 +167,7 @@ const getAllCategories = async () => {
   }
 };
 
-// categpries list in product page as dropdown
+// categories list in product page as dropdown
 
 const getDropdownCategories = async () => {
   try {
@@ -352,7 +352,6 @@ const getAllOrders = async () => {
         statusColor = "danger";
       }
 
-      console.log(statusColor);
 
       order.items.forEach((item) => {
         // Find User
@@ -375,11 +374,11 @@ const getAllOrders = async () => {
                 // Splitting the string at the 'T' character
                 const datePart = dateString.split("T")[0];
 
-                console.log(userData.email);
-                console.log(products.name);
-                console.log(order.totalPrice);
-                console.log(datePart);
-                console.log(order.status);
+                // console.log(userData.email);
+                // console.log(products.name);
+                // console.log(order.totalPrice);
+                // console.log(datePart);
+                // console.log(order.status);
 
                 const row = document.createElement("tr");
 
@@ -409,7 +408,6 @@ const getAllOrders = async () => {
 
 const handleOrders = (event) => {
   const orderID = event.target.dataset.orderId;
-  // console.log(orderID)
   $.ajax({
     type: "GET",
     url: `api/v1/admin/orders/${orderID}`,
@@ -422,4 +420,8 @@ const handleOrders = (event) => {
     },
   });
 };
+
+
+
+
 

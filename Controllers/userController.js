@@ -124,26 +124,29 @@ exports.removeCartItem = catchAsync(async (req, res) => {
   });
 });
 
+exports.getCartItemsCount = catchAsync(async (req, res, next) => {
+  const cart = await Cart.findOne({ user: req.user._id });
+
+  const cartItemsCount = cart.items.length;
+
+  res.json({ count: cartItemsCount });
+});
 
 exports.saveShippingAddress = catchAsync(async (req, res) => {
   const cart = await Cart.findOne({ user: req.user._id });
-  cart.shippingAddress.push(req.body) 
+  cart.shippingAddress.push(req.body);
   await cart.save();
   res.status(201).json({
     status: "success",
     message: "Shipping address saved successfully.",
     cart,
-  })
+  });
 });
-
 
 // purchase
 
 exports.purchaseItem = catchAsync(async (req, res, next) => {
-  const {
-    shippingAddress,
-    totalPrice
-  } = req.body;
+  const { shippingAddress, totalPrice } = req.body;
 
   // Retrieve the user
   const user = await User.findById(req.user._id);

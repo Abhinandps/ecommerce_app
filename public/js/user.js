@@ -58,7 +58,9 @@ const getProducts = () => {
             <ion-icon name="eye-outline"></ion-icon>
               </button>
 
-            <button class="btn-action">
+            <button class="btn-action add-to-cart" data-productId='${
+              product._id
+            }'>
                 <ion-icon name="bag-add-outline"></ion-icon>
             </button>
 
@@ -90,9 +92,79 @@ const getProducts = () => {
     </div>
     </div>
         `;
-
         row.append(card);
       });
+    },
+  });
+};
+
+// Event listener for clicking on "View Details - add to cart - remove from cart" button
+document.addEventListener("click", function (event) {
+  if (
+    event.target.classList.contains("view-details") ||
+    event.target.closest(".view-details")
+  ) {
+    const button = event.target.classList.contains("view-details")
+      ? event.target
+      : event.target.closest(".view-details");
+    const product = JSON.parse(button.dataset.product);
+    handleViewDetails(product);
+  } else if (
+    event.target.classList.contains("add-to-cart") ||
+    event.target.closest(".add-to-cart")
+  ) {
+    const button = event.target.classList.contains("add-to-cart")
+      ? event.target
+      : event.target.closest(".add-to-cart");
+    const productId = button.dataset.productid;
+    handleaddToCart(productId);
+  }
+  else if (
+    event.target.classList.contains("add-to-cart") ||
+    event.target.closest(".add-to-cart")
+  ) {
+    const button = event.target.classList.contains("add-to-cart")
+      ? event.target
+      : event.target.closest(".add-to-cart");
+    const productId = button.dataset.productid;
+    handleaddToCart(productId);
+  }
+});
+
+// Function to handle the view details functionality
+const handleViewDetails = (product) => {
+  localStorage.setItem("product", JSON.stringify(product));
+  window.location.href = "/details";
+};
+
+// get the count of cart items
+const getCartCount = () => {
+  $.ajax({
+    type: "GET",
+    url: "/api/v1/user/cart/items/count",
+    success: function (response) {
+      const cartCount = document.querySelector("#cart_count");
+      cartCount.textContent = response.count;
+    },
+    error: function (error) {
+      console.error("Error retrieving cart items count", error);
+    },
+  });
+};
+
+getCartCount();
+
+// function to handle the add to cart functionality
+const handleaddToCart = (productId) => {
+  $.ajax({
+    type: "POST",
+    url: "/api/v1/user/cart",
+    data: {
+      productId,
+    },
+    success: function (response) {
+      console.log(response);
+      alert(response.message);
     },
   });
 };
@@ -123,12 +195,16 @@ const getCart = () => {
 
             const singleItem = `
               <div class="cart-product">
+              <button class="exit-btn">
+              <ion-icon name="close-outline" role="img" class="md hydrated" aria-label="close outline"></ion-icon>
+          </button>
                 <div class="product_image">
                   <img src=${newPath} />
                   <div class="product_details">
                     <div class="product_title">
                       <p>${product.name}</p>
                     </div>
+                   
                     <div class="product_qty">
                       <p>${product.price} * ${item.quantity} <span>  ${
               product.price * item.quantity
@@ -166,6 +242,7 @@ const getCart = () => {
             // Counter functions
             async function incrementCounter(e) {
               e.preventDefault();
+
               const productId = $(this).data("product-id");
               const currentInput = $(this).siblings(".qty-input");
               let currentValue = parseInt(currentInput.val());
@@ -179,7 +256,7 @@ const getCart = () => {
                   } catch (error) {
                     console.error(error);
                   }
-                }, 800);
+                }, 600);
               }
             }
 
@@ -235,6 +312,21 @@ const getCart = () => {
       productCount.textContent = response.cart.items.length;
     },
   });
+};
+
+const handleRemoveCartItem = () => {
+  const confirm = window.confirm("Do you want to remove this item ?");
+  if (confirm) {
+    $.ajax({
+      type: "DELETE",
+      url: `/api/v1/user/cart/${productId}`,
+      success: function (response) {
+        if (response.status) {
+          getCart();
+        }
+      },
+    });
+  }
 };
 
 const goToChekOut = () => {
@@ -311,27 +403,6 @@ const getCheckOut = () => {
 
 getCheckOut();
 
-// getOrders function included in order.ejs 
-
-
-
-
-
-
-
-// Handle click event on product card
-$(document).on("click", ".view-details", function (event) {
-  event.preventDefault();
-
-  const product = JSON.stringify($(this).data("product"));
-
-  console.log(product);
-
-  // Store the product details in localStorage or sessionStorage
-  localStorage.setItem("product", product);
-
-  // Redirect to the product page
-  window.location.href = "/details";
-});
+// getOrders function included in order.ejs
 
 // Event listener for address selection
