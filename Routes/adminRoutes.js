@@ -68,11 +68,11 @@ router.put("/:id/block", toggleBlock);
 
 router.get("/categories", isAuthenticate, isAdmin, getAllCategories);
 
-router.post("/category", upload.single("icon"), addCategory);
+router.post("/category", upload.single("image"), addCategory);
 
 router.get("/category/:id",isAuthenticate,isAdmin, getOneCategory);
 
-router.put("/category/:id", upload.single("icon"), updateCategory);
+router.put("/category/:id", upload.single("image"), updateCategory);
 
 router.delete("/category/:id", deleteCategory);
 

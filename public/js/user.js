@@ -5,21 +5,52 @@ const logout = async () => {
   }
 };
 
+
 const getCategories = () => {
   $.ajax({
     type: "GET",
     url: "http://127.0.0.1:3000/api/v1/admin/categories",
     success: function (categories) {
       const { data } = categories;
+      const dropdown = document.querySelector(".dropdown-panel");
+
       data.categories.forEach((category) => {
-        const imagePath = category.icon;
-        const newPath = imagePath.replace("public", "");
-        const link = `<a href="/category/${category.id}" class="nav-item nav-link my-0"> <img width=15 class="mr-2" src=${newPath}  /> ${category.name}</a>`;
-        $("#category-list").append(link);
+        const imagePath = category.image;
+        if (imagePath) {
+          const newPath = imagePath.replace("public", "");
+
+          const list = document.createElement("ul");
+          list.classList.add("dropdown-panel-list");
+
+          const listTitle = document.createElement("li")
+          listTitle.classList.add("menu-title")
+          const navlink = document.createElement("a")
+          navlink.href="#"
+          navlink.innerHTML = category.name
+
+          const listItem = document.createElement("li");
+          listItem.classList.add("panel-list-item");
+          const link = document.createElement("a");
+          link.href = "#";
+          const img = document.createElement("img");
+          img.src = newPath;
+          img.alt = "";
+          img.width = 250;
+          img.height = 119;
+
+          link.appendChild(img);
+          listTitle.appendChild(navlink);
+          listItem.appendChild(link);
+          list.appendChild(listTitle);
+          list.appendChild(listItem);
+
+          dropdown.appendChild(list);
+        }
       });
     },
   });
 };
+ 
 
 const getProducts = () => {
   const row = $(".product-grid");
@@ -118,8 +149,7 @@ document.addEventListener("click", function (event) {
       : event.target.closest(".add-to-cart");
     const productId = button.dataset.productid;
     handleaddToCart(productId);
-  }
-  else if (
+  } else if (
     event.target.classList.contains("add-to-cart") ||
     event.target.closest(".add-to-cart")
   ) {
@@ -164,6 +194,7 @@ const handleaddToCart = (productId) => {
     },
     success: function (response) {
       console.log(response);
+      getCartCount();
       alert(response.message);
     },
   });
@@ -195,7 +226,9 @@ const getCart = () => {
 
             const singleItem = `
               <div class="cart-product">
-              <button class="exit-btn">
+              <button class="exit-btn" onClick="handleRemoveCartItem('${
+                product._id
+              }')">
               <ion-icon name="close-outline" role="img" class="md hydrated" aria-label="close outline"></ion-icon>
           </button>
                 <div class="product_image">
@@ -314,23 +347,42 @@ const getCart = () => {
   });
 };
 
-const handleRemoveCartItem = () => {
+const handleRemoveCartItem = (productId) => {
   const confirm = window.confirm("Do you want to remove this item ?");
   if (confirm) {
     $.ajax({
       type: "DELETE",
       url: `/api/v1/user/cart/${productId}`,
       success: function (response) {
-        if (response.status) {
-          getCart();
-        }
+        getCart();
+        getCartCount();
       },
     });
   }
 };
 
 const goToChekOut = () => {
-  window.location.href = "/checkout";
+  const row = $(".cart-items");
+  $.ajax({
+    type: "GET",
+    url: "/api/v1/user/cart",
+    success: function (response) {
+      if (response.cart.items.length > 0) {
+        window.location.href = "/checkout";
+      } else {
+        const cart = `
+        <div class="empty-cart">
+        <h3>Missing Cart items ?</h3>
+        <p>Your Cart is Empty now this time to shop</p>
+        <a href="/shop" class="button">Shop</a>
+        </div>
+        `;
+        row.append(cart);
+        // alert("cart is Empty")
+        // window.location.href = "/cart";
+      }
+    },
+  });
 };
 
 const getCheckOut = () => {
@@ -380,17 +432,22 @@ const getCheckOut = () => {
       });
 
       async function placeOrder(addressId, response) {
+        console.log(response)
         try {
           const axiosResponse = await axios.post("/api/v1/user/cart/purchase", {
             shippingAddress: addressId,
-            totalPrice: 1000,
-            // totalPrice: response.totalPrice + shippingHandlingFee,
+            // totalPrice: 1000,
+            totalPrice: response.cart.productSum,
           });
           console.log(axiosResponse.data);
           console.log("Order placed successfully");
           alert("Order placed successfully");
+          window.location.href="/"
         } catch (error) {
           console.error("Error placing order:", error);
+          // console.error();
+          alert(error.response.data.message)
+          // console.log(error)
         }
       }
 

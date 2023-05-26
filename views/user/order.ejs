@@ -5,8 +5,8 @@
         <div class="header">
             <p>Tracking My Order</p>
             <nav>
-                <ul>
-                    <li><a href="/orders">Orders(3 items)</a></li>
+                <ul class="menu-category-list">
+                    <li class="meanu-category"><a class="menu-title" href="/orders">Orders</a></li>
                     <li><a href="#">Deliverd</a></li>
                     <li><a href="#">Return</a></li>
                 </ul>
@@ -25,13 +25,12 @@
 
         const getOrders = () => {
             const row = document.querySelector('[orders-history]')
-            console.log(row)
+            // console.log(row)
             $.ajax({
                 type: "GET",
                 url: "/api/v1/user/orders",
                 success: function (response) {
                     const { data } = response
-
                     data.forEach((order) => {
                         order.items.forEach((product) => {
                             const { product: productID } = product
@@ -79,12 +78,12 @@
                                                 5 start
                                             </div>
                                             <div class="product_price">
-                                                <p>MRP <span>${products.price}/-</span></p>
+                                                <p>MRP <span>${order.totalPrice}/-</span></p>
                                             </div>
                                         </div>
 
                                         <div class="tracking_status">
-                                            status
+                                            ${order.status}
                                         </div>
 
                                         <div class="delivery_address">
@@ -111,6 +110,7 @@
                                         </div>
                                     </div>`
                                             const tempElement = document.createElement('div');
+                                            tempElement.setAttribute("id", "order_item");
                                             tempElement.innerHTML = orderedDetailsCard;
                                             row.append(tempElement)
 
@@ -134,6 +134,7 @@
 
         window.onload = function () {
             getOrders()
+            getCategories()
         }
     </script>
 

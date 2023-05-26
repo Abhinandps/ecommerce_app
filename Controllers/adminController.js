@@ -62,12 +62,13 @@ exports.addCategory = catchAsync(async (req, res, next) => {
   const category = await Category.create({
     name,
     description,
-    icon: req.file.path,
+    image: req.file.path,
   });
   res.json(category);
 }, ErrorHandler);
 
 exports.updateCategory = catchAsync(async (req, res, next) => {
+  
   const { name, description } = req.body;
   // 1 find the category for update
   const category = await Category.findById(req.params.id);
@@ -77,14 +78,15 @@ exports.updateCategory = catchAsync(async (req, res, next) => {
     category.name = name || category.name;
     category.description = description || category.description;
 
+
     // Remove the old icon file if a new file is uploaded
     if (req.file) {
-      if (category.icon) {
-        fs.unlink(category.icon, (err) => {
+      if (category.image) {
+        fs.unlink(category.image, (err) => {
           if (err) console.log(err);
         });
       }
-      category.icon = req.file.path;
+      category.image = req.file.path;
     }
 
     // Save the updated category
@@ -107,8 +109,8 @@ exports.deleteCategory = catchAsync(async (req, res, next) => {
   await Category.findByIdAndDelete(req.params.id);
 
   // Delete the icon file from storage
-  if (category.icon) {
-    fs.unlink(category.icon, (err) => {
+  if (category.image) {
+    fs.unlink(category.image, (err) => {
       if (err) console.log(err);
     });
   }

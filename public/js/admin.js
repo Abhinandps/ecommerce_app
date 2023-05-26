@@ -151,19 +151,23 @@ const getAllCategories = async () => {
       const editBtn = `<label type="button"  class="badge badge-primary" data-user-id="${category._id}" onclick="handleFormEdit(event)"> <i class="mdi mdi-grease-pencil"></i></label>`;
 
       const dltBtn = `<label type="button"  class="badge badge-danger" data-user-id="${category._id}" onclick="handleCategoryDelete(event)"> <i class="mdi mdi-delete"></i> </label>`;
-      const imagePath = category.icon;
-      const newPath = imagePath.replace("public", "");
-      // <img src="${category.icon}"/>
-      row.innerHTML = `
-              <td><img src="${newPath}" /> ${category.name}</td>
+      const imagePath = category.image;
+      if (imagePath) {
+        console.log(imagePath);
+        const newPath = imagePath.replace("public", "");
+
+        row.innerHTML = `
+              <td><img src="${newPath}" style="width: auto; height: 70px; object-fit: fill; border-radius:0px;" /></td>
+              <td>${category.name}</td>
               <td style="white-space: pre-wrap">${category.description}</td>
               <td>${editBtn}</td>
               <td>${dltBtn}</td>
             `;
-      tableBody.appendChild(row);
+        tableBody.appendChild(row);
+      }
     });
   } catch (err) {
-    console.error(error);
+    console.error(err);
   }
 };
 
@@ -352,7 +356,6 @@ const getAllOrders = async () => {
         statusColor = "danger";
       }
 
-
       order.items.forEach((item) => {
         // Find User
         $.ajax({
@@ -405,7 +408,6 @@ const getAllOrders = async () => {
   } catch (err) {}
 };
 
-
 const handleOrders = (event) => {
   const orderID = event.target.dataset.orderId;
   $.ajax({
@@ -420,8 +422,3 @@ const handleOrders = (event) => {
     },
   });
 };
-
-
-
-
-

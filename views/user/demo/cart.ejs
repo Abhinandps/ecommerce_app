@@ -1,0 +1,59 @@
+<%- include ('../../layouts/header.ejs') %>
+
+
+    <div class="container wrapper">
+
+        <div class="carts">
+            <div class="cart-head">
+                <h2 class="cart-title">Your Cart</h2>
+                <button class="carrt-button">
+                    <i></i>
+                    ( 3 items )
+                </button>
+            </div>
+
+            <div class="cart-items">
+
+            </div>
+        </div>
+
+        <div class="proceedSidebar">
+            <div class="desc">
+                <p>how are shipping costs calculated? shipping have been applied to your order</p>
+            </div>
+            <div class="sidebar-heading">
+                <h2>Order Summary</h2>
+            </div>
+            <div class="sidebar-details">
+                <div class="group-data">
+                    <div class="data-title">Items( <span item-count>  </span> ):</div>
+                    <div id="totalPrice" class="title-value">₹<span></span></div>
+                </div>
+                <div class="group-data">
+                    <div class="data-title"> shipping & handling:</div>
+                    <div class="title-value">₹98.00</div>
+                </div>
+                <div class="group-data">
+                    <div class="data-title">Delivery Charges:</div>
+                    <div class="title-value">₹0.00</div>
+                </div>
+                <div class="group-data">
+                    <div class="data-total">total Payable:</div>
+                    <div id="totalPayable" class="title-value"></div>
+                </div>
+                <button class="btn-proceed" onclick="goToChekOut()">Checkout</button>
+            </div>
+        </div>
+
+        
+    </div>
+    </div>
+
+    <script>
+        window.onload = function () {
+            getCart();
+        };
+    </script>
+
+
+    <%- include ('../../layouts/footer.ejs') %>
