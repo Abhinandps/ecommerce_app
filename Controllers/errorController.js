@@ -3,7 +3,6 @@
 module.exports = (err, req, res, next) => {
     err.statusCode = err.statusCode || 500;
     err.status = err.status || "error";
-
     
   // Check if the error is a Mongoose validation error
   if (err.name === "ValidationError") {
@@ -13,6 +12,7 @@ module.exports = (err, req, res, next) => {
     for (let field in err.errors) {
       errors[field] = err.errors[field].message;
     }
+
 
     // Return the errors as JSON
     return res.status(400).json({
@@ -24,13 +24,15 @@ module.exports = (err, req, res, next) => {
 
     // Check if the error is a duplicate key error
     if (err.code === 11000) {
-      const field = Object.keys(err.keyValue)[0];
-      const message = `${field} already exists.`;
-  
+      const errors = {};
+      for(let field in err.keyValue){
+        errors[field] = `${field} already exist`;
+      }
+     
       // Return the error as JSON
       return res.status(400).json({
         status: "fail",
-        message: {email:message},
+        message:errors,
       });
     }
 

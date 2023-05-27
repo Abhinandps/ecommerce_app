@@ -63,7 +63,7 @@
                     <!-- <div email-error class="invalid"></div> -->
 
                     <div class="form-group">
-                        <button type="submit" class="btn" onclick="showOTPForm()">Request otp</button>
+                        <button type="submit" class="btn">Request otp</button>
                     </div>
 
                     <div class="form-group">
@@ -105,24 +105,39 @@
                     <div class="form-group">
                         <label for="email">Name:</label>
                         <input type="text" id="username" name="username" required>
+                        <span class="invalid" id="name-error"></span>
                     </div>
 
                     <div class="form-group">
                         <label for="email2">Email:</label>
                         <input type="email" id="email2" name="email" email-field required>
-                        <span class="invalid" email-error  data-email-error></span>
+                        <span class="invalid" email-error data-email-error></span>
                     </div>
 
                     <div class="form-group">
                         <label for="mobile">Mobile:</label>
                         <input type="mobile" id="mobile" name="mobile" required>
+                        <span class="invalid" mobile-error></span>
                     </div>
 
                     <div class="form-group">
                         <label for="password">password:</label>
                         <input type="password" id="pass2" name="password" required>
-                        <span class="invalid" password-error data-email-error></span>
+                        <span class="invalid" password-error data-password-error></span>
+                        <!-- <div class="password-criteria">
+                            <label>*criteria</label>
+                            <pre class="message" criteria></pre>
+                        </div> -->
+                    </div>
 
+                    <div class="form-group">
+                        <label for="password">confirm password:</label>
+                        <input type="password" id="confirmpass2" name="confirmpassword" required>
+                        <span class="invalid" confirm-password-error></span>
+                        <!-- <div class="password-criteria">
+                            <label>*criteria</label>
+                            <pre class="message" criteria></pre>
+                        </div> -->
                     </div>
 
 
@@ -857,8 +872,11 @@
         // const password = document.querySelector('[password-field]');
         const msgError = document.getElementById('message-error')
         const otpLoginForm = document.getElementById('otp-login-form');
+        const nameError = document.getElementById('name-error')
         const emailError = document.querySelector('[email-error]')
         const passError = document.querySelector('[password-error]')
+        const mobileError = document.querySelector('[mobile-error]')
+        const confirmPassError = document.querySelector('[confirm-password-error]')
         const signupForm = document.getElementById('signup-form');
         let globalEmailAccess;
 
@@ -886,6 +904,7 @@
 
                 if (res.data.status == "success") {
                     globalEmailAccess = email
+                    showOTPForm()
                     // location.assign(`/verify-otp?email=${email}`)
                 } else {
                     const errorData = response.data;
@@ -972,12 +991,15 @@
         // SIGN UP
         signupForm.addEventListener('submit', async (event) => {
             event.preventDefault();
-           
+
             try {
                 const username = document.getElementById('username').value;
                 const email = document.getElementById('email2').value;
                 const mobile = document.getElementById('mobile').value;
                 const password = document.getElementById('pass2').value;
+                const confirmpassword = document.getElementById('confirmpass2').value;
+                
+                console.log(confirmpassword)
 
                 // const emailError = document.getElementById('[email-error]')
                 // const passError = document.getElementById('[password-error]')
@@ -985,14 +1007,16 @@
 
                 const res = await axios({
                     method: 'POST',
-                    url: 'http://127.0.0.1:3000/api/v1/user/signup',
+                    url: '/api/v1/user/signup',
                     data: {
-                        username, email, password, mobile
+                        username, email, password, confirmpassword, mobile
                     },
                 });
 
 
+
                 if (res.data.status == "success") {
+                    globalEmailAccess = email
                     showOTPForm()
                 }
                 else {
@@ -1001,22 +1025,40 @@
             }
             catch (err) {
                 const errData = err.response.data.message
+                if (errData.username) {
+                    nameError.textContent = errData.username
+                } else {
+                    nameError.textContent = ''
+                }
+
                 if (errData.email) {
-                    console.log(emailError)
                     emailError.textContent = errData.email
                 } else {
                     emailError.textContent = ''
                 }
+
                 if (errData.password) {
                     passError.textContent = errData.password
                 }
                 else {
                     passError.textContent = ''
                 }
+
+                if (errData.mobile) {
+                    mobileError.textContent = errData.mobile
+                }
+                else {
+                    mobileError.textContent = ''
+                }
+                if (errData.confirmPassword) {
+                    confirmPassError.textContent = errData.confirmPassword
+                }
+                else {
+                    confirmPassError.textContent = ''
+                }
             }
         });
 
-       
 
 
         emailFields.forEach((field) => {
@@ -1036,13 +1078,13 @@
                     if (res.data.status === 'success') {
                         emailError.textContent = '';
                     } else {
-                        emailError.textContent = res.data.message; 
+                        emailError.textContent = res.data.message;
                     }
                 } catch (err) {
                     if (err.response && err.response.status === 401) {
-                        emailError.textContent = err.response.data.message; 
+                        emailError.textContent = err.response.data.message;
                     } else {
-                        emailError.textContent = ''; 
+                        emailError.textContent = '';
                     }
                 }
             });

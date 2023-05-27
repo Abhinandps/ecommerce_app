@@ -62,8 +62,12 @@ const getProducts = () => {
       const { data } = products;
 
       data.forEach((product) => {
+        console.log(product)
         const imagePath = product.image;
         const newPath = imagePath.replace("public", "");
+
+        console.log(newPath)
+
 
         const card = `
         <div class="showcase">
@@ -101,7 +105,6 @@ const getProducts = () => {
 
     <div class="showcase-content">
 
-        <a href="#" class="showcase-category">${product.category.name}</a>
 
         <a href="#">
             <h3 class="showcase-title">${product.name}</h3>
@@ -437,7 +440,7 @@ const getCheckOut = () => {
           const axiosResponse = await axios.post("/api/v1/user/cart/purchase", {
             shippingAddress: addressId,
             // totalPrice: 1000,
-            totalPrice: response.cart.productSum,
+            totalPrice: response.totalPrice,
           });
           console.log(axiosResponse.data);
           console.log("Order placed successfully");
@@ -451,6 +454,45 @@ const getCheckOut = () => {
         }
       }
 
+
+      // async function placeOrder(addressId, response) {
+      //   console.log(response);
+      //   const productSum = response.productSum;
+      //   const axiosResponses = [];
+
+      //   console.log(response.productSum)
+      
+      //   try {
+      //     for (const productId in productSum) {
+      //       if (productSum.hasOwnProperty(productId)) {
+      //         const productSumValue = productSum[productId];
+      
+      //         const axiosResponse = await axios.post(
+      //           "/api/v1/user/cart/purchase",
+      //           {
+      //             shippingAddress: addressId,
+      //             totalPrice: productSumValue,
+      //           }
+      //         );
+              
+      //         axiosResponses.push(axiosResponse);
+      //       }
+      //     }
+      
+      //     console.log("Orders placed successfully");
+      //     alert("Orders placed successfully");
+      //     window.location.href = "/";
+      //   } catch (error) {
+      //     console.error("Error placing orders:", error);
+      //     alert(error.response.data.message);
+      //   }
+      
+      //   // Access individual responses if needed
+      //   axiosResponses.forEach((response, index) => {
+      //     console.log(`Response ${index + 1}:`, response.data);
+      //   });
+      // }
+      
       text.textContent = response.totalPrice;
       totalPayable.textContent = response.totalPrice + shippingHandlingFee;
       productCount.textContent = response.cart.items.length;
@@ -463,3 +505,6 @@ getCheckOut();
 // getOrders function included in order.ejs
 
 // Event listener for address selection
+
+
+

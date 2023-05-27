@@ -79,25 +79,35 @@ const createSendToken = (user, statusCode, res) => {
 
 // User signup
 exports.signup = catchAsync(async (req, res, next) => {
+  const {password,confirmpassword}=req.body
+  // Check if the passwords match
+
+  if (password !== confirmpassword) {
+    return res.status(400).json({ message: {confirmPassword:'Passwords do not match'} });
+  }
+
   // Save requested data and hashed password to the database
   const newUser = await User.create(req.body);
+  console.log(newUser)
 
   // Generate an OTP and store it in the user object
 
   const otp = generateNumericOTP(4)
 
-  newUser.otp = otp;
-  await newUser.save();
+  // newUser.otp = otp;
+  // await newUser.save();
 
   // Send the OTP to the user's email address
-  sendOTP(otp, newUser);
+  // sendOTP(otp, newUser);
 
   res.json({ status: "success" });
 }, ErrorHandler);
 
+
 // Verify the OTP
 exports.verifyOTP = async (req, res, next) => {
   const { email, otp } = req.body;
+  console.log(email,otp)
   const user = await User.findOne({ email });
 
   if (!user) {
@@ -168,6 +178,7 @@ exports.login = catchAsync(async (req, res, next) => {
   // Create a new session for the user
   req.session.userId = 1;
 }, ErrorHandler);
+
 
 // User generateOTP
 exports.generateOTP = catchAsync(async (req, res, next) => {

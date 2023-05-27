@@ -9,7 +9,7 @@ const modalCloseOverlay = document.querySelector("[data-modal-overlay]");
 // modal function
 const modalCloseFunc = function () {
   modal.classList.remove("modal-active");
-  modal.classList.add("closed");
+  modal.classList.remove("closed");
 };
 
 const modalDisplayFunc = function () {

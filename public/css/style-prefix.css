@@ -259,7 +259,7 @@ body::-webkit-scrollbar-thumb:hover {
 }
 
 #message-error {
-  padding: 0 20px;
+  /* padding: 0 20px; */
 }
 
 /**
@@ -2483,6 +2483,23 @@ footer {
  * responsive larger than 570px screen
  */
 
+@media (max-width: 570px) {
+  /* LOGIN SIGN UP OTP */
+  .modal-content {
+    border-radius: 0px;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    margin: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+.form-container{
+  width: 90%;
+}
+}
+
 @media (min-width: 570px) {
   /**
    * #HEADER
@@ -2533,14 +2550,6 @@ footer {
     -webkit-transition: var(--transition-timing);
     -o-transition: var(--transition-timing);
     transition: var(--transition-timing);
-  }
-
-  .header-top-actions select:hover {
-    color: var(--eerie-black);
-  }
-
-  .header-search-container {
-    min-width: 300px;
   }
 
   /**
@@ -3503,10 +3512,8 @@ footer {
 /* form  */
 
 .form-container {
-  max-width: 400px;
   margin: 0 auto;
-  padding: 20px;
-  border: 1px solid #ccc;
+  padding: 10px 30px;
 }
 
 .form-container h2 {
@@ -3518,7 +3525,7 @@ footer {
 }
 
 .form-group {
-  padding: 10px 20px;
+  /* padding: 10px 20px; */
   width: 100%;
 }
 
@@ -3553,6 +3560,7 @@ footer {
   background: var(--eerie-black);
   color: #fff;
   transition: 0.3s;
+  margin-top: 20px;
 }
 
 .form-group .btn-black:hover {
@@ -3562,7 +3570,7 @@ footer {
 .links {
   width: 100%;
   text-align: left;
-  padding: 10px 20px;
+  padding: 10px 0px;
   font-weight: var(--weight-400);
 }
 
@@ -3583,6 +3591,7 @@ footer {
 #otp-form .box-wrapper .input-box {
   display: flex;
   margin: 20px;
+  justify-content: center;
 }
 
 .otp-container {
@@ -3982,4 +3991,12 @@ div > .row {
   color: var(--davys-gray);
   font-size: var(--fs-6);
   font-weight: var(--weight-500);
+}
+
+
+.password-criteria{
+
+  font-size: var(--fs-11);
+  color: var(--spanish-gray);
+  width: fit-content;
 }
