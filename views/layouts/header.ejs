@@ -56,8 +56,8 @@
                         <input type="email" id="email" name="email" placeholder="email" email-field required>
                     </div> -->
                     <div class="form-group">
-                        <label for="email1">Email:</label>
-                        <input type="email" id="email1" name="email" email-field required>
+                        <!-- <label for="email1"></label> -->
+                        <input type="text" id="email1" placeholder="email or mobile" name="email" email-field required>
                         <span class="invalid" data-email-error></span>
                     </div>
                     <!-- <div email-error class="invalid"></div> -->
@@ -874,11 +874,13 @@
         const otpLoginForm = document.getElementById('otp-login-form');
         const nameError = document.getElementById('name-error')
         const emailError = document.querySelector('[email-error]')
+        const commonError = document.querySelector('[data-email-error]')
+
         const passError = document.querySelector('[password-error]')
         const mobileError = document.querySelector('[mobile-error]')
         const confirmPassError = document.querySelector('[confirm-password-error]')
         const signupForm = document.getElementById('signup-form');
-        let globalEmailAccess;
+        let globalInputAccess;
 
         const otpForm = document.getElementById('otp-form');
         const otpError = document.getElementById('otp-error')
@@ -889,23 +891,39 @@
         otpLoginForm.addEventListener('submit', async (event) => {
             event.preventDefault();
 
-            const email = document.getElementById('email1').value;
-
+            const contactValue = document.getElementById('email1').value;
             try {
+
+                let preferredMethod
+                let contactData
+
+                if (validateEmail(contactValue)) {
+                    preferredMethod = 'email';
+                    contactData = { email: contactValue };
+                } else if (validatePhoneNumber(contactValue)) {
+                    preferredMethod = 'phone';
+                    contactData = { phone: contactValue };
+                } else {
+                    commonError.textContent = "Invalid email or phone number"
+                    return
+                }
+
+                console.log(preferredMethod, contactData)
+
                 const res = await axios({
                     method: 'POST',
                     url: 'http://127.0.0.1:3000/api/v1/user/generate-otp',
                     data: {
-                        email
+                        preferredMethod,
+                        contactData
                     },
                 });
 
-                console.log(res)
+                // console.log(res)
 
                 if (res.data.status == "success") {
-                    globalEmailAccess = email
+                    globalInputAccess = contactData
                     showOTPForm()
-                    // location.assign(`/verify-otp?email=${email}`)
                 } else {
                     const errorData = response.data;
                     console.error(errorData);
@@ -923,26 +941,40 @@
         otpForm.addEventListener('submit', async (event) => {
             event.preventDefault();
             try {
-                const email = globalEmailAccess && globalEmailAccess;
+                let email
+                let phoneNumber
+                if (globalInputAccess.email) {
+                    email = globalInputAccess.email
+                } else if (globalInputAccess.phone) {
+                    phoneNumber = globalInputAccess.phone
+                }
 
-                // const email = document.getElementById('email').value;
                 const otpInputs = document.querySelectorAll('.otp');
                 let otp = "";
+                let res
                 for (let i = 0; i < otpInputs.length; i++) {
                     otp += otpInputs[i].value;
                 }
 
-                const res = await axios.post(`http://127.0.0.1:3000/api/v1/user/verify-otp`, {
-                    email,
-                    otp
-                });
+                if (email) {
+                    res = await axios.post(`http://127.0.0.1:3000/api/v1/user/verify-otp`, {
+                        email,
+                        otp
+                    });
+                } else if (phoneNumber) {
+                    res = await axios.post(`http://127.0.0.1:3000/api/v1/user/verify-otp`, {
+                        phoneNumber,
+                        otp
+                    });
+                }
 
+                if (res) {
 
-                if (res.data.status === "success") {
-                    console.log(email, otp)
-                    location.assign('/')
-                } else {
-                    console.log("Failed");
+                    if (res.data.status === "success") {
+                        location.assign('/')
+                    } else {
+                        console.log("Failed");
+                    }
                 }
             } catch (error) {
                 if (error.response) {
@@ -998,7 +1030,7 @@
                 const mobile = document.getElementById('mobile').value;
                 const password = document.getElementById('pass2').value;
                 const confirmpassword = document.getElementById('confirmpass2').value;
-                
+
                 console.log(confirmpassword)
 
                 // const emailError = document.getElementById('[email-error]')
@@ -1016,7 +1048,7 @@
 
 
                 if (res.data.status == "success") {
-                    globalEmailAccess = email
+                    globalInputAccess = {phone:mobile}
                     showOTPForm()
                 }
                 else {
@@ -1090,7 +1122,16 @@
             });
         });
 
+        // Contact Values Validation
+        function validateEmail(email) {
+            const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return EMAIL_REGEX.test(email);
+        }
 
+        function validatePhoneNumber(phone) {
+            const PHONE_REGEX = /^\d{10}$/;
+            return PHONE_REGEX.test(phone);
+        }
 
 
     </script>

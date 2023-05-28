@@ -18,23 +18,23 @@ Workout:7.5
 -------------------
 Week 2
 
-[]User sign up & login with validation.
-[]Admin sign in.
-[]OTP login.
-[]Admin side user management (list user, block/unblock).
-[]Category management in admin side.
-[]Product management in admin side (add, edit & delete products).
+[✓]User sign up & login with validation.
+[✓]Admin sign in.
+[✓]OTP login.
+[✓]Admin side user management (list user, block/unblock).
+[✓]Category management in admin side.
+[✘]Product management in admin side (add, edit & delete products).
 []List products in user side.
 []Product details view in user side with image zoom
 
 Updations
 
 [] user block custom alert
-[] soft delete 
+[✓] soft delete 
 [] form validation
 [] login UI
 [] $ to ₹
-[] header cleanup and UI
+[✓] header cleanup and UI
 [] image crop
 [] multiple images (multer)
 [].gitignore
@@ -61,8 +61,8 @@ to complete  tasks
 
 Project Updations:
 
-[]confirm password
-[]preview of selected images
+[✓]confirm password
+[✓]preview of selected images
 []add multiple images
 []product list and details is not working
 []currency is missing
@@ -70,7 +70,7 @@ Project Updations:
 []reason cancel and return 
 []return expiry
 []place order is pending
-[]Mobile OTP login
+[✓]Mobile OTP login
 []sort filter pagination for every list : admin side
 []custom alerts
 []category should be unique

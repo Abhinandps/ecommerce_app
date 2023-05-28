@@ -2,12 +2,13 @@ const User = require("../Models/userModel");
 
 const jwt = require("jsonwebtoken");
 
-const otpGenerator = require("otp-generator");
+// const otpGenerator = require("otp-generator");
 const nodemailer = require("nodemailer");
 
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const ErrorHandler = require("../Controllers/errorController");
+const twilio = require("twilio");
 
 function generateNumericOTP(length) {
   const digits = "0123456789";
@@ -33,7 +34,6 @@ const sendOTP = (otp, user) => {
       pass: process.env.EMAIL_PASSWORD,
     },
   });
-
   const mailOptions = {
     from: process.env.EMAIL_USERNAME,
     to: user.email,
@@ -47,6 +47,19 @@ const sendOTP = (otp, user) => {
     } else {
       console.log("Email sent: " + info.response);
     }
+  });
+};
+
+const sendMobileOTP = async (otp, mobileNumber) => {
+  const client = twilio(
+    process.env.TWILIO_ACCOUNT_SID,
+    process.env.TWILIO_AUTH_TOKEN
+  );
+
+  await client.messages.create({
+    body: `Your OTP: ${otp}`,
+    from: process.env.TWILIO_PHONE_NUMBER,
+    to: `+91${mobileNumber}`,
   });
 };
 
@@ -79,23 +92,27 @@ const createSendToken = (user, statusCode, res) => {
 
 // User signup
 exports.signup = catchAsync(async (req, res, next) => {
-  const {password,confirmpassword}=req.body
+  const { password, confirmpassword } = req.body;
   // Check if the passwords match
 
   if (password !== confirmpassword) {
-    return res.status(400).json({ message: {confirmPassword:'Passwords do not match'} });
+    return res
+      .status(400)
+      .json({ message: { confirmPassword: "Passwords do not match" } });
   }
 
   // Save requested data and hashed password to the database
   const newUser = await User.create(req.body);
-  console.log(newUser)
 
   // Generate an OTP and store it in the user object
+  const otp = generateNumericOTP(4);
 
-  const otp = generateNumericOTP(4)
+  newUser.otp = otp;
+  await newUser.save();
 
-  // newUser.otp = otp;
-  // await newUser.save();
+
+   // Send the OTP to the user's mobile number
+   sendMobileOTP(otp, newUser.mobile);
 
   // Send the OTP to the user's email address
   // sendOTP(otp, newUser);
@@ -103,12 +120,17 @@ exports.signup = catchAsync(async (req, res, next) => {
   res.json({ status: "success" });
 }, ErrorHandler);
 
-
 // Verify the OTP
 exports.verifyOTP = async (req, res, next) => {
-  const { email, otp } = req.body;
-  console.log(email,otp)
-  const user = await User.findOne({ email });
+  const { email, phoneNumber, otp } = req.body;
+
+  let user;
+
+  if (email) {
+    user = await User.findOne({ email });
+  } else if (phoneNumber) {
+    user = await User.findOne({ mobile: phoneNumber });
+  }
 
   if (!user) {
     console.log("not found");
@@ -166,11 +188,9 @@ exports.login = catchAsync(async (req, res, next) => {
     );
   }
 
-  
-  if (typeof user.otp === 'string' && user.otp.trim() !== '') {
-    return next(new AppError('Something wrong login through OTP'));
+  if (typeof user.otp === "string" && user.otp.trim() !== "") {
+    return next(new AppError("Something wrong login through OTP"));
   }
-
 
   // 3) if everything ok, send token to client
   createSendToken(user, 200, res);
@@ -179,37 +199,85 @@ exports.login = catchAsync(async (req, res, next) => {
   req.session.userId = 1;
 }, ErrorHandler);
 
-
 // User generateOTP
 exports.generateOTP = catchAsync(async (req, res, next) => {
-  const email = req.body.email;
+  const { preferredMethod, contactData } = req.body;
 
-  // 2) Check if user exist
-  const user = await User.findOne({ email }).select("+password");
+  // console.log(preferredMethod, contactData.phone);
 
-  if (!user) {
-    return next(new AppError(`User not found`, 400));
-  }
-
-  if (user.isBlock) {
-    return next(
-      new AppError(`Your account has been blocked. Please contact support`, 401)
+  if (preferredMethod === "email") {
+    // 2) Check if user exist
+    const user = await User.findOne({ email: contactData.email }).select(
+      "+password"
     );
+
+    if (!user) {
+      return next(new AppError(`User not found`, 400));
+    }
+
+    if (user.isBlock) {
+      return next(
+        new AppError(
+          `Your account has been blocked. Please contact support`,
+          401
+        )
+      );
+    }
+
+    if (user) {
+      // Generate an OTP and store it in the user object
+      const otp = generateNumericOTP(4);
+      user.otp = otp;
+      await user.save();
+
+      // Send the OTP to the user's email address
+      sendOTP(otp, user);
+    }
+  } else if (preferredMethod === "phone") {
+    // 2) Check if user exist
+    const user = await User.findOne({ mobile: contactData.phone }).select(
+      "+password"
+    );
+
+    if (!user) {
+      return next(new AppError(`User not found`, 400));
+    }
+
+    if (user.isBlock) {
+      return next(
+        new AppError(
+          `Your account has been blocked. Please contact support`,
+          401
+        )
+      );
+    }
+
+    if (user) {
+      // Generate an OTP and store it in the user object
+      const otp = generateNumericOTP(4);
+      user.otp = otp;
+      await user.save();
+
+      // const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+
+      // await client.messages.create({
+      //   body: `Your OTP: ${otp}`,
+      //   from: process.env.TWILIO_PHONE_NUMBER,
+      //   // to: contactData.phone,
+      //   to: `+91${contactData.phone}`,
+      // });
+
+      // Send the OTP to the user's mobile number
+      sendMobileOTP(otp, contactData.phone);
+    }
+  } else {
+    return next(new AppError(`Invalid preferred contact method`, 400));
   }
 
-  if (user) {
-    // Generate an OTP and store it in the user object
-    const otp = generateNumericOTP(4);
-    user.otp = otp;
-    await user.save();
-
-    // Send the OTP to the user's email address
-    sendOTP(otp, user);
-
-    res.json({
-      status: "success",
-    });
-  }
+  res.json({
+    status: "success",
+    message: `OTP is sent to Your ${preferredMethod} successfully`,
+  });
 });
 
 // User Logout
