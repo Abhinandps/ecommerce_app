@@ -209,8 +209,9 @@ const getAllProducts = async () => {
       const editBtn = `<label type="button"  class="badge badge-primary" data-product-id="${product._id}" onclick="handleProductFormEdit(event)"> <i class="mdi mdi-grease-pencil"></i></label>`;
 
       const dltBtn = `<label type="button"  class="badge badge-danger" data-product-id="${product._id}" onclick="handleProductDelete(event)"> <i class="mdi mdi-delete"></i> </label>`;
-      const imagePath = product.image;
-      const newPath = imagePath.replace("public", "");
+      // const imagePath = product.image;
+      // const newPath = imagePath.replace("public", "");
+      //
 
       $.ajax({
         type: "GET",
@@ -218,7 +219,17 @@ const getAllProducts = async () => {
         success: function (response) {
           const categoryName = response.data.categories.name;
           row.innerHTML = `
-          <td><img width=20 src="${newPath}" /> ${product.name}</td>
+          <td>
+            ${product.image.map((path, index) => {
+              const newPath = path.replace("public", "");
+              if (index === 0) {
+                return `<img width=20 src="${newPath}" />`;
+              } else {
+                return `<img width=20 src="${newPath}" /> ${product.name}`;
+              }
+            })}
+          </td>
+          
           <td>${categoryName}</td>
           <td style="white-space: pre-wrap">${product.description}</td>
           <td>${product.stock}</td>

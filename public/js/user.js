@@ -5,7 +5,6 @@ const logout = async () => {
   }
 };
 
-
 const getCategories = () => {
   $.ajax({
     type: "GET",
@@ -22,11 +21,11 @@ const getCategories = () => {
           const list = document.createElement("ul");
           list.classList.add("dropdown-panel-list");
 
-          const listTitle = document.createElement("li")
-          listTitle.classList.add("menu-title")
-          const navlink = document.createElement("a")
-          navlink.href="#"
-          navlink.innerHTML = category.name
+          const listTitle = document.createElement("li");
+          listTitle.classList.add("menu-title");
+          const navlink = document.createElement("a");
+          navlink.href = "#";
+          navlink.innerHTML = category.name;
 
           const listItem = document.createElement("li");
           listItem.classList.add("panel-list-item");
@@ -50,7 +49,6 @@ const getCategories = () => {
     },
   });
 };
- 
 
 const getProducts = () => {
   const row = $(".product-grid");
@@ -60,25 +58,32 @@ const getProducts = () => {
     url: "http://127.0.0.1:3000/api/v1/user/products",
     success: function (products) {
       const { data } = products;
+      console.log(data);
 
       data.forEach((product) => {
-        console.log(product)
-        const imagePath = product.image;
-        const newPath = imagePath.replace("public", "");
+        // const imagePath =
 
-        console.log(newPath)
-
+        // console.log(newPath)
 
         const card = `
         <div class="showcase">
 
         <div class="showcase-banner">
 
-        <img src="${newPath}" alt="Mens Winter Leathers Jackets"
-            width="300" class="product-img default">
-        <img src="src/images/products/jacket-4.jpg" alt="Mens Winter Leathers Jackets"
-            width="300" class="product-img hover">
+        ${product.image
+          .map((path, index) => {
+            const newPath = path.replace("public", "");
+            let className = "product-img default";
 
+            if (index === 1) {
+              className = " product-img hover";
+            }
+            console.log(newPath)
+            return `<img src="${newPath}" alt="Mens Winter Leathers Jackets" width="300" class="${className}">`;
+          })
+          }
+
+      
         <p class="showcase-badge">15%</p>
 
         <div class="showcase-actions">
@@ -435,7 +440,7 @@ const getCheckOut = () => {
       });
 
       async function placeOrder(addressId, response) {
-        console.log(response)
+        console.log(response);
         try {
           const axiosResponse = await axios.post("/api/v1/user/cart/purchase", {
             shippingAddress: addressId,
@@ -445,15 +450,14 @@ const getCheckOut = () => {
           console.log(axiosResponse.data);
           console.log("Order placed successfully");
           alert("Order placed successfully");
-          window.location.href="/"
+          window.location.href = "/";
         } catch (error) {
           console.error("Error placing order:", error);
           // console.error();
-          alert(error.response.data.message)
+          alert(error.response.data.message);
           // console.log(error)
         }
       }
-
 
       // async function placeOrder(addressId, response) {
       //   console.log(response);
@@ -461,12 +465,12 @@ const getCheckOut = () => {
       //   const axiosResponses = [];
 
       //   console.log(response.productSum)
-      
+
       //   try {
       //     for (const productId in productSum) {
       //       if (productSum.hasOwnProperty(productId)) {
       //         const productSumValue = productSum[productId];
-      
+
       //         const axiosResponse = await axios.post(
       //           "/api/v1/user/cart/purchase",
       //           {
@@ -474,11 +478,11 @@ const getCheckOut = () => {
       //             totalPrice: productSumValue,
       //           }
       //         );
-              
+
       //         axiosResponses.push(axiosResponse);
       //       }
       //     }
-      
+
       //     console.log("Orders placed successfully");
       //     alert("Orders placed successfully");
       //     window.location.href = "/";
@@ -486,13 +490,13 @@ const getCheckOut = () => {
       //     console.error("Error placing orders:", error);
       //     alert(error.response.data.message);
       //   }
-      
+
       //   // Access individual responses if needed
       //   axiosResponses.forEach((response, index) => {
       //     console.log(`Response ${index + 1}:`, response.data);
       //   });
       // }
-      
+
       text.textContent = response.totalPrice;
       totalPayable.textContent = response.totalPrice + shippingHandlingFee;
       productCount.textContent = response.cart.items.length;
@@ -505,6 +509,3 @@ getCheckOut();
 // getOrders function included in order.ejs
 
 // Event listener for address selection
-
-
-

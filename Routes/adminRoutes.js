@@ -82,7 +82,7 @@ router.get("/products", isAuthenticate, isAdmin, getAllProducts);
 
 router.get("/product/:id", isAuthenticate, isAdmin, getOneProduct);
 
-router.post("/product", upload.single("image"), addProduct);
+router.post("/product", upload.array('image',2), addProduct);
 
 router.put("/product/:id", upload.single("image"), updateProduct);
 

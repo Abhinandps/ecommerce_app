@@ -22,22 +22,25 @@
                                 <h4 class="card-title">Add New Products</h4>
                                 <div class="form-group">
                                     <label for="exampleInputName1">Product Name</label>
-                                    <input type="text" class="form-control" name="name" id="exampleInputName1"
-                                        placeholder="Name" required>
+                                    <input type="text" class="form-control" id="product-name" name="name"
+                                        id="exampleInputName1" placeholder="Name">
+                                    <p class="text-danger my-2 name-error error"></p>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="exampleSelectGender">Category</label>
-                                    <select class="form-control" id="category-dropdown" name="category" required>
+                                    <select class="form-control" category id="category-dropdown" name="category">
 
                                         <option></option>
 
                                     </select>
+                                    <p class="text-danger my-2 category-error error"></p>
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Upload Image</label> <br>
-                                    <input type="file" id="product-img" name="image" class="file-upload-info" required>
+                                    <label>Select Images (2 required):</label> <br>
+                                    <input type="file" id="product-img" name="image" class="file-upload-info" multiple>
+                                    <p class="text-danger my-2 error error-message"></p>
                                     <!-- <div class="input-group col-xs-12">
                                 <input type="text" class="form-control file-upload-info" disabled
                                     placeholder="Upload Icon">
@@ -50,19 +53,22 @@
 
                                 <div class="form-group">
                                     <label for="exampleInputCity1">Product Price</label>
-                                    <input type="number" name="price" class="form-control" id="exampleInputCity1"
-                                        placeholder="price" required>
+                                    <input type="number" name="price" class="form-control" id="price"
+                                        placeholder="price">
+                                    <p class="text-danger my-2 price-error error"></p>
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputCity1">Stock</label>
-                                    <input type="number" name="stock" class="form-control" id="exampleInputCity1"
-                                        placeholder="stock" required>
+                                    <input type="number" name="stock" class="form-control " id="stock"
+                                        placeholder="stock">
+                                    <p class="text-danger my-2 stock-error error"></p>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="exampleTextarea1">Description</label>
-                                    <textarea class="form-control" name="description" id="exampleTextarea1" rows="4"
-                                        required></textarea>
+                                    <textarea class="form-control " name="description" id="description"
+                                        rows="4"></textarea>
+                                    <p class="text-danger my-2 desc-error error"></p>
                                 </div>
                                 <button type="submit" class="btn btn-primary mr-2">Submit</button>
                                 <button type="reset" class="btn btn-dark">Cancel</button>
@@ -74,22 +80,23 @@
                                 <h4 class="card-title">Update Products</h4>
                                 <div class="form-group">
                                     <label for="exampleInputName1">Product Name</label>
-                                    <input type="text" class="form-control" name="name" id="product_name"
-                                        placeholder="Name" required>
+                                    <input type="text" class="form-control product-name" name="name" id="product_name"
+                                        placeholder="Name">
                                 </div>
 
                                 <div class="form-group">
                                     <label for="exampleSelectGender">Category</label>
-                                    <select class="form-control" id="product_dropdown" name="category">
+                                    <select class="form-control category" id="product_dropdown" name="category">
 
                                         <option></option>
 
                                     </select>
+                                    <p class="text-danger my-2 category-error error"></p>
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Upload Image</label> <br>
-                                    <input type="file" id="product-img" name="image" class="file-upload-info" required>
+                                    <label>Select Images (2 required):</label> <br>
+                                    <input type="file" id="product-img" name="image" class="file-upload-info">
                                     <!-- <div class="input-group col-xs-12">
                                 <input type="text" class="form-control file-upload-info" disabled
                                     placeholder="Upload Icon">
@@ -98,27 +105,31 @@
                                         type="button">Upload</button>
                                 </span>
                             </div> -->
+                                    <p class="text-danger my-2 error error-message"></p>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="exampleInputCity1">Product Price</label>
-                                    <input type="number" name="price" class="form-control" id="product_price"
-                                        placeholder="price" required>
+                                    <input type="number" name="price" class="form-control price" id="product_price"
+                                        placeholder="price">
+                                    <p class="text-danger my-2 price-error error"></p>
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputCity1">Stock</label>
-                                    <input type="number" name="stock" class="form-control" id="product_stock"
-                                        placeholder="stock" required>
+                                    <input type="number" name="stock" class="form-control stock" id="product_stock"
+                                        placeholder="stock">
+                                    <p class="text-danger my-2 stock-error error"></p>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="exampleTextarea1">Description</label>
-                                    <textarea class="form-control" name="description" id="product_desc" rows="4"
-                                        required></textarea>
+                                    <textarea class="form-control description" name="description" id="product_desc"
+                                        rows="4"></textarea>
+                                    <p class="text-danger my-2 desc-error error"></p>
                                 </div>
                                 <button type="submit" class="btn btn-success mr-2">Save</button>
                                 <button type="reset" class="btn btn-dark">Cancel</button>
-                            </form>
+                            </form> 
 
 
                         </div>
@@ -165,25 +176,107 @@
             };
 
 
-
             const form = document.getElementById('product-form');
-
+            const fileError = document.querySelector('.error-message')
+            const errorMsg = document.querySelectorAll('.error');
+            let isValid = true;
 
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
+
+                clearErrorMessages();
+
+                // Validate form fields
+                const productName = document.getElementById('product-name');
+                const category = document.querySelector('[category]');
+                const description = document.getElementById('description');
+                const stock = document.getElementById('stock');
+                const price = document.getElementById('price');
+
+                isValid = true; // Reset isValid before validating the form fields
+
+                if (!productName.value.trim()) {
+                    showError("name-error", "Please enter the product name.");
+                    isValid = false;
+                }
+
+                if (category.value === "") {
+                    showError("category-error", "Please select a category.");
+                    isValid = false;
+                }
+
+                if (!price.value.trim()) {
+                    showError("price-error", "Please enter the product price.");
+                    isValid = false;
+                } else if (isNaN(price.value)) {
+                    showError("price-error", "Price must be a valid number.");
+                    isValid = false;
+                }
+
+                if (!stock.value.trim()) {
+                    showError("stock-error", "Please enter the product stock.");
+                    isValid = false;
+                } else if (isNaN(stock.value)) {
+                    showError("stock-error", "Stock must be a valid number.");
+                    isValid = false;
+                } else if (parseInt(stock.value) < 1) {
+                    showError("stock-error", "Stock must be at least 1.");
+                    isValid = false;
+                }
+
+                const descriptionValue = description.value.trim();
+                if (!descriptionValue) {
+                    showError("desc-error", "Please enter the product description.");
+                    isValid = false;
+                } else {
+                    const wordCount = countWords(descriptionValue);
+                    const minWordCount = 50;
+                    const maxWordCount = 100;
+
+                    if (wordCount > maxWordCount) {
+                        showError("desc-error", `Description can have a maximum of ${maxWordCount} words.`);
+                        isValid = false;
+                    }
+                }
+
                 try {
-                    const formData = new FormData(form);
-                    const response = await axios.post('http://127.0.0.1:3000/api/v1/admin/product', formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data'
-                        }
-                    })
-                    await getAllProducts();
-                    console.log(response)
+                    if (isValid) {
+                        const formData = new FormData(form);
+                        const response = await axios.post('http://127.0.0.1:3000/api/v1/admin/product', formData, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            }
+                        });
+                        errorMsg.textContent = "";
+                        await getAllProducts();
+                    }
                 } catch (error) {
-                    console.error(error);
+                    const message = error.response.data.message;
+                    if (message) {
+                        fileError.textContent = message;
+                    } else {
+                        fileError.textContent = "";
+                    }
                 }
             });
+
+            function showError(element, errorMessage) {
+                const errorElement = document.querySelector(`.${element}`)
+                errorElement.textContent = errorMessage
+            }
+
+            function countWords(text) {
+                const trimmedText = text.trim();
+                const words = trimmedText.split(/\s+/);
+                return words.length;
+            }
+
+            function clearErrorMessages() {
+                const errorElements = document.querySelectorAll(".error");
+                errorElements.forEach((element) => {
+                    element.textContent = "";
+                });
+            }
 
         </script>
 

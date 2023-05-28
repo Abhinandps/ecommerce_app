@@ -136,6 +136,18 @@ exports.getOneProduct = catchAsync(async (req, res) => {
 
 exports.addProduct = catchAsync(async (req, res, next) => {
   const { name, price, category, description, stock } = req.body;
+  const files = req.files
+
+  if (!files || files.length === 0) {
+    return next(new AppError('No files uploaded',400))
+  }
+
+  const filePaths = files.map(file => file.path);
+  
+  if(filePaths.length < 2){
+    return next(new AppError('No files uploaded',400))
+  }
+
   // create a new product object
   const product = new Product({
     name,
@@ -143,14 +155,14 @@ exports.addProduct = catchAsync(async (req, res, next) => {
     category,
     description,
     stock,
-    image: req.file.path,
+    image: filePaths,
   });
 
   // Save the product to the database
   await product.save();
 
   // Send a response to the client
-  res.json(product);
+  res.status(201).json({status:"success",product});
 });
 
 exports.updateProduct = catchAsync(async (req, res, next) => {
