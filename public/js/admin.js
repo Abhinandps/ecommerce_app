@@ -253,66 +253,176 @@ const handleProductFormEdit = (event) => {
   const productID = event.target.dataset.productId;
   const editForm = document.getElementById("edit-product-form");
 
+  // fields
+  const productName = editForm.querySelector("#product_name");
+  const category = editForm.querySelector("#product_dropdown");
+  const price = editForm.querySelector("#product_price");
+  const stock = editForm.querySelector("#product_stock");
+  const description = editForm.querySelector("#product_desc");
+
+  // file error
+  const fileError = document.querySelector(".file-error");
+
   $.ajax({
     type: "GET",
     url: `http://127.0.0.1:3000/api/v1/admin/product/${productID}`,
-    success: function (response) {
+    success: async function (response) {
       const { products } = response.data;
+      // console.log(products.category)
 
       // Fetch the category name using the category ID
-      // $.ajax({
-      //   type: "GET",
-      //   url: `http://127.0.0.1:3000/api/v1/admin/category/${products.category}`,
-      //   success: function (response) {
-      //     const categoryName = response.data.categories.name;
-      //     editForm.querySelector("#product_dropdown").value = categoryName;
-      //   },
-      //   error: function (err) {
-      //     console.error(err);
-      //   },
-      // });
+      $.ajax({
+        type: "GET",
+        url: `http://127.0.0.1:3000/api/v1/admin/categories`,
+        success: function (response) {
+          const { categories } = response.data;
 
-      editForm.querySelector("#product_name").value = products.name;
+          // Populate the category dropdown options
+          const categoryDropdown = editForm.querySelector("#product_dropdown");
+          categoryDropdown.innerHTML = ""; // Clear existing options
 
-      editForm.querySelector("#product_price").value = products.price;
-      editForm.querySelector("#product_stock").value = products.stock;
-      editForm.querySelector("#product_desc").value = products.description;
+          categories.forEach((category) => {
+            const option = document.createElement("option");
+            option.value = category._id;
+            option.textContent = category.name;
+            categoryDropdown.appendChild(option);
+          });
+
+          // Set the selected category
+          const selectedCategory = categories.find(
+            (category) => category._id === products.category
+          );
+
+          if (selectedCategory) {
+            categoryDropdown.value = selectedCategory._id;
+          }
+        },
+        error: function (err) {
+          console.error(err);
+        },
+      });
+
+      productName.value = products.name;
+      // category.value= products.category;
+      price.value = products.price;
+      stock.value = products.stock;
+      description.value = products.description;
 
       const form = document.getElementById("product-form");
       form.style.display = "none";
       editForm.style.display = "block";
     },
     error: function (err) {
-      console.error(err);
+      console.log(error);
     },
   });
 
+  // const errorMsg = document.querySelectorAll(".error");
+
+  let isValid = true;
   // Listen for the edit form submission
   editForm.addEventListener("submit", (e) => {
     e.preventDefault();
-    const formData = new FormData(editForm);
 
-    $.ajax({
-      type: "PUT",
-      url: `http://127.0.0.1:3000/api/v1/admin/product/${productID}`,
-      data: formData,
-      processData: false,
-      contentType: false,
-      success: async function (response) {
-        console.log(response);
+    clearErrorMessages();
 
-        // Hide the edit form and show the add form
-        form.style.display = "block";
-        editForm.style.display = "none";
+    isValid = true; // Reset isValid before validating the form fields
 
-        // Reload the categories table
-        await getAllProducts();
-      },
-      error: function (err) {
-        console.error(err);
-      },
-    });
+    if (!productName.value.trim()) {
+      showError("productName-error", "Please enter the product name.");
+      isValid = false;
+    }
+
+    if (category.value === "") {
+      showError("productCategory-error", "Please select a category.");
+      isValid = false;
+    }
+
+    if (!price.value.trim()) {
+      showError("productPrice-error", "Please enter the product price.");
+      isValid = false;
+    } else if (isNaN(price.value)) {
+      showError("productPrice-error", "Price must be a valid number.");
+      isValid = false;
+    }
+
+    if (!stock.value.trim()) {
+      showError("productStock-error", "Please enter the product stock.");
+      isValid = false;
+    } else if (isNaN(stock.value)) {
+      showError("productStock-error", "Stock must be a valid number.");
+      isValid = false;
+    } else if (parseInt(stock.value) < 1) {
+      showError("productStock-error", "Stock must be at least 1.");
+      isValid = false;
+    }
+
+    const descriptionValue = description.value.trim();
+    if (!descriptionValue) {
+      showError("productDesc-error", "Please enter the product description.");
+      isValid = false;
+    } else {
+      const wordCount = countWords(descriptionValue);
+      // const minWordCount = 50;
+      const maxWordCount = 100;
+
+      if (wordCount > maxWordCount) {
+        showError(
+          "productDesc-error",
+          `Description can have a maximum of ${maxWordCount} words.`
+        );
+        isValid = false;
+      }
+    }
+    try {
+      if (isValid) {
+        const formData = new FormData(editForm);
+        $.ajax({
+          type: "PUT",
+          url: `http://127.0.0.1:3000/api/v1/admin/product/${productID}`,
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function (response) {
+            console.log(response);
+
+            // Hide the edit form and show the add form
+            form.style.display = "block";
+            editForm.style.display = "none";
+
+            // Reload the categories table
+            getAllProducts();
+          },
+          error: function (error) {
+            const message = error.responseJSON.message;
+            if (message) {
+              fileError.textContent = message;
+            } else {
+              fileError.textContent = "";
+            }
+          },
+        });
+      }
+    } catch (error) {}
   });
+
+  function showError(element, errorMessage) {
+    const errorElement = document.querySelector(`#${element}`);
+    errorElement.textContent = errorMessage;
+  }
+
+  function countWords(text) {
+    const trimmedText = text.trim();
+    const words = trimmedText.split(/\s+/);
+    return words.length;
+  }
+
+  function clearErrorMessages() {
+    const errorElements = document.querySelectorAll(".error");
+    errorElements.forEach((element) => {
+      element.textContent = "";
+    });
+  }
 };
 
 const handleProductDelete = (event) => {

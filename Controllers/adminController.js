@@ -17,13 +17,13 @@ exports.getAllUsers = catchAsync(async (req, res) => {
   });
 });
 
-exports.getOneUsers = catchAsync(async(req,res)=>{
-  const user = await User.findOne({_id: req.params.id})
+exports.getOneUsers = catchAsync(async (req, res) => {
+  const user = await User.findOne({ _id: req.params.id });
   res.status(200).json({
-    status:"success",
-    data:user
-  })
-})
+    status: "success",
+    data: user,
+  });
+});
 
 exports.getOneCategory = catchAsync(async (req, res) => {
   const categories = await Category.findOne({ _id: req.params.id });
@@ -68,7 +68,6 @@ exports.addCategory = catchAsync(async (req, res, next) => {
 }, ErrorHandler);
 
 exports.updateCategory = catchAsync(async (req, res, next) => {
-  
   const { name, description } = req.body;
   // 1 find the category for update
   const category = await Category.findById(req.params.id);
@@ -77,7 +76,6 @@ exports.updateCategory = catchAsync(async (req, res, next) => {
   if (category) {
     category.name = name || category.name;
     category.description = description || category.description;
-
 
     // Remove the old icon file if a new file is uploaded
     if (req.file) {
@@ -119,7 +117,7 @@ exports.deleteCategory = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllProducts = catchAsync(async (req, res) => {
-  const products = await Product.find({deleted:false});
+  const products = await Product.find({ deleted: false });
   res.status(200).json({
     status: "success",
     data: { products },
@@ -136,16 +134,16 @@ exports.getOneProduct = catchAsync(async (req, res) => {
 
 exports.addProduct = catchAsync(async (req, res, next) => {
   const { name, price, category, description, stock } = req.body;
-  const files = req.files
+  const files = req.files;
 
   if (!files || files.length === 0) {
-    return next(new AppError('No files uploaded',400))
+    return next(new AppError("No files uploaded", 400));
   }
 
-  const filePaths = files.map(file => file.path);
-  
-  if(filePaths.length < 2){
-    return next(new AppError('No files uploaded',400))
+  const filePaths = files.map((file) => file.path);
+
+  if (filePaths.length < 2) {
+    return next(new AppError("No files uploaded", 400));
   }
 
   // create a new product object
@@ -162,11 +160,23 @@ exports.addProduct = catchAsync(async (req, res, next) => {
   await product.save();
 
   // Send a response to the client
-  res.status(201).json({status:"success",product});
+  res.status(201).json({ status: "success", product });
 });
 
 exports.updateProduct = catchAsync(async (req, res, next) => {
   const { name, price, category, description } = req.body;
+  const files = req.files;
+
+  if (!files || files.length === 0) {
+    return next(new AppError("No files uploaded", 400));
+  }
+
+  const filePaths = files.map((file) => file.path);
+
+  if (filePaths.length < 2) {
+    return next(new AppError("No files uploaded", 400));
+  }
+
   // 1 find the product for update
   const product = await Product.findById(req.params.id);
 
@@ -177,14 +187,22 @@ exports.updateProduct = catchAsync(async (req, res, next) => {
     product.description = description || product.description;
     product.category = category || product.category;
 
-    // Remove the old icon file if a new file is uploaded
-    if (req.file) {
-      if (product.image) {
+    // Remove the old image file if a new file is uploaded
+    if (files.length > 0) {
+      if (Array.isArray(product.image)) {
+        // Remove all existing images
+        product.image.forEach((filePath) => {
+          fs.unlink(filePath, (err) => {
+            if (err) console.log(err);
+          });
+        });
+      } else if (product.image) {
+        // Remove the existing image
         fs.unlink(product.image, (err) => {
           if (err) console.log(err);
         });
       }
-      product.image = req.file.path;
+      product.image = filePaths;
     }
 
     // Save the updated product
@@ -202,7 +220,7 @@ exports.deleteProduct = catchAsync(async (req, res, next) => {
   if (!product) {
     return next(new AppError("Product not found", 404));
   }
-  
+
   // Set the deleted field to true
   product.deleted = true;
   await product.save();

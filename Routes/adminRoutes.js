@@ -84,7 +84,7 @@ router.get("/product/:id", isAuthenticate, isAdmin, getOneProduct);
 
 router.post("/product", upload.array('image',2), addProduct);
 
-router.put("/product/:id", upload.single("image"), updateProduct);
+router.put("/product/:id", upload.array('image',2), updateProduct);
 
 router.delete("/product/:id", deleteProduct);
 

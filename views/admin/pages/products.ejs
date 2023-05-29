@@ -80,8 +80,9 @@
                                 <h4 class="card-title">Update Products</h4>
                                 <div class="form-group">
                                     <label for="exampleInputName1">Product Name</label>
-                                    <input type="text" class="form-control product-name" name="name" id="product_name"
+                                    <input type="text" class="form-control" name="name" id="product_name"
                                         placeholder="Name">
+                                        <p id="productName-error " class="text-danger my-2 error"></p>
                                 </div>
 
                                 <div class="form-group">
@@ -91,12 +92,12 @@
                                         <option></option>
 
                                     </select>
-                                    <p class="text-danger my-2 category-error error"></p>
+                                    <p id="productCategory-error" class="text-danger my-2 error"></p>
                                 </div>
 
                                 <div class="form-group">
                                     <label>Select Images (2 required):</label> <br>
-                                    <input type="file" id="product-img" name="image" class="file-upload-info">
+                                    <input type="file" id="product-img" name="image" class="file-upload-info" multiple>
                                     <!-- <div class="input-group col-xs-12">
                                 <input type="text" class="form-control file-upload-info" disabled
                                     placeholder="Upload Icon">
@@ -105,27 +106,27 @@
                                         type="button">Upload</button>
                                 </span>
                             </div> -->
-                                    <p class="text-danger my-2 error error-message"></p>
+                                    <p class="text-danger my-2 error file-error"></p>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="exampleInputCity1">Product Price</label>
                                     <input type="number" name="price" class="form-control price" id="product_price"
                                         placeholder="price">
-                                    <p class="text-danger my-2 price-error error"></p>
+                                    <p id="productPrice-error" class="text-danger my-2 error"></p>
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputCity1">Stock</label>
                                     <input type="number" name="stock" class="form-control stock" id="product_stock"
                                         placeholder="stock">
-                                    <p class="text-danger my-2 stock-error error"></p>
+                                    <p id="productStock-error" class="text-danger my-2  error"></p>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="exampleTextarea1">Description</label>
                                     <textarea class="form-control description" name="description" id="product_desc"
                                         rows="4"></textarea>
-                                    <p class="text-danger my-2 desc-error error"></p>
+                                    <p id="productDesc-error" class="text-danger my-2  error"></p>
                                 </div>
                                 <button type="submit" class="btn btn-success mr-2">Save</button>
                                 <button type="reset" class="btn btn-dark">Cancel</button>
@@ -179,6 +180,7 @@
             const form = document.getElementById('product-form');
             const fileError = document.querySelector('.error-message')
             const errorMsg = document.querySelectorAll('.error');
+            const nameError = document.querySelector('.name-error')
             let isValid = true;
 
             form.addEventListener('submit', async (e) => {
@@ -230,7 +232,7 @@
                     isValid = false;
                 } else {
                     const wordCount = countWords(descriptionValue);
-                    const minWordCount = 50;
+                    // const minWordCount = 50;
                     const maxWordCount = 100;
 
                     if (wordCount > maxWordCount) {
@@ -252,10 +254,18 @@
                     }
                 } catch (error) {
                     const message = error.response.data.message;
+                    const name = error.response.data.message.name
                     if (message) {
                         fileError.textContent = message;
                     } else {
                         fileError.textContent = "";
+                    }
+
+                    if(name){
+                        nameError.textContent = name
+                        fileError.textContent = "";
+                    }else{
+                        nameError.textContent=""
                     }
                 }
             });

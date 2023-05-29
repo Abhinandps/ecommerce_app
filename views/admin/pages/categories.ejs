@@ -23,11 +23,12 @@
                                     <label for="exampleInputName1">Category Name</label>
                                     <input type="text" class="form-control" name="name" id="category-name"
                                         placeholder="Name">
+                                        <p id="name-error" class="text-danger my-2"></p>
                                 </div>
 
                                 <div class="form-group">
                                     <label>Upload Icon</label> <br>
-                                    <input type="file" name="image" class="file-upload-info">
+                                    <input type="file" name="image" class="file-upload-info" required>
                                     <!-- <div class="input-group col-xs-12">
                                         <input type="text" class="form-control file-upload-info" disabled
                                             placeholder="Upload Icon">
@@ -53,7 +54,8 @@
                                 <h4 class="card-title">Update Category</h4>
                                 <div class="form-group">
                                     <label for="exampleInputName1">Category Name</label>
-                                    <input type="text" class="form-control" name="name" id="name" placeholder="Name">
+                                    <input type="text" class="form-control" name="name" id="name" placeholder="Name" required>
+                                    <p id="edit-name-error" class="text-danger my-2"></p>
                                 </div>
 
                                 <div class="form-group">
@@ -116,6 +118,7 @@
 
             const cardBody = document.getElementById('card-body');
             const form = document.getElementById('category-form');
+            const nameError = document.getElementById('name-error')
 
 
             form.addEventListener('submit', async (e) => {
@@ -127,10 +130,16 @@
                             'Content-Type': 'multipart/form-data'
                         }
                     })
+                    nameError.innerHTML = ''
                     await getAllCategories();
-                    console.log(response)
+                    // console.log(response)
                 } catch (error) {
-                    console.error(error);
+                    const name = error.response.data.message.name
+                    if(name){
+                        nameError.innerHTML = name
+                    } else{
+                        nameError.innerHTML = ''
+                    }
                 }
             });
 
