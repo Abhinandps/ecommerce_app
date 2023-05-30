@@ -10,6 +10,7 @@ const {
   getCart,
   addToCart,
   updateCartItem,
+  updateCartTotal,
   removeCartItem,
   getCartItemsCount,
   saveShippingAddress,
@@ -56,6 +57,8 @@ router.get("/products",isAuthenticate,getAllProducts);
 router.route("/cart").get(isAuthenticate,getCart).post(isAuthenticate,addToCart);
 
 router.route("/cart/:productId").put(isAuthenticate,updateCartItem).delete(isAuthenticate,removeCartItem);
+
+router.patch("/cart/total",isAuthenticate,updateCartTotal)
 
 router.get("/cart/items/count", isAuthenticate, getCartItemsCount)
 

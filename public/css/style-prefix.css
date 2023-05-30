@@ -3881,9 +3881,6 @@ footer {
   color: var(--white);
 }
 
-
-
-
 .input-fields {
   font-size: var(--fs-9);
   display: flex;
@@ -4221,7 +4218,7 @@ img {
 
 /* Add Shipping Address  */
 
-#btnOpenForm{
+#btnOpenForm {
   background: var(--sandy-brown);
   padding: 10px 20px;
   border-radius: var(--border-radius-sm);
@@ -4335,4 +4332,11 @@ img {
   left: 0;
   right: 0;
   bottom: 0;
+}
+
+.radio-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 300px;
 }

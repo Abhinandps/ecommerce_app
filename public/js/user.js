@@ -215,11 +215,11 @@ const getCart = () => {
     success: function (response) {
       const { cart } = response;
       const data = cart.items;
-      console.log(data);
+      console.log("data" + data);
 
       row.empty();
 
-      if(data.length < 1){
+      if (data.length < 1) {
         const cart = `
         <div class="empty-cart">
         <h3>Missing Cart items ?</h3>
@@ -238,7 +238,6 @@ const getCart = () => {
             const { data } = response;
             const product = data.products;
             console.log(product);
-
 
             const singleItem = `
               <div class="cart-product">
@@ -355,8 +354,6 @@ const getCart = () => {
         });
       });
 
-      
-
       const totalPrice = document.querySelector("#totalPrice");
       const totalPayable = document.querySelector("#totalPayable");
       const productCount = document.querySelector("[item-count]");
@@ -402,7 +399,7 @@ const getCheckOut = () => {
   const totalPrice = document.querySelector("#totalPrice");
   const totalPayable = document.querySelector("#totalPayable");
   const productCount = document.querySelector("[item-count]");
-  const pay = document.querySelector("[proceed-pay]");
+  const proceedPay = document.querySelector("[proceed-pay]");
   const shippingHandlingFee = 98;
 
   const text = totalPrice.querySelector("span");
@@ -414,7 +411,7 @@ const getCheckOut = () => {
       const { cart } = response;
       const data = cart.shippingAddress;
       row.empty();
-      console.log(data)
+      console.log(data);
 
       data.forEach((address) => {
         const addressList = `
@@ -438,78 +435,96 @@ const getCheckOut = () => {
         row.append(addressList);
       });
 
-      pay.addEventListener("click", async () => {
+      proceedPay.addEventListener("click", () => {
         const selectedAddressId = $('input[name="user-info"]:checked').val();
         console.log(`Selected address ID: ${selectedAddressId}`);
-        await placeOrder(selectedAddressId, response);
+        if (selectedAddressId) {
+          window.location.href = "/payment?addressId=" + selectedAddressId;
+        } else {
+          alert("Please select a shipping address.");
+        }
       });
 
-      async function placeOrder(addressId, response) {
-        console.log(response);
-        try {
-          const axiosResponse = await axios.post("/api/v1/user/cart/purchase", {
-            shippingAddress: addressId,
-            // totalPrice: 1000,
-            totalPrice: response.totalPrice,
-          });
-          console.log(axiosResponse.data);
-          console.log("Order placed successfully");
-          alert("Order placed successfully");
-          window.location.href = "/";
-        } catch (error) {
-          console.error("Error placing order:", error);
-          // console.error();
-          alert(error.response.data.message);
-          // console.log(error)
-        }
-      }
-
-      // async function placeOrder(addressId, response) {
-      //   console.log(response);
-      //   const productSum = response.productSum;
-      //   const axiosResponses = [];
-
-      //   console.log(response.productSum)
-
-      //   try {
-      //     for (const productId in productSum) {
-      //       if (productSum.hasOwnProperty(productId)) {
-      //         const productSumValue = productSum[productId];
-
-      //         const axiosResponse = await axios.post(
-      //           "/api/v1/user/cart/purchase",
-      //           {
-      //             shippingAddress: addressId,
-      //             totalPrice: productSumValue,
-      //           }
-      //         );
-
-      //         axiosResponses.push(axiosResponse);
-      //       }
-      //     }
-
-      //     console.log("Orders placed successfully");
-      //     alert("Orders placed successfully");
-      //     window.location.href = "/";
-      //   } catch (error) {
-      //     console.error("Error placing orders:", error);
-      //     alert(error.response.data.message);
-      //   }
-
-      //   // Access individual responses if needed
-      //   axiosResponses.forEach((response, index) => {
-      //     console.log(`Response ${index + 1}:`, response.data);
-      //   });
-      // }
-
       text.textContent = response.totalPrice;
-      totalPayable.textContent = response.totalPrice + shippingHandlingFee;
+      let totalPriceValue = response.totalPrice + shippingHandlingFee;
+      totalPayable.textContent = totalPriceValue;
       productCount.textContent = response.cart.items.length;
+
+      // Update the cart collection's total value
+      updateCartTotal(totalPriceValue);
+    },
+  });
+};
+
+const updateCartTotal = (totalPrice) => {
+  $.ajax({
+    type: "PATCH",
+    url: "/api/v1/user/cart/total",
+    data: {
+      totalPrice,
+    },
+    success: function (response) {},
+    error: function (error) {
+      console.error("Error updating cart total:", error);
+      getCheckOut()
     },
   });
 };
 
 getCheckOut();
+
+const getPaymentDetails = () => {
+  const totalPayable = document.querySelector("#totalPayable");
+  // const productCount = document.querySelector("[item-count]");
+  const placeOrderButton = document.querySelector("[place_order]");
+
+  $.ajax({
+    type: "GET",
+    url: "/api/v1/user/cart",
+    success: function (response) {
+      const cart = response.cart;
+      totalPayable.textContent = cart.totalPrice;
+
+      placeOrderButton.addEventListener("click", async () => {
+        const selectedPaymentOption = $(
+          'input[name="payment-option"]:checked'
+        ).val();
+
+        if (selectedPaymentOption) {
+          const urlParams = new URLSearchParams(window.location.search);
+          const addressId = urlParams.get("addressId");
+          if (addressId) {
+            try {
+              await placeOrder(addressId, selectedPaymentOption, response);
+            } catch (error) {
+              console.log(error);
+            }
+          }
+        } else {
+          alert("select payment option");
+        }
+      });
+    },
+  });
+
+  async function placeOrder(addressId, selectedPaymentOption, response) {
+    try {
+      const axiosResponse = await axios.post("/api/v1/user/cart/purchase", {
+        shippingAddress: addressId,
+        paymentMethod: selectedPaymentOption,
+        totalPrice: response.totalPrice,
+      });
+      console.log(axiosResponse.data);
+      alert("Order placed successfully");
+      window.location.href = "/myorders";
+    } catch (error) {
+      console.error("Error placing order:", error);
+      alert(error.response.data.message);
+    }
+  }
+};
+
+getPaymentDetails();
 
 // getOrders function included in order.ejs
 

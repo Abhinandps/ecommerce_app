@@ -14,7 +14,7 @@
         </div>
 
         <main orders-history>
-           <!-- DYNAMIC DATA COMES  -->
+            <!-- DYNAMIC DATA COMES  -->
         </main>
 
 
@@ -47,14 +47,13 @@
                                             const { cart } = response
                                             console.log(cart)
                                             console.log(products)
-                                            
-                                            let shippingAddress = cart.shippingAddress.find(address=>address._id === order.shippingAddress)
-                                            if(!shippingAddress){
+
+                                            let shippingAddress = cart.shippingAddress.find(address => address._id === order.shippingAddress)
+                                            if (!shippingAddress) {
                                                 console.log("no address found")
                                             }
 
-                                            const imagePath = products.image;
-                                            const newPath = imagePath.replace("public", "");
+                                         
 
                                             const MAX_DESCRIPTION_LENGTH = 50;
 
@@ -65,8 +64,15 @@
 
                                             const orderedDetailsCard = `<div class="row">
                                         <div class="product_details">
+
                                             <div class="product_image">
-                                                <img src=${newPath} alt="">
+                                                ${products.image.map((path, index) => {
+                                                const newPath = path.replace("public", "");
+                                                console.log(newPath)
+                                                if (index === 0) {
+                                                    return `<img src="${newPath}" width="100"/>`
+                                                }
+                                            })}
                                             </div>
                                             <div class="product_name">
                                                 <p>${products.name}</p>

@@ -140,6 +140,12 @@ exports.getOrdersPage = (req,res)=>{
   }
 }
 
+exports.getPaymentPage = (req,res)=>{
+  if(req.user){
+    res.render("user/payment.ejs")
+  }
+}
+
 
 
 exports.getErrorPage = (req,res)=>{

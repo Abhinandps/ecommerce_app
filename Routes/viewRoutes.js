@@ -18,7 +18,8 @@ const {
   getCheckoutPage,
   getOrdersPage,
   getOrderPage,
-  getAllOrders
+  getAllOrders,
+  getPaymentPage
 } = require("../Controllers/viewController");
 
 const { isAuthenticate ,isAdmin} = require("../middleware/auth");
@@ -65,6 +66,8 @@ router.get("/cart",isAuthenticate , getCartPage);
 router.get("/checkout",isAuthenticate , getCheckoutPage);
 
 router.get("/myorders",isAuthenticate , getOrdersPage);
+
+router.get("/payment",isAuthenticate , getPaymentPage);
 
 
 module.exports = router;

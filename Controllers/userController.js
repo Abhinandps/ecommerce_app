@@ -87,11 +87,12 @@ exports.updateCartItem = catchAsync(async (req, res) => {
   const cartItem = cart.items.find(
     (item) => item.product.toString() === productId
   );
+
   cartItem.quantity = quantity;
 
   await cart.save();
 
-  const { productSum, totalPrice } = await cart.calculatePrices();
+  const { productSum } = await cart.calculatePrices();
 
   res.status(201).json({
     status: "success",
@@ -99,6 +100,22 @@ exports.updateCartItem = catchAsync(async (req, res) => {
     cart,
     productSum,
     totalPrice,
+  });
+});
+
+exports.updateCartTotal = catchAsync(async (req, res) => {
+  const { totalPrice } = req.body;
+  console.log(totalPrice)
+  const userId = req.user._id; 
+  const cart = await Cart.findOneAndUpdate(
+    { user: userId },
+    { totalPrice: totalPrice },
+    { new: true }
+  );
+  res.status(200).json({
+    status: "success",
+    message: "Cart total price updated successfully.",
+    cart,
   });
 });
 
@@ -146,8 +163,9 @@ exports.saveShippingAddress = catchAsync(async (req, res) => {
 // purchase
 
 exports.purchaseItem = catchAsync(async (req, res, next) => {
-  const { shippingAddress, totalPrice } = req.body;
-  console.log(shippingAddress)
+  const { shippingAddress,paymentMethod, totalPrice } = req.body;
+  
+  console.log(shippingAddress);
 
   // Retrieve the user
   const user = await User.findById(req.user._id);
@@ -216,7 +234,7 @@ exports.purchaseItem = catchAsync(async (req, res, next) => {
     user: user._id,
     items: cart.items,
     shippingAddress,
-    paymentMethod: "COD",
+    paymentMethod,
     totalPrice,
   });
 

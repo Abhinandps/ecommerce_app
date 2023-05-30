@@ -126,9 +126,7 @@
 
     <script>
         const form = document.getElementById('add-new-address');
-        // const fileError = document.querySelector('.error-message')
-        // const errorMsg = document.querySelectorAll('.error');
-        // const nameError = document.querySelector('.name-error')
+        
         let isValid = true;
 
         form.addEventListener('submit', async (e) => {
@@ -199,8 +197,6 @@
                         address:address.value
                     }
                     const response = await axios.post('/api/v1/user/address', formData);
-                    // errorMsg.textContent = "";
-                    // await getAllProducts();
                     getCheckOut()
                 }
             } catch (error) {

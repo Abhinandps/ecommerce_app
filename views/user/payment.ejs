@@ -1,0 +1,124 @@
+<%- include ('../layouts/header.ejs') %>
+
+
+    <div class="container wrapper">
+
+        <div class="carts">
+            <div class="cart-head">
+                <h2 class="cart-title">Payment</h2>
+                <!-- <button class="carrt-button">
+                    <i></i>
+                    Address
+                </button> -->
+            </div>
+
+            <div class="cart-items">
+                <div class="payment-options">
+                    <input type="radio" id="cod" name="payment-option" value="cod">
+                    <label for="cod">Cash on Delivery</label>
+                  
+                    <input type="radio" id="card" name="payment-option" value="card">
+                    <label for="card">Credit Card</label>
+                  
+                    <input type="radio" id="upi" name="payment-option" value="upi">
+                    <label for="upi">UPI</label>
+                  </div>                  
+            </div>
+        </div>
+
+        <div class="proceedSidebar">
+            <!-- <div class="desc">
+                <p>how are shipping costs calculated? shipping have been applied to your order</p>
+            </div> -->
+            <div class="sidebar-heading">
+                <h2>Price Details</h2>
+            </div>
+            <div class="sidebar-details">
+                <div class="group-data">
+                    <div class="data-title"> <span item-count> </span> </div>
+                    <div id="totalPrice" class="title-value"><span></span></div>
+                </div>
+                <div class="group-data">
+                    <div class="data-title">Delivery Charges:</div>
+                    <div class="title-value">₹0.00</div>
+                </div>
+                <div class="group-data">
+                    <div class="data-total">total Payable:</div>
+                    <div id="totalPayable" class="title-value"></div>
+                </div>
+                <button class="btn-proceed" place_order>Place Order</button>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="form-popup-bg">
+        <div class="form-container">
+            <button id="btnCloseForm" class="modal-close-btn">
+                <ion-icon id="btnCloseForm" name="close-outline"></ion-icon>
+            </button>
+            <h1>Add Shipping address</h1>
+            <!-- <p>For more information. Please complete this form.</p> -->
+
+            <form id="add-new-address" method="post">
+                <div class="field-group">
+                    <div class="form-group">
+                        <label for="">Name</label>
+                        <input id="name" type="text" name="custName" class="form-control" />
+                        <span class="invalid error" id="error-name"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="">Mobile</label>
+                        <input class="form-control" type="number" id="phone" name="mobile" type="text" />
+                        <span class="invalid error" id="mobile-error"></span>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <div class="form-group">
+                        <label for="">zipCode</label>
+                        <input class="form-control" id="zipCode" name="zipCode" type="text" />
+                        <span class="invalid error" id="zipcode-error"></span>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="">Locality</label>
+                        <input class="form-control" id="locality" name="locality" type="text" />
+                        <span class="invalid error" id="locality-error"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="">Address</label>
+                    <textarea class="form-control" id="address" name="address" type="text" cols="30"
+                        rows="5"></textarea>
+                    <span class="invalid error" id="address-error"></span>
+
+                </div>
+
+
+                <div class="field-group">
+                    <div class="form-group">
+                        <label for="">City</label>
+                        <input class="form-control" id="city" name="city" type="text" />
+                        <span class="invalid error" id="city-error"></span>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="">State</label>
+                        <select class="form-control" id="state" name="state" type="text">
+                            <option value=""></option>
+                        </select>
+                        <span class="invalid error" id="state-error"></span>
+
+
+                    </div>
+                </div>
+
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+
+
+    <%- include ('../layouts/footer.ejs') %>
