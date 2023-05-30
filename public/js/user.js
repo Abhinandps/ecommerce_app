@@ -219,6 +219,17 @@ const getCart = () => {
 
       row.empty();
 
+      if(data.length < 1){
+        const cart = `
+        <div class="empty-cart">
+        <h3>Missing Cart items ?</h3>
+        <p>Your Cart is Empty now this time to shop</p>
+        <a href="/shop" class="button">Shop</a>
+        </div>
+        `;
+        row.append(cart);
+      }
+
       data.forEach((item) => {
         $.ajax({
           type: "GET",
@@ -374,24 +385,13 @@ const handleRemoveCartItem = (productId) => {
 };
 
 const goToChekOut = () => {
-  const row = $(".cart-items");
+  // const row = $(".cart-items");
   $.ajax({
     type: "GET",
     url: "/api/v1/user/cart",
     success: function (response) {
       if (response.cart.items.length > 0) {
         window.location.href = "/checkout";
-      } else {
-        const cart = `
-        <div class="empty-cart">
-        <h3>Missing Cart items ?</h3>
-        <p>Your Cart is Empty now this time to shop</p>
-        <a href="/shop" class="button">Shop</a>
-        </div>
-        `;
-        row.append(cart);
-        // alert("cart is Empty")
-        // window.location.href = "/cart";
       }
     },
   });
@@ -414,6 +414,7 @@ const getCheckOut = () => {
       const { cart } = response;
       const data = cart.shippingAddress;
       row.empty();
+      console.log(data)
 
       data.forEach((address) => {
         const addressList = `
@@ -427,7 +428,7 @@ const getCheckOut = () => {
        </div>
        </div>
             <div class="address">
-                <p> ${address.address}, ${address.city}, ${address.state}, ${address.zipCode}</p>
+                <p> ${address.address}, ${address.locality}, ${address.city},${address.state}, ${address.zipCode}</p>
             </div>
         </div>
         <button>EDIT</button>

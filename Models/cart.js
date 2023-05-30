@@ -42,16 +42,13 @@ const cartSchema = new mongoose.Schema({
         type: String,
         required: true,
       },
-      country: {
+      locality: {
         type: String,
         required: true,
       },
       zipCode: {
         type: String,
         required: true,
-      },
-      alterMobile: {
-        type: Number,
       },
     },
   ],

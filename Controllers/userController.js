@@ -147,6 +147,7 @@ exports.saveShippingAddress = catchAsync(async (req, res) => {
 
 exports.purchaseItem = catchAsync(async (req, res, next) => {
   const { shippingAddress, totalPrice } = req.body;
+  console.log(shippingAddress)
 
   // Retrieve the user
   const user = await User.findById(req.user._id);
