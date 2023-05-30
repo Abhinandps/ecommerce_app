@@ -149,30 +149,30 @@
                         const newStatus = this.value;
                         const orderID = order.orderID
 
-                        const confirmation = confirm(`Are you sure you want to change the status to "${newStatus}"?`);
-                        if (confirmation) {
-                            currentStatus = newStatus;
-                            order.status = currentStatus;
-                            localStorage.setItem('order', JSON.stringify(order));
-                            
-                            $.ajax({
-                                type: "PUT",
-                                url: `/api/v1/admin/orders/${orderID}`,
-                                data: {
-                                    status: currentStatus
-                                },
-                                success: function (response) {
-                                    console.log("ajax status "+currentStatus)
-                                    // console.log(response.data.order.status);
-                                },
-                                error: function (xhr, status, error) {
-                                    console.log(error);
-                                }
-                            });
-                        } else {
-                            statusDropdown.value = currentStatus
-                        }
+                        showCustomConfirmation("Are you sure you want to delete this item?", function (result) {
+                            if (result) {
+                                currentStatus = newStatus;
+                                order.status = currentStatus;
+                                localStorage.setItem('order', JSON.stringify(order));
 
+                                $.ajax({
+                                    type: "PUT",
+                                    url: `/api/v1/admin/orders/${orderID}`,
+                                    data: {
+                                        status: currentStatus
+                                    },
+                                    success: function (response) {
+                                        console.log("ajax status " + currentStatus)
+                                        showToast(`Order Status Changed to  ${currentStatus}`, "primary");
+                                    },
+                                    error: function (xhr, status, error) {
+                                        console.log(error);
+                                    }
+                                });
+                            } else {
+                                statusDropdown.value = currentStatus
+                            }
+                        });
                     });
 
 

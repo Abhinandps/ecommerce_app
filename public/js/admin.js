@@ -18,7 +18,7 @@ const getUsers = async () => {
 
     users.forEach((user) => {
       const row = document.createElement("tr");
-      const btn = `<label type="button"  class="badge ${
+      const btn = `<label type="button" id="btn-confirm"  class="badge ${
         user.isBlock ? "badge-primary " : "badge-danger"
       }" data-user-id="${user._id}" onclick="handleClick(event)">${
         user.isBlock ? "Unblock" : "Block"
@@ -40,24 +40,32 @@ const getUsers = async () => {
 // Block and Unblock users
 const handleClick = (event) => {
   const userId = event.target.dataset.userId;
-  const confirmed = window.confirm(
-    `Are you sure you want to change the status ?`
-  );
 
-  if (confirmed) {
-    $.ajax({
-      type: "PUT",
-      url: `http://127.0.0.1:3000/api/v1/admin/${userId}/block`,
-      success: function (user) {
-        const btn = $(`label[data-user-id="${user._id}"]`);
-        btn.addClass(user.isBlock ? "badge-danger" : "badge-primary");
-        getUsers();
-      },
-      error: function (err) {
-        console.error(err);
-      },
-    });
-  }
+  showCustomConfirmation(
+    "Are you sure you want to Change this User status ?",
+    function (result) {
+      if (result) {
+        $.ajax({
+          type: "PUT",
+          url: `http://127.0.0.1:3000/api/v1/admin/${userId}/block`,
+          success: function (user) {
+            const btn = $(`label[data-user-id="${user._id}"]`);
+            btn.addClass(user.isBlock ? "badge-danger" : "badge-primary");
+
+            showToast(`User Status Changed Successfully`, "info");
+
+            getUsers();
+          },
+          error: function (err) {
+            console.error(err);
+          },
+        });
+      } else {
+        // User canceled the action
+        console.log("Deletion canceled");
+      }
+    }
+  );
 };
 
 const handleFormEdit = (event) => {
@@ -102,6 +110,7 @@ const handleFormEdit = (event) => {
 
         // Reload the categories table
         getAllCategories();
+        showToast(`Category Updated Successfully`, "success");
       },
       error: function (err) {
         console.error(err);
@@ -112,25 +121,30 @@ const handleFormEdit = (event) => {
 
 const handleCategoryDelete = (event) => {
   const categoryID = event.target.dataset.userId;
-  const confirmed = window.confirm(
-    `Are you sure you want to delete the category ?`
+
+  showCustomConfirmation(
+    "Are you sure you want to delete this item?",
+    function (result) {
+      if (result) {
+        $.ajax({
+          type: "DELETE",
+          url: `http://127.0.0.1:3000/api/v1/admin/category/${categoryID}`,
+          success: function (response) {
+            console.log(response);
+
+            // Reload the categories table
+            getAllCategories();
+            showToast(`Category Deleted Successfully`, "danger");
+          },
+          error: function (err) {
+            console.error(err);
+          },
+        });
+      } else {
+        console.log("Deletion canceled");
+      }
+    }
   );
-
-  if (confirmed) {
-    $.ajax({
-      type: "DELETE",
-      url: `http://127.0.0.1:3000/api/v1/admin/category/${categoryID}`,
-      success: function (response) {
-        console.log(response);
-
-        // Reload the categories table
-        getAllCategories();
-      },
-      error: function (err) {
-        console.error(err);
-      },
-    });
-  }
 };
 
 // Categories
@@ -392,6 +406,7 @@ const handleProductFormEdit = (event) => {
 
             // Reload the categories table
             getAllProducts();
+            showToast(`Product Updated Successfully`, "warning");
           },
           error: function (error) {
             const message = error.responseJSON.message;
@@ -427,25 +442,28 @@ const handleProductFormEdit = (event) => {
 
 const handleProductDelete = (event) => {
   const productID = event.target.dataset.productId;
-  const confirmed = window.confirm(
-    `Are you sure you want to delete the category ?`
+
+  showCustomConfirmation(
+    "Are you sure you want to delete the product?",
+    function (result) {
+      if (result) {
+        $.ajax({
+          type: "DELETE",
+          url: `http://127.0.0.1:3000/api/v1/admin/product/${productID}`,
+          success: async function (response) {
+            console.log(response);
+
+            await getAllProducts();
+          },
+          error: function (err) {
+            console.error(err);
+          },
+        });
+      } else {
+        console.log("Deletion canceled");
+      }
+    }
   );
-
-  if (confirmed) {
-    $.ajax({
-      type: "DELETE",
-      url: `http://127.0.0.1:3000/api/v1/admin/product/${productID}`,
-      success: async function (response) {
-        console.log(response);
-
-        // Reload the products table
-        await getAllProducts();
-      },
-      error: function (err) {
-        console.error(err);
-      },
-    });
-  }
 };
 
 // Orders
@@ -543,3 +561,77 @@ const handleOrders = (event) => {
     },
   });
 };
+
+function showToast(message, type) {
+  const toastContainer = document.getElementById("toastContainer");
+
+  const toast = document.createElement("div");
+  toast.className = `toast p-3 position-fixed top-100 end-0 z-index-100000`;
+  toast.style.zIndex = "20000";
+  toast.style.top = "100px";
+  toast.style.right = "25px";
+
+  toast.classList.add(`bg-${type}`);
+  toast.textContent = message;
+
+  toastContainer.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add("show");
+    setTimeout(() => {
+      toast.classList.remove("show");
+      toast.remove();
+    }, 3000); // Adjust the duration as needed
+  }, 100); // Delay the toast appearance if needed
+}
+
+// Function to open the confirmation dialog
+function openConfirmationDialog() {
+  $("#confirmationDialog").modal("show");
+}
+
+// Function to handle the confirmation action
+function confirmAction() {
+  console.log("Confirmed");
+  // Add your custom logic here
+
+  $("#confirmationDialog").modal("hide");
+}
+
+function showCustomConfirmation(message, callback) {
+  var modalHtml =
+    '<div class="modal fade" id="customConfirmationModal" tabindex="-1" role="dialog">' +
+    '<div class="modal-dialog" role="document">' +
+    '<div class="modal-content">' +
+    '<div class="modal-header">' +
+    '<h5 class="modal-title">Confirmation</h5>' +
+    '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
+    '<span aria-hidden="true">&times;</span>' +
+    "</button>" +
+    "</div>" +
+    '<div class="modal-body">' +
+    "<p>" +
+    message +
+    "</p>" +
+    "</div>" +
+    '<div class="modal-footer">' +
+    '<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>' +
+    '<button type="button" class="btn btn-primary" id="confirmButton">Confirm</button>' +
+    "</div>" +
+    "</div>" +
+    "</div>" +
+    "</div>";
+
+  $("body").append(modalHtml);
+
+  $("#customConfirmationModal").modal("show");
+
+  $("#confirmButton").on("click", function () {
+    callback(true);
+    $("#customConfirmationModal").modal("hide");
+  });
+
+  $("#customConfirmationModal").on("hidden.bs.modal", function () {
+    $(this).remove();
+  });
+}

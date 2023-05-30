@@ -69,12 +69,12 @@ Project Updations:
 []Order cancellation option in user side.
 []reason cancel and return 
 []return expiry
-[]place order is pending
+[✔]place order is pending
 [✓]Mobile OTP login
 []sort filter pagination for every list : admin side
-[]custom alerts
+[✓]custom alerts
 [✓]category should be unique
-[]toaster messages for every server actions
+[✓]toaster messages for every server actions
 [✓]validation for all forms
 []Complete the updates next week
 
