@@ -5,7 +5,6 @@ const modal = document.querySelector("[data-modal]");
 const modalCloseBtn = document.querySelector("[data-modal-close]");
 const modalCloseOverlay = document.querySelector("[data-modal-overlay]");
 
-
 // modal function
 const modalCloseFunc = function () {
   modal.classList.remove("modal-active");
@@ -22,8 +21,6 @@ const modalDisplayFunc = function () {
 // modal eventListener
 modalCloseOverlay.addEventListener("click", modalCloseFunc);
 modalCloseBtn.addEventListener("click", modalCloseFunc);
-
-
 
 // notification toast variables
 const notificationToast = document.querySelector("[data-toast]");
@@ -98,7 +95,7 @@ const overlay = document.querySelector("[data-overlay]");
 // Multi Page Handle
 
 const signup = document.querySelector("[data-user-action]");
-const mobileSignup = document.querySelector("[data-mobile-user-action]")
+const mobileSignup = document.querySelector("[data-mobile-user-action]");
 
 signup.addEventListener("click", modalDisplayFunc);
 mobileSignup.addEventListener("click", modalDisplayFunc);
@@ -142,6 +139,3 @@ let tabChange = function (val) {
     }
   }
 };
-
-
-

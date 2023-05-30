@@ -63,8 +63,8 @@ Project Updations:
 
 [✓]confirm password
 [✓]preview of selected images
-[]add multiple images
-[]product list and details is not working
+[✓]add multiple images
+[✓]product list and details is not working
 []currency is missing
 []Order cancellation option in user side.
 []reason cancel and return 
@@ -73,9 +73,9 @@ Project Updations:
 [✓]Mobile OTP login
 []sort filter pagination for every list : admin side
 []custom alerts
-[]category should be unique
+[✓]category should be unique
 []toaster messages for every server actions
-[]validation for all forms
+[✓]validation for all forms
 []Complete the updates next week
 
 Week Repeat

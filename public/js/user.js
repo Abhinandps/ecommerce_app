@@ -70,18 +70,16 @@ const getProducts = () => {
 
         <div class="showcase-banner">
 
-        ${product.image
-          .map((path, index) => {
-            const newPath = path.replace("public", "");
-            let className = "product-img default";
+        ${product.image.map((path, index) => {
+          const newPath = path.replace("public", "");
+          let className = "product-img default";
 
-            if (index === 1) {
-              className = " product-img hover";
-            }
-            console.log(newPath)
-            return `<img src="${newPath}" alt="Mens Winter Leathers Jackets" width="300" class="${className}">`;
-          })
+          if (index === 1) {
+            className = " product-img hover";
           }
+          console.log(newPath);
+          return `<img src="${newPath}" alt="Mens Winter Leathers Jackets" width="300" class="${className}">`;
+        })}
 
       
         <p class="showcase-badge">15%</p>
@@ -228,9 +226,8 @@ const getCart = () => {
           success: function (response) {
             const { data } = response;
             const product = data.products;
+            console.log(product);
 
-            const imagePath = product.image;
-            const newPath = imagePath.replace("public", "");
 
             const singleItem = `
               <div class="cart-product">
@@ -240,7 +237,12 @@ const getCart = () => {
               <ion-icon name="close-outline" role="img" class="md hydrated" aria-label="close outline"></ion-icon>
           </button>
                 <div class="product_image">
-                  <img src=${newPath} />
+                ${product.image.map((path, index) => {
+                  const newPath = path.replace("public", "");
+                  if (index === 0) {
+                    return `<img src=${newPath} />`;
+                  }
+                })}
                   <div class="product_details">
                     <div class="product_title">
                       <p>${product.name}</p>
@@ -341,6 +343,8 @@ const getCart = () => {
           },
         });
       });
+
+      
 
       const totalPrice = document.querySelector("#totalPrice");
       const totalPayable = document.querySelector("#totalPayable");
