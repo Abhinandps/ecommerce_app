@@ -363,6 +363,8 @@ const getCart = () => {
       text.textContent = response.totalPrice;
       totalPayable.textContent = response.totalPrice + shippingHandlingFee;
       productCount.textContent = response.cart.items.length;
+
+      updateCartTotal(response.totalPrice + shippingHandlingFee)
     },
   });
 };
@@ -388,6 +390,7 @@ const goToChekOut = () => {
     url: "/api/v1/user/cart",
     success: function (response) {
       if (response.cart.items.length > 0) {
+        getCheckOut()
         window.location.href = "/checkout";
       }
     },
@@ -403,7 +406,6 @@ const getCheckOut = () => {
   const shippingHandlingFee = 98;
 
   const text = totalPrice.querySelector("span");
-
   $.ajax({
     type: "GET",
     url: "/api/v1/user/cart",
@@ -484,6 +486,8 @@ const getPaymentDetails = () => {
     success: function (response) {
       const cart = response.cart;
       totalPayable.textContent = cart.totalPrice;
+      updateCartTotal(cart.totalPrice)
+      console.log(cart.totalPrice)
 
       placeOrderButton.addEventListener("click", async () => {
         const selectedPaymentOption = $(
@@ -495,7 +499,7 @@ const getPaymentDetails = () => {
           const addressId = urlParams.get("addressId");
           if (addressId) {
             try {
-              await placeOrder(addressId, selectedPaymentOption, response);
+              await placeOrder(addressId, selectedPaymentOption, cart);
             } catch (error) {
               console.log(error);
             }
@@ -508,6 +512,7 @@ const getPaymentDetails = () => {
   });
 
   async function placeOrder(addressId, selectedPaymentOption, response) {
+    console.log(response)
     try {
       const axiosResponse = await axios.post("/api/v1/user/cart/purchase", {
         shippingAddress: addressId,
