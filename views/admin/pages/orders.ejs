@@ -1,6 +1,40 @@
 <%- include ('../../layouts/adminHeader.ejs') %>
 
+    <style>
+        .pagination {
+            display: inline-block;
+            max-width: 50%;
+            margin: 0 auto;
+        }
 
+        .pagination-list {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 0 auto;
+        }
+
+        .page-item {
+            display: inline;
+        }
+
+        .page-link {
+            padding: 0.5em 0.75em;
+            text-decoration: none;
+            border: 1px solid #dee2e6;
+            background-color: #191c24;
+            color: #007bff;
+        }
+
+        .page-item.active .page-link {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+    </style>
 
     <div class="main-panel">
         <div class="content-wrapper">
@@ -35,22 +69,75 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                       
+
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <div class="pagination">
+                    <ul class="pagination-list" id="pagination-list">
+
+                    </ul>
+                </div>
+
+
             </div>
         </div>
 
+        <script>
+        window.onload = async function (){
+            await getAllOrders()
+        }           
+        </script>
 
         <script>
-            window.onload = async function(){
-                await getAllOrders()
+            function createPagination(totalPages, currentPage) {
+                const paginationList = document.getElementById('pagination-list');
+                paginationList.innerHTML = '';
+
+
+                const prevButton = createPaginationButton(currentPage - 1, 'Prev');
+                paginationList.appendChild(prevButton);
+
+
+                for (let i = 1; i <= totalPages; i++) {
+                    const listItem = createPaginationButton(i, i);
+                    if (i === currentPage) {
+                        listItem.classList.add('active');
+                    }
+                    paginationList.appendChild(listItem);
+                }
+
+
+                const nextButton = createPaginationButton(currentPage + 1, 'Next');
+                paginationList.appendChild(nextButton);
             }
+
+            function createPaginationButton(pageNumber, text) {
+                const listItem = document.createElement('li');
+                listItem.classList.add('page-item');
+
+                const link = document.createElement('a');
+                link.href = '#';
+                link.textContent = text;
+                link.classList.add('page-link');
+                listItem.appendChild(link);
+
+                return listItem;
+            }
+
+            let totalPages = 5;
+            const currentPage = 1;
+
+            createPagination(totalPages, currentPage);
+
+            // totalPages = 10;
+            // createPagination(totalPages, currentPage);
+
         </script>
 
 
-    <%- include ('../../layouts/adminFooter.ejs') %>
+        <%- include ('../../layouts/adminFooter.ejs') %>

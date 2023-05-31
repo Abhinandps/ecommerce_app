@@ -65,7 +65,7 @@ Project Updations:
 [✓]preview of selected images
 [✓]add multiple images
 [✓]product list and details is not working
-[]currency is missing
+[✓]currency is missing
 []Order cancellation option in user side.
 []reason cancel and return 
 []return expiry

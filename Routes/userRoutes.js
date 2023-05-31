@@ -75,7 +75,7 @@ router.get('/orders', isAuthenticate, orderHistory)
 
 router.route('/orders/:orderID')
   .get(isAuthenticate,getOrderDetails )
-  .delete(isAuthenticate, orderCancel)
+  .put(isAuthenticate, orderCancel)
 
 module.exports = router;
 

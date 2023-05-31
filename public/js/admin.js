@@ -468,9 +468,14 @@ const handleProductDelete = (event) => {
 
 // Orders
 
-const getAllOrders = async () => {
+const getAllOrders = async (page, limit) => {
   try {
-    const res = await axios.get("/api/v1/admin/orders");
+    const res = await axios.get("/api/v1/admin/orders", {
+      params: {
+        page: page,
+        limit: limit,
+      },
+    });
     const { data } = res.data;
     const orders = data.orders;
     // console.log(orders)
@@ -546,6 +551,7 @@ const getAllOrders = async () => {
     });
   } catch (err) {}
 };
+
 
 const handleOrders = (event) => {
   const orderID = event.target.dataset.orderId;

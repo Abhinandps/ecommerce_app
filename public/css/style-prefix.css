@@ -3975,6 +3975,7 @@ div > .row {
 }
 
 #order_item {
+  position: relative;
   border: 1px solid var(--cultured);
   padding: 10px 20px;
   margin: 25px 0;
@@ -4219,10 +4220,10 @@ img {
 /* Add Shipping Address  */
 
 #btnOpenForm {
-  background: var(--sandy-brown);
+  /* background: var(--sandy-brown);
   padding: 10px 20px;
   border-radius: var(--border-radius-sm);
-  margin: 10px 0;
+  margin: 10px 0; */
 }
 
 .form-popup-bg {
@@ -4340,3 +4341,17 @@ img {
   justify-content: space-between;
   width: 300px;
 }
+
+
+
+.cancel_order{
+  position: absolute;
+  right: 20px;
+  top: 80%;
+  border: 1px solid var(--cultured);
+  padding: 10px 20px;
+  border-radius: var(--border-radius-md);
+  font-size: var(--fs-8);
+  box-shadow: 1px 2px 3px -3px #555;
+}
+

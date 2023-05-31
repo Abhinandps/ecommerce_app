@@ -283,8 +283,10 @@ exports.orderCancel = catchAsync(async (req, res, next) => {
   if (!order) {
     return next(new AppError("Order not found", 404));
   }
-  if (order.status === "cancelled") {
-    return next(new AppError("Order is already cancelled", 400));
-  }
+  
   res.json({ message: "Order canceled successfully." });
+  
+  if (order.status === "cancelled") {
+    return next(new AppError("Order is cancelled", 400));
+  }
 });
