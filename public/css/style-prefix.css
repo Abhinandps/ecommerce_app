@@ -3620,16 +3620,19 @@ footer {
   right: 30px;
   border-radius: 12px;
   background: #fff;
-  padding: 20px 35px 20px 25px;
+  padding: 10px 30px 20px 10px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-  border-left: 6px solid #4070f4;
+  border-left: 6px solid  var(--sandy-brown);
   overflow: hidden;
+  z-index: 777;
   transform: translateX(calc(100% + 30px));
   transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.35);
 }
 
 .toast.active {
   transform: translateX(0%);
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.35);
+
 }
 
 .toast .toast-content {
@@ -3643,7 +3646,7 @@ footer {
   justify-content: center;
   height: 35px;
   width: 35px;
-  background-color: #4070f4;
+  background-color: var(--sandy-brown);
   color: #fff;
   font-size: 20px;
   border-radius: 50%;
@@ -3659,11 +3662,13 @@ footer {
   font-size: 20px;
   font-weight: 400;
   color: #666666;
+  font-size: var(--fs-8);
 }
 
 .message .text.text-1 {
   font-weight: 600;
   color: #333;
+  font-size: var(--fs-6);
 }
 
 .toast .close {
@@ -3695,7 +3700,7 @@ footer {
   right: 0;
   height: 100%;
   width: 100%;
-  background-color: #4070f4;
+  background-color:  var(--sandy-brown);
 }
 
 .progress.active:before {
@@ -4259,6 +4264,8 @@ img {
   -moz-transition: opacity 0.3s 0s, visibility 0s 0s;
   transition: opacity 0.3s 0s, visibility 0s 0s;
 }
+
+/* 
 .form-container {
   border-radius: 10px;
   display: flex;
@@ -4268,8 +4275,8 @@ img {
   position: relative;
   color: #fff;
   background-color: var(--white);
-}
-
+} */
+/* 
 .form-container .field-group {
   display: flex;
   gap: 15px;
@@ -4312,7 +4319,7 @@ img {
   margin-top: 20px;
   font-weight: var(--weight-500);
   font-size: var(--fs-7);
-}
+} */
 
 .close-button {
   background: none;

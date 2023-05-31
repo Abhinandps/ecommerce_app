@@ -214,7 +214,8 @@
                         method: 'PUT',
                         success: function (response) {
                             // getOrders()
-                            alert(response.message)
+                            showToast()
+                            setToastMessage("Cancelled", response.message);
                         },
                         error: function (error) {
                             // Handle the error response

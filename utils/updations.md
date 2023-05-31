@@ -66,8 +66,8 @@ Project Updations:
 [✓]add multiple images
 [✓]product list and details is not working
 [✓]currency is missing
-[]Order cancellation option in user side.
-[]reason cancel and return 
+[✓]Order cancellation option in user side.
+[✗]reason cancel and return 
 []return expiry
 [✔]place order is pending
 [✓]Mobile OTP login

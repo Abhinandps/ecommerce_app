@@ -201,7 +201,10 @@ const handleaddToCart = (productId) => {
     success: function (response) {
       console.log(response);
       getCartCount();
-      alert(response.message);
+      showToast()
+      setToastMessage(response.status, response.message);
+
+
     },
   });
 };
@@ -306,6 +309,8 @@ const getCart = () => {
                   try {
                     await updateCartItem(productId, currentValue);
                     getCart();
+                    showToast()
+                    setToastMessage("Cart Updated", `Cart Increment to ${currentValue} items`);
                   } catch (error) {
                     console.error(error);
                   }
@@ -326,6 +331,8 @@ const getCart = () => {
                   try {
                     await updateCartItem(productId, currentValue);
                     getCart();
+                    showToast()
+                    setToastMessage("Cart Updated", `Cart Decrement to ${currentValue} items`);
                   } catch (error) {
                     console.error(error);
                   }
@@ -378,6 +385,9 @@ const handleRemoveCartItem = (productId) => {
       success: function (response) {
         getCart();
         getCartCount();
+        showToast()
+        setToastMessage("Removed", "Cart Item Removed ");
+
       },
     });
   }
@@ -443,7 +453,8 @@ const getCheckOut = () => {
         if (selectedAddressId) {
           window.location.href = "/payment?addressId=" + selectedAddressId;
         } else {
-          alert("Please select a shipping address.");
+          showToast()
+          setToastMessage("Warning", "Please select a shipping address.");
         }
       });
 
@@ -505,7 +516,8 @@ const getPaymentDetails = () => {
             }
           }
         } else {
-          alert("select payment option");
+          showToast()
+          setToastMessage("Warning", "Please select payment method.");
         }
       });
     },
@@ -520,11 +532,12 @@ const getPaymentDetails = () => {
         totalPrice: response.totalPrice,
       });
       console.log(axiosResponse.data);
-      alert("Order placed successfully");
+      showToast()
+      setToastMessage("Success", "Order placed successfully");
       window.location.href = "/myorders";
     } catch (error) {
       console.error("Error placing order:", error);
-      alert(error.response.data.message);
+      setToastMessage("Failed",error.response.data.message)
     }
   }
 };
@@ -534,3 +547,5 @@ getPaymentDetails();
 // getOrders function included in order.ejs
 
 // Event listener for address selection
+
+

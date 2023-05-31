@@ -25,9 +25,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
 
-        <script src="https://cdn.jsdelivr.net/npm/medium-zoom/dist/medium-zoom.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/medium-zoom/dist/medium-zoom.min.js"></script>
 
-   
+
     <script>
 
 
@@ -184,19 +184,51 @@
 
     <!-- message toast  -->
 
-    <!-- <div class="toast">
+    <!-- <button onclick="showToast()">Show Toast</button> -->
+
+    <div class="toast" id="toast">
         <div class="toast-content">
             <i class="fas fa-solid fa-check check"></i>
 
             <div class="message">
-                <span class="text text-1">Success</span>
-                <span class="text text-2">Your changes has been saved</span>
+                <span class="text text-1" id="toast-text-1"></span>
+                <span class="text text-2" id="toast-text-2"></span>
             </div>
         </div>
-        <i class="fa-solid fa-xmark close"></i>
+        <i class="fa-solid fa-xmark close" onclick="closeToast()"></i>
 
         <div class="progress"></div>
-    </div> -->
+    </div>
+
+
+    <script>
+        function showToast() {
+  const toast = document.getElementById("toast");
+  toast.classList.add("active");
+
+  setTimeout(() => {
+    closeToast();
+  }, 3000);
+}
+
+function closeToast() {
+  const toast = document.getElementById("toast");
+  toast.classList.remove("active");
+}
+
+// Optional: Customize the toast message
+function setToastMessage(text1, text2) {
+  const toastText1 = document.getElementById("toast-text-1");
+  const toastText2 = document.getElementById("toast-text-2");
+
+  toastText1.textContent = text1;
+  toastText2.textContent = text2;
+}
+
+
+// showToast();
+    </script>
+
 
     <!--
     - HEADER
