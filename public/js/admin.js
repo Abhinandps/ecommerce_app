@@ -470,13 +470,42 @@ const handleProductDelete = (event) => {
 
 // --- HANDLE ORDER PAGINATION START
 
+
 const handlePaginationClick = async (pageNumber) => {
   try {
-    const response = await fetchData(
-      `/api/v1/admin/orders?page=${pageNumber}&limit=10`
-    );
+    const orderId = document.getElementById('order-id').value;
+    const orderStatus = document.getElementById('order-status').value;
+    const paymentMethod = document.getElementById('payment-method').value;
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
+    const sortBy = document.getElementById('sort-by').value;
+    const sortOrder = document.getElementById('sort-order').value;
+
+    // Construct the query string with sorting and filtering parameters
+    let queryString = `/api/v1/admin/orders?page=${pageNumber}&limit=10`;
+
+    if (orderId) {
+      queryString += `&orderId=${orderId}`;
+    }
+    if (orderStatus) {
+      queryString += `&orderStatus=${orderStatus}`;
+    }
+    if (paymentMethod) {
+      queryString += `&paymentMethod=${paymentMethod}`;
+    }
+    if (startDate && endDate) {
+      queryString += `&startDate=${startDate}&endDate=${endDate}`;
+    }
+
+    if (sortBy && sortOrder) {
+      queryString += `&sortBy=${sortBy}&sortOrder=${sortOrder}`;
+    }
+
+    const response = await fetchData(queryString);
+
     const { data } = response;
-    console.log(data.results)
+
+    console.log(data)
     const tableBody = document.getElementsByTagName("tbody")[0];
     tableBody.innerHTML=''
     data.results.forEach((order) => {
@@ -582,6 +611,7 @@ async function fetchDataAndPaginate(url, currentPage) {
     const response = await fetchData(`${url}?page=${currentPage}&limit=10`);
     const { data } = response;
 
+
     const tableBody = document.getElementsByTagName("tbody")[0];
     tableBody.innerHTML=''
     data.results.forEach((order) => {
@@ -618,8 +648,8 @@ async function fetchDataAndPaginate(url, currentPage) {
       `;
       tableBody.innerHTML += row.outerHTML;
     });
-    console.log(data.results);
-    console.log(url);
+
+
     updatePaginationNumbers(data.previous, data.next, currentPage);
   } catch (error) {
     console.error(error);
@@ -644,6 +674,35 @@ const handleOrders = (event) => {
     },
   });
 };
+
+
+
+// Apply Filters button click event
+document.getElementById('apply-filters').addEventListener('click', function() {
+  handlePaginationClick(1);
+});
+
+// Apply Sort button click event
+document.getElementById('apply-sort').addEventListener('click', function() {
+  handlePaginationClick(1);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ------------------------------------------------------------------
 

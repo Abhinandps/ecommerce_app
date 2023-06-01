@@ -95,7 +95,7 @@ Week 3 Project Updations
 [] - profile 
 [] - $ and ₹
 [] 
-[✘] + search, filter, sort
+[✔] + search, filter, sort, pagination
 [✘] + Coupon management
 [] + Online payment
 [] + Banner management

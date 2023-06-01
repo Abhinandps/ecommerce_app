@@ -5,11 +5,11 @@
         <div class="content-wrapper">
             <div class="page-header">
                 <a class="badge badge-primary" href="/orders">Back To Orders</a>
-                <h3 class="page-title"> Form elements </h3>
+                <!-- <h3 class="page-title"> Form elements </h3> -->
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="#">Forms</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Form elements</li>
+                        <!-- <li class="breadcrumb-item"><a href="#">Forms</a></li> -->
+                        <!-- <li class="breadcrumb-item active" aria-current="page">Form elements</li> -->
                     </ol>
                 </nav>
             </div>
@@ -47,7 +47,7 @@
                                         <span class="icon icon-sm rounded-circle alert-success"
                                             style="width:50px; height:50px"><i
                                                 class="text-success mdi mdi-account"></i></span>
-                                        <div class="text">
+                                        <div class="text" id="user_data">
                                             <h6 class="mb-1">Customer</h6>
                                             <p class="mb-1">User Admin <br><a
                                                     href="mailto:user@example.com">user@example.com</a></p>
@@ -61,7 +61,7 @@
                                         <span class="icon icon-sm rounded-circle alert-success"
                                             style="width:50px; height:50px"><i
                                                 class="text-success mdi mdi-truck"></i></span>
-                                        <div class="text">
+                                        <div class="text" id="order_info">
                                             <h6 class="mb-1">Order Info</h6>
                                             <p class="mb-1">Pay Method:</p>
                                         </div>
@@ -75,7 +75,7 @@
                                         <span class="icon icon-sm rounded-circle alert-success"
                                             style="width:50px; height:50px"><i
                                                 class="text-success mdi mdi-google-maps"></i></span>
-                                        <div class="text">
+                                        <div class="text" id="delivery_info">
                                             <h6 class="mb-1">Deliver To</h6>
                                             <p class="mb-1">Shipping:
                                             <address></address>
@@ -127,6 +127,9 @@
                 </div>
             </div>
 
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
             <script>
                 // window.onload = async function(){
                 //     await getAllOrders()
@@ -169,13 +172,65 @@
                                         console.log(error);
                                     }
                                 });
-
-                                
-
                             } else {
                                 statusDropdown.value = currentStatus
                             }
+
                         });
+                    });
+
+
+                    const userData = document.getElementById("user_data")
+                    const orderInfo = document.getElementById("order_info")
+                    const deliveryInfo = document.getElementById("delivery_info")
+
+                    const htmlContent = `
+                            <h6 class="my-2">OrderInfo</h6>
+                            <p class="mb-1">Pay Method: <span style="text-transform:upperCase" class="text-info rounded-circle bg-dark p-2">${order.paymentMethod}</span></p>
+                            `
+                            orderInfo.innerHTML = htmlContent
+
+                    $.ajax({
+                        type: "GET",
+                        url: `/api/v1/admin/users/${order.user}`,
+                        success: function (response) {
+                            const data = response.data
+
+                            const htmlContent = `
+                            <h6 class="my-2">Customer</h6>
+                            <p class="mb-1">${data.username}
+                                <br><a href="${data.email}">${data.email}</a>
+                            </p>
+                            `
+                            userData.innerHTML = htmlContent
+
+                            // showToast(`Order Status Changed to  ${currentStatus}`, "primary");
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(error);
+                        }
+                    });
+
+                    $.ajax({
+                        type: "GET",
+                        url: `/api/v1/admin/carts?shippingAddressId=${order.shippingOrder}&userId=${order.user}/`,
+                        success: function (response) {
+                            // const data = response.data
+                            console.log(response)
+
+                            // const htmlContent = `
+                            // <h6 class="my-2">Customer</h6>
+                            // <p class="mb-1">${data.username}
+                            //     <br><a href="${data.email}">${data.email}</a>
+                            // </p>
+                            // `
+                            // userData.innerHTML = htmlContent
+
+                            // showToast(`Order Status Changed to  ${currentStatus}`, "primary");
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(error);
+                        }
                     });
 
 

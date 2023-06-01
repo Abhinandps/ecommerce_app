@@ -1,8 +1,9 @@
 const fs = require("fs");
+const mongoose = require('mongoose');
 const User = require("../Models/userModel");
 const Product = require("../Models/products");
 const Category = require("../Models/category");
-
+const Cart = require("../Models/Cart");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const ErrorHandler = require("../Controllers/errorController");
@@ -228,6 +229,29 @@ exports.deleteProduct = catchAsync(async (req, res, next) => {
   res.status(204).json({ message: "Product deleted" });
 });
 
+// // Carts
+// exports.getAllCarts = catchAsync(async (req, res, next) => {
+//   const { shippingAddressId, userId } = req.query;
+//   console.log(shippingAddressId, userId);
+
+//   const filters = {};
+
+//   if (shippingAddressId) {
+//     const shippingAddressIdObject = new mongoose.Types.ObjectId(shippingAddressId);
+//     filters.shippingAddress = { $in: [shippingAddressIdObject] };
+//   }
+
+//   if (userId) {
+//     const userIdObject = new mongoose.Types.ObjectId(userId);
+//     filters.user = userIdObject;
+//   }
+
+//   const carts = await Cart.find(filters);
+
+//   res.status(200).json({ carts });
+// });
+
+
 // Orders
 
 exports.getAllOrders = catchAsync(async (req, res, next) => {
@@ -236,6 +260,33 @@ exports.getAllOrders = catchAsync(async (req, res, next) => {
     data: res.paginatedResults,
   });
 });
+
+// exports.getAllOrders = catchAsync(async (req, res, next) => {
+//   let results = res.paginatedResults.results;
+
+//   console.log(req.query.orderStatus);
+
+//   // if (req.query.orderStatus) {
+//   //   results = results.filter(order => order.orderStatus === req.query.orderStatus);
+//   // }
+
+//   // Prepare the paginated results
+//   const paginatedResults = {
+//     results: results,
+//     next: res.paginatedResults.next,
+//     previous: res.paginatedResults.previous,
+//   };
+
+//   res.status(200).json({
+//     status: "success",
+//     data: paginatedResults,
+//   });
+
+//   res.status(200).json({
+//     status: "success",
+//     data: results,
+//   });
+// });
 
 exports.getOrder = catchAsync(async (req, res, next) => {
   const { orderID } = req.params;

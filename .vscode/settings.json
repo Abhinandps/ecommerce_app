@@ -3,6 +3,8 @@
         "confirmpass",
         "confirmpassword",
         "handleadd",
+        "Orderfilter",
+        "Ordersfilter",
         "Updations"
     ]
 }

@@ -55,6 +55,60 @@
                             <!-- <h4 class="card-title">Basic Table</h4> -->
                             <p class="card-description"> You can change the <code>status</code> of orders
                             </p>
+
+                            <div class="filters">
+                               
+                                <h2>Filters:</h2>
+                                <div class="filter-item">
+                                    <label for="order-id">Order ID:</label>
+                                    <input type="text" id="order-id" placeholder="Enter Order ID...">
+                                  </div>
+                                <div class="filter-item">
+                                  <label for="order-status">Order Status:</label>
+                                  <select id="order-status">
+                                    <option value="">All</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="confirmed">Confirmed</option>
+                                    <option value="shipped">Shipped</option>
+                                    <option value="delivered">Delivered</option>
+                                    <option value="cancelled">Canceled</option>
+                                  </select>
+                                </div>
+                                <div class="filter-item">
+                                    <label for="payment-method">Payment Method:</label>
+                                    <select id="payment-method">
+                                      <option value="">All</option>
+                                      <option value="card">Credit Card</option>
+                                      <option value="paypal">PayPal</option>
+                                      <option value="cod">Cash On Delivery</option>
+                                    </select>
+                                  </div>
+                                <div class="filter-item">
+                                  <label for="date-range">Date Range:</label>
+                                  <input type="date" id="start-date">
+                                  <input type="date" id="end-date">
+                                </div>
+                              
+                                <button id="apply-filters">Apply Filters</button>
+                                <button id="apply-filters" onclick="location.assign('/orders')" >Restore</button>
+                              </div>
+                              
+                              <div class="sort-options">
+                                <h2>Sort By:</h2>
+                                <select id="sort-by">
+                                  <option value="updatedAt">Order Date</option>
+                                  <option value="totalPrice">Total Amount</option>
+                                  <option value="status">Order Status</option>
+                                </select>
+                                <select id="sort-order">
+                                  <option value="desc">High to Low</option>
+                                  <option value="asc">Low to High</option>
+                                </select>
+                                <button id="apply-sort">Apply Sort</button>
+                              </div>
+                              
+                              
+
                             <div class="table-responsive">
                                 <table class="table">
                                     <thead>
@@ -92,13 +146,13 @@
         </div>
 
         <script>
-        window.onload = async function (){
-            await getAllOrders()
-        }           
+            window.onload = async function () {
+                await getAllOrders()
+            }           
         </script>
 
         <script>
-           
+
         </script>
 
 

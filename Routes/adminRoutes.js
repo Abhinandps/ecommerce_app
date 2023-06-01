@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 
-const multer = require("multer");
 
 const adminAuth = require("../Controllers/adminAuth");
 const {
@@ -21,29 +20,23 @@ const {
   getAllOrders,
   getOrder,
   updateOrderStatus,
-  orderCancel
+  orderCancel,
+  getAllCarts
 } = require("../Controllers/adminController");
+
 const { isAuthenticate, isAdmin } = require("../middleware/auth");
+
 const Order = require("../Models/orders");
 
-// multer storage engine
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
-      cb(null, "public/assets/images/");
-    } else if (file.mimetype === "image/svg+xml") {
-      cb(null, "public/assets/icons/");
-    } else {
-      cb(new Error("Invalid file type"));
-    }
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname); // set unique filename
-  },
-});
+// pagination
+const { paginatedResults } = require("../utils/pagination");
 
-// multer middleware
-const upload = multer({ storage });
+// multer
+const upload = require("../utils/multerConfig");
+
+// middleware
+
+
 
 router.get("/login", (req, res) => {
   res.render("admin/login");
@@ -89,43 +82,19 @@ router.put("/product/:id", upload.array('image',2), updateProduct);
 
 router.delete("/product/:id", deleteProduct);
 
+
+// cart
+
+// router.get("/carts", isAdmin, getAllCarts);
+
+
+
+
 // Orders
 
-router.get("/orders", isAdmin,paginatedResults(Order), getAllOrders);
+router.get("/orders", isAdmin, paginatedResults(Order), getAllOrders);
 
-
-function paginatedResults(model) {
-  return async (req, res, next) => {
-    const page = parseInt(req.query.page)
-    const limit = parseInt(req.query.limit)
-
-    const startIndex = (page - 1) * limit
-    const endIndex = page * limit
-
-    const results = {}
-
-    if (endIndex < await model.countDocuments().exec()) {
-      results.next = {
-        page: page + 1,
-        limit: limit
-      }
-    }
-    
-    if (startIndex > 0) {
-      results.previous = {
-        page: page - 1,
-        limit: limit
-      }
-    }
-    try {
-      results.results = await model.find().limit(limit).skip(startIndex).exec()
-      res.paginatedResults = results
-      next()
-    } catch (e) {
-      res.status(500).json({ message: e.message })
-    }
-  }
-}
+// router.get("/orders/filter", isAdmin,paginatedResults(Order),getFilteredOrders );
 
 
 router.route("/orders/:orderID")
@@ -135,3 +104,6 @@ router.route("/orders/:orderID")
 
 
 module.exports = router;
+
+
+
