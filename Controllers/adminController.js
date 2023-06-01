@@ -231,34 +231,11 @@ exports.deleteProduct = catchAsync(async (req, res, next) => {
 // Orders
 
 exports.getAllOrders = catchAsync(async (req, res, next) => {
-  const orders = await Order.find();
   res.status(200).json({
     status: "success",
-    data: { orders },
+    data: res.paginatedResults,
   });
 });
-
-
-// exports.getAllOrders = catchAsync(async (req, res, next) => {
-
-//   const { page, limit } = req.query;
-
-//   const parsedPage = parseInt(page, 10) || 1;
-//   const parsedLimit = parseInt(limit, 10) || 10;
-
-//   const startIndex = (parsedPage - 1) * parsedLimit;
-//   const endIndex = parsedPage * parsedLimit;
-
-//   const paginatedData = data.slice(startIndex, endIndex);
-
-//   res.json({
-//     data: paginatedData,
-//     currentPage: parsedPage,
-//     totalPages: Math.ceil(data.length / parsedLimit),
-//   });
-// });
-
-
 
 exports.getOrder = catchAsync(async (req, res, next) => {
   const { orderID } = req.params;

@@ -3,7 +3,7 @@
 
 Week 1
 
-Updations in Project:
+Updations in Project Figma
 
 []OTP verification
 []list all coupons in user side
@@ -23,20 +23,20 @@ Week 2
 [✓]OTP login.
 [✓]Admin side user management (list user, block/unblock).
 [✓]Category management in admin side.
-[✘]Product management in admin side (add, edit & delete products).
-[]List products in user side.
-[]Product details view in user side with image zoom
+[✓]Product management in admin side (add, edit & delete products).
+[✓]List products in user side.
+[✓]Product details view in user side with image zoom
 
 Updations
 
-[] user block custom alert
+[✓] user block custom alert
 [✓] soft delete 
-[] form validation
-[] login UI
+[✓] form validation
+[✓] login UI
 [] $ to ₹
 [✓] header cleanup and UI
 [] image crop
-[] multiple images (multer)
+[✓] multiple images (multer)
 [].gitignore
 
 Theory-7
@@ -46,13 +46,11 @@ Workouts-7
 
 Week 3 (Repeat)
 
-[] Cart management (Add to cart, list products in cart,
-[] remove products from cart).
-[] Purchase with COD.
-[] Order management &
-[] order cancellation option in admin side,
-[] Order cancellation option in user side.
-[] Order history and status in user side. Mobile OTP login.
+[✓] Cart management (Add to cart, list products in cart,remove products from cart).
+[✓] Purchase with COD.
+[✓] Order management & order cancellation option in admin side,
+[✓] Order cancellation option in user side.
+[✓] Order history and status in user side. Mobile OTP login.
 [] Crop
 
 Review postponed  he need 2 more days 
@@ -84,7 +82,34 @@ Workout:4
 
 ---------------------
 
-Week 3 Advanced (my workouts)
+Week 3 Project Updations 
+
+[] - Home page
+[] - admin login cleanup
+[] - category delete logic
+[] - order details - admin
+[] - add product UI
+[] - Home page
+[] - guest user experience
+[] - order success and order details page 
+[] - profile 
+[] - $ and ₹
+[] 
+[✘] + search, filter, sort
+[✘] + Coupon management
+[] + Online payment
+[] + Banner management
+[] + Fix broken UI and use dynamic data
+[] Complete the updates with next week task
+
+[] Integrate payment methods Razorpay, Paypal.
+[] Image Zooming, Image Cropping
+[] Admin dashboard
+[] Chart & Graph reports in Admin Side
+[] User profile
+
+Theory:6
+Workout:6
 
 
 

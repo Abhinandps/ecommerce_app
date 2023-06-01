@@ -180,7 +180,9 @@ const getCartCount = () => {
     url: "/api/v1/user/cart/items/count",
     success: function (response) {
       const cartCount = document.querySelector("#cart_count");
+      const cartCountMobile = document.querySelector("#cart_count_mobile");
       cartCount.textContent = response.count;
+      cartCountMobile.textContent = response.count;
     },
     error: function (error) {
       console.error("Error retrieving cart items count", error);

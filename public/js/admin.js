@@ -468,24 +468,18 @@ const handleProductDelete = (event) => {
 
 // Orders
 
-const getAllOrders = async (page, limit) => {
-  try {
-    const res = await axios.get("/api/v1/admin/orders", {
-      params: {
-        page: page,
-        limit: limit,
-      },
-    });
-    const { data } = res.data;
-    const orders = data.orders;
-    // console.log(orders)
-    // orders.forEach((order)=>{
-    //   console.log(order)
-    // })
-    const tableBody = document.getElementsByTagName("tbody")[0];
-    // tableBody.innerHTML = "";
+// --- HANDLE ORDER PAGINATION START
 
-    orders.forEach((order) => {
+const handlePaginationClick = async (pageNumber) => {
+  try {
+    const response = await fetchData(
+      `/api/v1/admin/orders?page=${pageNumber}&limit=10`
+    );
+    const { data } = response;
+    console.log(data.results)
+    const tableBody = document.getElementsByTagName("tbody")[0];
+    tableBody.innerHTML=''
+    data.results.forEach((order) => {
       let statusColor;
       // // Determine the color based on the order status
       if (order.status === "pending") {
@@ -500,57 +494,140 @@ const getAllOrders = async (page, limit) => {
         statusColor = "danger";
       }
 
-      order.items.forEach((item) => {
-        // Find User
-        $.ajax({
-          type: "GET",
-          url: `/api/v1/admin/users/${order.user}`,
-          success: function (response) {
-            const { data } = response;
-            const userData = data;
+      const dateString = order.updatedAt
+      /// Splitting the string at the 'T' character
+      const datePart = dateString.split("T")[0]
 
-            // Find product details
-            $.ajax({
-              type: "GET",
-              url: `/api/v1/admin/product/${item.product}`,
-              success: function (response) {
-                const { data } = response;
-                const { products } = data;
-                const dateString = products.updatedAt;
+      const row = document.createElement("tr");
 
-                // Splitting the string at the 'T' character
-                const datePart = dateString.split("T")[0];
+      const statusBadge = `<span class="badge badge-${statusColor}">${order.status}</span>`;
+      const editBtn = `<label id="view" type="button"  class="badge badge-primary" data-order-id="${order.orderID}" onclick="handleOrders(event)"> <i class="mdi mdi-eye" muted></i></label>`;
 
-                // console.log(userData.email);
-                // console.log(products.name);
-                // console.log(order.totalPrice);
-                // console.log(datePart);
-                // console.log(order.status);
-
-                const row = document.createElement("tr");
-
-                const statusBadge = `<span class="badge badge-${statusColor}">${order.status}</span>`;
-                const editBtn = `<label id="view" type="button"  class="badge badge-primary" data-order-id="${order.orderID}" onclick="handleOrders(event)"> <i class="mdi mdi-eye" muted></i></label>`;
-
-                row.innerHTML = `
-                <td> ${products.name} </td>
-                <td> ${userData.email} </td>
-                <td> ₹${order.totalPrice} </td>
-                <td> ${order.paymentMethod} </td>
-                <td> ${datePart} </td>
-                <td> ${statusBadge}</td>
-                <td> ${editBtn}</td>
-                `;
-                tableBody.innerHTML += row.outerHTML;
-              },
-            });
-            // console.log(item);
-          },
-        });
-      });
+      row.innerHTML = `
+      <td> ${order.orderID} </td>
+      <td> ₹${order.totalPrice} </td>
+      <td> ${order.paymentMethod} </td>
+      <td> ${datePart} </td>
+      <td> ${statusBadge}</td>
+      <td> ${editBtn}</td>
+      `;
+      tableBody.innerHTML += row.outerHTML;
     });
-  } catch (err) {}
+
+    
+
+    updatePaginationNumbers(data.previous, data.next, pageNumber);
+  } catch (error) {
+    console.error(error);
+  }
 };
+
+const fetchData = async (url) => {
+  try {
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+const updatePaginationNumbers = (previousPage, nextPage, currentPage) => {
+  var paginationContainer = document.getElementById("pagination-container");
+  if (paginationContainer) {
+    paginationContainer.innerHTML = "";
+    if (previousPage) {
+      var previousButton = createPaginationButton(
+        previousPage.page,
+        "Previous"
+      );
+      paginationContainer.appendChild(previousButton);
+    }
+
+    var currentButton = createPaginationButton(currentPage, currentPage, true);
+    paginationContainer.appendChild(currentButton);
+
+    if (nextPage) {
+      var nextButton = createPaginationButton(nextPage.page, "Next");
+      paginationContainer.appendChild(nextButton);
+    }
+  }
+};
+
+// Function to create a pagination button
+function createPaginationButton(pageNumber, label, isActive) {
+  var button = document.createElement("button");
+  button.innerHTML = label;
+  button.classList.add("btn", "btn-primary", "page-link");
+
+  if (isActive) {
+    button.classList.add("active");
+  }
+
+  button.addEventListener("click", function () {
+    handlePaginationClick(pageNumber);
+  });
+
+  return button;
+}
+
+if (window.location.pathname.includes("/orders")) {
+  fetchDataAndPaginate("/api/v1/admin/orders", 1);
+}
+
+
+
+// Function to fetch data and paginate
+async function fetchDataAndPaginate(url, currentPage) {
+  try {
+    const response = await fetchData(`${url}?page=${currentPage}&limit=10`);
+    const { data } = response;
+
+    const tableBody = document.getElementsByTagName("tbody")[0];
+    tableBody.innerHTML=''
+    data.results.forEach((order) => {
+      let statusColor;
+      // // Determine the color based on the order status
+      if (order.status === "pending") {
+        statusColor = "warning";
+      } else if (order.status === "delivered") {
+        statusColor = "success";
+      } else if (order.status === "shipped") {
+        statusColor = "primary";
+      } else if (order.status === "confirmed") {
+        statusColor = "info";
+      } else {
+        statusColor = "danger";
+      }
+
+      const dateString = order.updatedAt
+      /// Splitting the string at the 'T' character
+      const datePart = dateString.split("T")[0]
+
+      const row = document.createElement("tr");
+
+      const statusBadge = `<span class="badge badge-${statusColor}">${order.status}</span>`;
+      const editBtn = `<label id="view" type="button"  class="badge badge-primary" data-order-id="${order.orderID}" onclick="handleOrders(event)"> <i class="mdi mdi-eye" muted></i></label>`;
+
+      row.innerHTML = `
+      <td> ${order.orderID} </td>
+      <td> ₹${order.totalPrice} </td>
+      <td> ${order.paymentMethod} </td>
+      <td> ${datePart} </td>
+      <td> ${statusBadge}</td>
+      <td> ${editBtn}</td>
+      `;
+      tableBody.innerHTML += row.outerHTML;
+    });
+    console.log(data.results);
+    console.log(url);
+    updatePaginationNumbers(data.previous, data.next, currentPage);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
+// --- HANDLE ORDER PAGINATION END
 
 
 const handleOrders = (event) => {
@@ -567,6 +644,8 @@ const handleOrders = (event) => {
     },
   });
 };
+
+// ------------------------------------------------------------------
 
 function showToast(message, type) {
   const toastContainer = document.getElementById("toastContainer");
@@ -599,7 +678,6 @@ function openConfirmationDialog() {
 // Function to handle the confirmation action
 function confirmAction() {
   console.log("Confirmed");
-  // Add your custom logic here
 
   $("#confirmationDialog").modal("hide");
 }

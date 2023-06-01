@@ -59,8 +59,8 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th>Name</th>
-                                            <th>Email</th>
+                                            <th>OrderID</th>
+                                            <!-- <th>Email</th> -->
                                             <th>Total</th>
                                             <th>Payment Method</th>
                                             <th>Date</th>
@@ -77,10 +77,14 @@
                     </div>
                 </div>
 
-                <div class="pagination">
+                <!-- <div class="pagination">
                     <ul class="pagination-list" id="pagination-list">
 
                     </ul>
+                </div> -->
+
+                <div id="pagination-container" class="w-100 d-flex g-2 justify-content-center">
+
                 </div>
 
 
@@ -94,49 +98,7 @@
         </script>
 
         <script>
-            function createPagination(totalPages, currentPage) {
-                const paginationList = document.getElementById('pagination-list');
-                paginationList.innerHTML = '';
-
-
-                const prevButton = createPaginationButton(currentPage - 1, 'Prev');
-                paginationList.appendChild(prevButton);
-
-
-                for (let i = 1; i <= totalPages; i++) {
-                    const listItem = createPaginationButton(i, i);
-                    if (i === currentPage) {
-                        listItem.classList.add('active');
-                    }
-                    paginationList.appendChild(listItem);
-                }
-
-
-                const nextButton = createPaginationButton(currentPage + 1, 'Next');
-                paginationList.appendChild(nextButton);
-            }
-
-            function createPaginationButton(pageNumber, text) {
-                const listItem = document.createElement('li');
-                listItem.classList.add('page-item');
-
-                const link = document.createElement('a');
-                link.href = '#';
-                link.textContent = text;
-                link.classList.add('page-link');
-                listItem.appendChild(link);
-
-                return listItem;
-            }
-
-            let totalPages = 5;
-            const currentPage = 1;
-
-            createPagination(totalPages, currentPage);
-
-            // totalPages = 10;
-            // createPagination(totalPages, currentPage);
-
+           
         </script>
 
 

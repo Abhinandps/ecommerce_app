@@ -133,7 +133,7 @@
                 // }
 
                 const orderDetails = localStorage.getItem('order')
-                console.log(orderDetails)
+                // console.log(orderDetails)
                 if (orderDetails) {
                     const order = JSON.parse(orderDetails)
                     let currentStatus = order.status
@@ -169,6 +169,9 @@
                                         console.log(error);
                                     }
                                 });
+
+                                
+
                             } else {
                                 statusDropdown.value = currentStatus
                             }
