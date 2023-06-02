@@ -87,7 +87,7 @@ router.delete("/product/:id", deleteProduct);
 
 // cart
 
-// router.get("/carts", isAdmin, getAllCarts);
+router.get("/carts", isAdmin, getAllCarts);
 
 
 

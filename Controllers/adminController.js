@@ -1,5 +1,5 @@
 const fs = require("fs");
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const User = require("../Models/userModel");
 const Product = require("../Models/products");
 const Category = require("../Models/category");
@@ -125,8 +125,6 @@ exports.deleteCategory = catchAsync(async (req, res, next) => {
 //   });
 // });
 
-
-
 exports.getAllProducts = catchAsync(async (req, res) => {
   // const products = await Product.find({ deleted: false });
   res.status(200).json({
@@ -134,7 +132,6 @@ exports.getAllProducts = catchAsync(async (req, res) => {
     data: res.paginatedResults,
   });
 });
-
 
 exports.getOneProduct = catchAsync(async (req, res) => {
   const products = await Product.findOne({ _id: req.params.id });
@@ -208,7 +205,7 @@ exports.updateProduct = catchAsync(async (req, res, next) => {
             if (err) console.log(err);
           });
         });
-      } 
+      }
       product.image = filePaths;
     }
 
@@ -235,28 +232,35 @@ exports.deleteProduct = catchAsync(async (req, res, next) => {
   res.status(204).json({ message: "Product deleted" });
 });
 
-// // Carts
-// exports.getAllCarts = catchAsync(async (req, res, next) => {
-//   const { shippingAddressId, userId } = req.query;
-//   console.log(shippingAddressId, userId);
+// Carts
+exports.getAllCarts = catchAsync(async (req, res, next) => {
+  const { userId } = req.query;
+  const filters = {};
 
-//   const filters = {};
+  if (userId) {
+    const userIdObject = new mongoose.Types.ObjectId(userId);
+    filters.user = userIdObject;
+  }
 
-//   if (shippingAddressId) {
-//     const shippingAddressIdObject = new mongoose.Types.ObjectId(shippingAddressId);
-//     filters.shippingAddress = { $in: [shippingAddressIdObject] };
-//   }
+  const carts = await Cart.find(filters);
 
-//   if (userId) {
-//     const userIdObject = new mongoose.Types.ObjectId(userId);
-//     filters.user = userIdObject;
-//   }
+  if (carts.length === 0) {
+    return res.status(404).json({ message: "No carts found" });
+  }
 
-//   const carts = await Cart.find(filters);
+  const cartIds = carts.map((cart) => cart._id);
+  const shippingAddresses = await Cart.find({ _id: { $in: cartIds } }).select(
+    "shippingAddress"
+  );
+  const cartsWithShippingAddress = carts.map((cart) => {
+    const cartShippingAddress = shippingAddresses.find(
+      (address) => address._id.toString() === cart._id.toString()
+    );
+    return { cart, shippingAddress: cartShippingAddress.shippingAddress };
+  });
 
-//   res.status(200).json({ carts });
-// });
-
+  res.status(200).json({ cartsWithShippingAddress });
+});
 
 // Orders
 

@@ -11,7 +11,6 @@ const getUsers = async () => {
     const res = await axios.get("http://127.0.0.1:3000/api/v1/admin/users");
     const { data } = res.data;
     const users = data.users;
-    console.log(users);
     const tableBody = document.querySelector("#user-table tbody");
 
     tableBody.innerHTML = "";
@@ -811,14 +810,19 @@ const handleOrders = (event) => {
 };
 
 // Apply Filters button click event
-document.getElementById("apply-filters").addEventListener("click", function () {
-  handlePaginationClick(1);
-});
+if(document.getElementById("apply-filters")){
+  document.getElementById("apply-filters").addEventListener("click", function () {
+    handlePaginationClick(1);
+  });
+}
 
 // Apply Sort button click event
-document.getElementById("apply-sort").addEventListener("click", function () {
-  handlePaginationClick(1);
-});
+if(document.getElementById("apply-sort")){
+
+  document.getElementById("apply-sort").addEventListener("click", function () {
+    handlePaginationClick(1);
+  });
+}
 
 
 

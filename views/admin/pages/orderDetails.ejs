@@ -119,7 +119,7 @@
                             </div>
 
                             <div class="col-lg-4 d-flex align-items-center">
-                                <button class="btn btn-info col-12 p-3">MARK AS DELIVERED</button>
+                                <button class="badge badge-info col-12 p-3" style="font-size: 16px;">Payed : ₹<span id="total"></span></button>
                             </div>
                         </div>
 
@@ -188,51 +188,66 @@
                             <h6 class="my-2">OrderInfo</h6>
                             <p class="mb-1">Pay Method: <span style="text-transform:upperCase" class="text-info rounded-circle bg-dark p-2">${order.paymentMethod}</span></p>
                             `
-                            orderInfo.innerHTML = htmlContent
+                    orderInfo.innerHTML = htmlContent
+
 
                     $.ajax({
                         type: "GET",
-                        url: `/api/v1/admin/users/${order.user}`,
+                        url: `/api/v1/admin/carts?userId=${order.user}`,
                         success: function (response) {
-                            const data = response.data
+                            const data = response.cartsWithShippingAddress[0].shippingAddress[0]
+                            const products = response.cartsWithShippingAddress[0].cart.items
+                            const address = `${data.address} ${data.locality} ${data.city} ${data.state} ${data.zipCode}.`
 
-                            const htmlContent = `
+
+                            const userContent = `
                             <h6 class="my-2">Customer</h6>
-                            <p class="mb-1">${data.username}
-                                <br><a href="${data.email}">${data.email}</a>
+                            <p class="mb-1">${data.custName}
+                                <br><a href="${data.mobile}">${data.mobile}</a>
                             </p>
                             `
-                            userData.innerHTML = htmlContent
+                            userData.innerHTML = userContent
 
-                            // showToast(`Order Status Changed to  ${currentStatus}`, "primary");
+                            const htmlContent = `
+                            <h6 class="my-2">Shipping Address</h6>
+                            <p class="mb-1">${address}</p>
+                            `
+                            deliveryInfo.innerHTML = htmlContent
                         },
                         error: function (xhr, status, error) {
                             console.log(error);
                         }
                     });
 
-                    $.ajax({
-                        type: "GET",
-                        url: `/api/v1/admin/carts?shippingAddressId=${order.shippingOrder}&userId=${order.user}/`,
-                        success: function (response) {
-                            // const data = response.data
-                            console.log(response)
+                    const tbody = document.querySelector('tbody');
+                    tbody.innerHTML = '';
 
-                            // const htmlContent = `
-                            // <h6 class="my-2">Customer</h6>
-                            // <p class="mb-1">${data.username}
-                            //     <br><a href="${data.email}">${data.email}</a>
-                            // </p>
-                            // `
-                            // userData.innerHTML = htmlContent
+                    order.items.forEach((product) => {
+                        console.log(product)
+                        $.ajax({
+                            type: "GET",
+                            url: `/api/v1/admin/product/${product.product}`,
+                            success: function (response) {
+                                const data = response.data.products
 
-                            // showToast(`Order Status Changed to  ${currentStatus}`, "primary");
-                        },
-                        error: function (xhr, status, error) {
-                            console.log(error);
-                        }
-                    });
+                                const tr = `
+                                    <tr>
+                                        <td>${data.name}</td>
+                                        <td>${data.price}</td>
+                                        <td>${product.quantity}</td>
+                                        <td>${data.price * product.quantity} </td>   
+                                    </tr>
 
+                                `;
+
+                                tbody.innerHTML += tr;
+
+                            }
+                        })
+                    })
+
+                    const total = document.querySelector('#total')
+                    total.textContent = order.totalPrice
 
                 }
 
