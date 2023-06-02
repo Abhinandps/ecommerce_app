@@ -211,53 +211,56 @@ const getDropdownCategories = async () => {
 
 const getAllProducts = async () => {
   try {
-    const res = await axios.get("http://127.0.0.1:3000/api/v1/admin/products");
-    const { data } = res.data;
-    const products = data.products;
+    let queryString = `/api/v1/admin/products?page=${pageNumber}&limit=5`;
+
+    const res = await fetchData(queryString);
+    // const { data } = res.data;
+    // const products = data.products;
+    console.log(res);
 
     const tableBody = document.getElementsByTagName("tbody")[0];
     tableBody.innerHTML = "";
 
-    products.forEach((product) => {
-      const row = document.createElement("tr");
-      const editBtn = `<label type="button"  class="badge badge-primary" data-product-id="${product._id}" onclick="handleProductFormEdit(event)"> <i class="mdi mdi-grease-pencil"></i></label>`;
+    // products.forEach((product) => {
+    //   const row = document.createElement("tr");
+    //   const editBtn = `<label type="button"  class="badge badge-primary" data-product-id="${product._id}" onclick="handleProductFormEdit(event)"> <i class="mdi mdi-grease-pencil"></i></label>`;
 
-      const dltBtn = `<label type="button"  class="badge badge-danger" data-product-id="${product._id}" onclick="handleProductDelete(event)"> <i class="mdi mdi-delete"></i> </label>`;
-      // const imagePath = product.image;
-      // const newPath = imagePath.replace("public", "");
-      //
+    //   const dltBtn = `<label type="button"  class="badge badge-danger" data-product-id="${product._id}" onclick="handleProductDelete(event)"> <i class="mdi mdi-delete"></i> </label>`;
+    //   // const imagePath = product.image;
+    //   // const newPath = imagePath.replace("public", "");
+    //   //
 
-      $.ajax({
-        type: "GET",
-        url: `http://127.0.0.1:3000/api/v1/admin/category/${product.category}`,
-        success: function (response) {
-          const categoryName = response.data.categories.name;
-          row.innerHTML = `
-          <td>
-            ${product.image.map((path, index) => {
-              const newPath = path.replace("public", "");
-              if (index === 0) {
-                return `<img width=20 src="${newPath}" />`;
-              } else {
-                return `<img width=20 src="${newPath}" /> ${product.name}`;
-              }
-            })}
-          </td>
-          
-          <td>${categoryName}</td>
-          <td style="white-space: pre-wrap">${product.description}</td>
-          <td>${product.stock}</td>
-          <td>${product.price}</td>
-          <td>${editBtn}</td>
-          <td>${dltBtn}</td>
-        `;
-          tableBody.innerHTML += row.outerHTML;
-        },
-        error: function (err) {
-          console.error(err);
-        },
-      });
-    });
+    //   $.ajax({
+    //     type: "GET",
+    //     url: `http://127.0.0.1:3000/api/v1/admin/category/${product.category}`,
+    //     success: function (response) {
+    //       const categoryName = response.data.categories.name;
+    //       row.innerHTML = `
+    //       <td>
+    //         ${product.image.map((path, index) => {
+    //           const newPath = path.replace("public", "");
+    //           if (index === 0) {
+    //             return `<img width=20 src="${newPath}" />`;
+    //           } else {
+    //             return `<img width=20 src="${newPath}" /> ${product.name}`;
+    //           }
+    //         })}
+    //       </td>
+
+    //       <td>${categoryName}</td>
+    //       <td style="white-space: pre-wrap">${product.description}</td>
+    //       <td>${product.stock}</td>
+    //       <td>${product.price}</td>
+    //       <td>${editBtn}</td>
+    //       <td>${dltBtn}</td>
+    //     `;
+    //       tableBody.innerHTML += row.outerHTML;
+    //     },
+    //     error: function (err) {
+    //       console.error(err);
+    //     },
+    //   });
+    // });
   } catch (err) {
     console.error(err);
   }
@@ -331,6 +334,7 @@ const handleProductFormEdit = (event) => {
     },
   });
 
+  openPopup("updateProductPopup");
   // const errorMsg = document.querySelectorAll(".error");
 
   let isValid = true;
@@ -466,20 +470,30 @@ const handleProductDelete = (event) => {
   );
 };
 
+
+
+// --- HANDLE PAGINATION START
+
+const fetchData = async (url) => {
+  try {
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 // Orders
-
-// --- HANDLE ORDER PAGINATION START
-
 
 const handlePaginationClick = async (pageNumber) => {
   try {
-    const orderId = document.getElementById('order-id').value;
-    const orderStatus = document.getElementById('order-status').value;
-    const paymentMethod = document.getElementById('payment-method').value;
-    const startDate = document.getElementById('start-date').value;
-    const endDate = document.getElementById('end-date').value;
-    const sortBy = document.getElementById('sort-by').value;
-    const sortOrder = document.getElementById('sort-order').value;
+    const orderId = document.getElementById("order-id").value;
+    const orderStatus = document.getElementById("order-status").value;
+    const paymentMethod = document.getElementById("payment-method").value;
+    const startDate = document.getElementById("start-date").value;
+    const endDate = document.getElementById("end-date").value;
+    const sortBy = document.getElementById("sort-by").value;
+    const sortOrder = document.getElementById("sort-order").value;
 
     // Construct the query string with sorting and filtering parameters
     let queryString = `/api/v1/admin/orders?page=${pageNumber}&limit=10`;
@@ -505,9 +519,9 @@ const handlePaginationClick = async (pageNumber) => {
 
     const { data } = response;
 
-    console.log(data)
+    console.log(data);
     const tableBody = document.getElementsByTagName("tbody")[0];
-    tableBody.innerHTML=''
+    tableBody.innerHTML = "";
     data.results.forEach((order) => {
       let statusColor;
       // // Determine the color based on the order status
@@ -523,9 +537,9 @@ const handlePaginationClick = async (pageNumber) => {
         statusColor = "danger";
       }
 
-      const dateString = order.updatedAt
+      const dateString = order.updatedAt;
       /// Splitting the string at the 'T' character
-      const datePart = dateString.split("T")[0]
+      const datePart = dateString.split("T")[0];
 
       const row = document.createElement("tr");
 
@@ -543,47 +557,93 @@ const handlePaginationClick = async (pageNumber) => {
       tableBody.innerHTML += row.outerHTML;
     });
 
-    
-
-    updatePaginationNumbers(data.previous, data.next, pageNumber);
+    updatePaginationNumbers(data.previous, data.next, pageNumber,"orders");
   } catch (error) {
     console.error(error);
   }
 };
 
-const fetchData = async (url) => {
+
+// Products
+
+const handleProductPaginationClick = async (pageNumber,searchQuery) => {
   try {
-    const response = await axios.get(url);
-    return response.data;
+    // Get filter and sort parameters for products
+    // const category = document.getElementById("category").value;
+    const priceRange = document.getElementById("price-range").value;
+    const sortBy = document.getElementById("sort-by").value;
+    const sortOrder = document.getElementById("sort-product").value;
+
+    // Construct the query string with filtering and sorting parameters
+    let queryString = `/api/v1/admin/products?page=${pageNumber}&limit=10`;
+
+    // if (category) {
+    //   queryString += `&category=${category}`;
+    // }
+    if (priceRange) {
+      queryString += `&priceRange=${priceRange}`;
+    }
+    if (sortBy && sortOrder) {
+      queryString += `&sortBy=${sortBy}&sortOrder=${sortOrder}`;
+    }
+
+    if (searchQuery) {
+      queryString += `&search=${searchQuery}`;
+    }
+
+    const response = await fetchData(queryString);
+
+    const { data } = response;
+
+    const tableBody = document.getElementsByTagName("tbody")[0];
+    tableBody.innerHTML = "";
+    data.results.forEach((product) => {
+        const row = document.createElement("tr");
+        const editBtn = `<label type="button"  class="badge badge-primary" data-product-id="${product._id}" onclick="handleProductFormEdit(event)"> <i class="mdi mdi-grease-pencil"></i></label>`;
+  
+        const dltBtn = `<label type="button"  class="badge badge-danger" data-product-id="${product._id}" onclick="handleProductDelete(event)"> <i class="mdi mdi-delete"></i> </label>`;
+       
+  
+        $.ajax({
+          type: "GET",
+          url: `http://127.0.0.1:3000/api/v1/admin/category/${product.category}`,
+          success: function (response) {
+            const categoryName = response.data.categories.name;
+            row.innerHTML = `
+            <td>
+              ${product.image.map((path, index) => {
+                const newPath = path.replace("public", "");
+                if (index === 0) {
+                  return `<img width=20 src="${newPath}" />`;
+                } else {
+                  return `<img width=20 src="${newPath}" /> ${product.name}`;
+                }
+              })}
+            </td>
+  
+            <td>${categoryName}</td>
+            <td style="white-space: pre-wrap">${product.description}</td>
+            <td>${product.stock}</td>
+            <td>${product.price}</td>
+            <td>${editBtn}</td>
+            <td>${dltBtn}</td>
+          `;
+            tableBody.innerHTML += row.outerHTML;
+          },
+          error: function (err) {
+            console.error(err);
+          },
+        });
+      });
+
+    updatePaginationNumbers(data.previous, data.next, pageNumber,"products");
   } catch (error) {
-    throw new Error(error.message);
+    console.error(error);
   }
 };
 
-const updatePaginationNumbers = (previousPage, nextPage, currentPage) => {
-  var paginationContainer = document.getElementById("pagination-container");
-  if (paginationContainer) {
-    paginationContainer.innerHTML = "";
-    if (previousPage) {
-      var previousButton = createPaginationButton(
-        previousPage.page,
-        "Previous"
-      );
-      paginationContainer.appendChild(previousButton);
-    }
 
-    var currentButton = createPaginationButton(currentPage, currentPage, true);
-    paginationContainer.appendChild(currentButton);
-
-    if (nextPage) {
-      var nextButton = createPaginationButton(nextPage.page, "Next");
-      paginationContainer.appendChild(nextButton);
-    }
-  }
-};
-
-// Function to create a pagination button
-function createPaginationButton(pageNumber, label, isActive) {
+function createPaginationButton(pageNumber, label, isActive, paginationType) {
   var button = document.createElement("button");
   button.innerHTML = label;
   button.classList.add("btn", "btn-primary", "page-link");
@@ -593,71 +653,146 @@ function createPaginationButton(pageNumber, label, isActive) {
   }
 
   button.addEventListener("click", function () {
-    handlePaginationClick(pageNumber);
+    if (paginationType === "orders") {
+      handlePaginationClick(pageNumber);
+    } else if (paginationType === "products") {
+      handleProductPaginationClick(pageNumber);
+    }
   });
 
   return button;
 }
 
-if (window.location.pathname.includes("/orders")) {
-  fetchDataAndPaginate("/api/v1/admin/orders", 1);
-}
+
+const updatePaginationNumbers = (previousPage, nextPage, currentPage, paginationType) => {
+  const paginationContainer = document.getElementById("pagination-container");
+  if (paginationContainer) {
+    paginationContainer.innerHTML = "";
+
+    if (previousPage) {
+      const previousButton = createPaginationButton(previousPage.page, "Previous", false, paginationType);
+      paginationContainer.appendChild(previousButton);
+    }
+
+    const currentButton = createPaginationButton(currentPage, currentPage, true, paginationType);
+    paginationContainer.appendChild(currentButton);
+
+    if (nextPage) {
+      const nextButton = createPaginationButton(nextPage.page, "Next", false, paginationType);
+      paginationContainer.appendChild(nextButton);
+    }
+  }
+};
 
 
-
-// Function to fetch data and paginate
-async function fetchDataAndPaginate(url, currentPage) {
+async function fetchDataAndPaginate(url, currentPage, dataType) {
   try {
     const response = await fetchData(`${url}?page=${currentPage}&limit=10`);
     const { data } = response;
-
-
+    console.log(data.results);
     const tableBody = document.getElementsByTagName("tbody")[0];
-    tableBody.innerHTML=''
-    data.results.forEach((order) => {
-      let statusColor;
-      // // Determine the color based on the order status
-      if (order.status === "pending") {
-        statusColor = "warning";
-      } else if (order.status === "delivered") {
-        statusColor = "success";
-      } else if (order.status === "shipped") {
-        statusColor = "primary";
-      } else if (order.status === "confirmed") {
-        statusColor = "info";
-      } else {
-        statusColor = "danger";
-      }
+    tableBody.innerHTML = "";
+    
+    if (dataType === "orders") {
+      data.results.forEach((order) => {
+        let statusColor;
+        // // Determine the color based on the order status
+        if (order.status === "pending") {
+          statusColor = "warning";
+        } else if (order.status === "delivered") {
+          statusColor = "success";
+        } else if (order.status === "shipped") {
+          statusColor = "primary";
+        } else if (order.status === "confirmed") {
+          statusColor = "info";
+        } else {
+          statusColor = "danger";
+        }
+  
+        const dateString = order.updatedAt;
 
-      const dateString = order.updatedAt
-      /// Splitting the string at the 'T' character
-      const datePart = dateString.split("T")[0]
-
+        /// Splitting the string at the 'T' character
+        const datePart = dateString.split("T")[0];
+  
+        const row = document.createElement("tr");
+  
+        const statusBadge = `<span class="badge badge-${statusColor}">${order.status}</span>`;
+        const editBtn = `<label id="view" type="button"  class="badge badge-primary" data-order-id="${order.orderID}" onclick="handleOrders(event)"> <i class="mdi mdi-eye" muted></i></label>`;
+  
+        row.innerHTML = `
+        <td> ${order.orderID} </td>
+        <td> ₹${order.totalPrice} </td>
+        <td> ${order.paymentMethod} </td>
+        <td> ${datePart} </td>
+        <td> ${statusBadge}</td>
+        <td> ${editBtn}</td>
+        `;
+        tableBody.innerHTML += row.outerHTML;
+      });
+      updatePaginationNumbers(data.previous, data.next, currentPage, "orders");
+    } else if (dataType === "products") {
+      data.results.forEach((product) => {
       const row = document.createElement("tr");
+      const editBtn = `<label type="button"  class="badge badge-primary" data-product-id="${product._id}" onclick="handleProductFormEdit(event)"> <i class="mdi mdi-grease-pencil"></i></label>`;
 
-      const statusBadge = `<span class="badge badge-${statusColor}">${order.status}</span>`;
-      const editBtn = `<label id="view" type="button"  class="badge badge-primary" data-order-id="${order.orderID}" onclick="handleOrders(event)"> <i class="mdi mdi-eye" muted></i></label>`;
+      const dltBtn = `<label type="button"  class="badge badge-danger" data-product-id="${product._id}" onclick="handleProductDelete(event)"> <i class="mdi mdi-delete"></i> </label>`;
+     
 
-      row.innerHTML = `
-      <td> ${order.orderID} </td>
-      <td> ₹${order.totalPrice} </td>
-      <td> ${order.paymentMethod} </td>
-      <td> ${datePart} </td>
-      <td> ${statusBadge}</td>
-      <td> ${editBtn}</td>
-      `;
-      tableBody.innerHTML += row.outerHTML;
+      $.ajax({
+        type: "GET",
+        url: `http://127.0.0.1:3000/api/v1/admin/category/${product.category}`,
+        success: function (response) {
+          const categoryName = response.data.categories.name;
+          row.innerHTML = `
+          <td>
+            ${product.image.map((path, index) => {
+              const newPath = path.replace("public", "");
+              if (index === 0) {
+                return `<img width=20 src="${newPath}" />`;
+              } else {
+                return `<img width=20 src="${newPath}" /> ${product.name}`;
+              }
+            })}
+          </td>
+
+          <td>${categoryName}</td>
+          <td style="white-space: pre-wrap">${product.description}</td>
+          <td>${product.stock}</td>
+          <td>${product.price}</td>
+          <td>${editBtn}</td>
+          <td>${dltBtn}</td>
+        `;
+          tableBody.innerHTML += row.outerHTML;
+        },
+        error: function (err) {
+          console.error(err);
+        },
+      });
     });
-
-
-    updatePaginationNumbers(data.previous, data.next, currentPage);
+      updatePaginationNumbers(data.previous, data.next, currentPage, "products");
+    }
   } catch (error) {
     console.error(error);
   }
 }
 
 
-// --- HANDLE ORDER PAGINATION END
+
+
+
+// Initial render for orders
+if (window.location.pathname.includes("/orders")) {
+  fetchDataAndPaginate("/api/v1/admin/orders", 1, "orders");
+}
+
+// Initial render for products
+if (window.location.pathname.includes("/products")) {
+  fetchDataAndPaginate("/api/v1/admin/products", 1, "products");
+}
+
+
+// --- HANDLE PAGINATION END
+
 
 
 const handleOrders = (event) => {
@@ -675,31 +810,15 @@ const handleOrders = (event) => {
   });
 };
 
-
-
 // Apply Filters button click event
-document.getElementById('apply-filters').addEventListener('click', function() {
+document.getElementById("apply-filters").addEventListener("click", function () {
   handlePaginationClick(1);
 });
 
 // Apply Sort button click event
-document.getElementById('apply-sort').addEventListener('click', function() {
+document.getElementById("apply-sort").addEventListener("click", function () {
   handlePaginationClick(1);
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -180,7 +180,8 @@
           <ul class="navbar-nav w-100">
             <li class="nav-item w-100">
               <form class="nav-link mt-2 mt-md-0 d-none d-lg-flex search">
-                <input type="text" class="form-control" placeholder="Search products">
+                <input id="search-bar" onkeydown="handleSearch(event)" type="text" class="form-control"
+                  placeholder="Search products">
               </form>
             </li>
           </ul>
@@ -291,5 +292,20 @@
         document.querySelector('#admin_logout').addEventListener('click', async () => {
           await adminlogout()
         })
+
+
+
+        function handleSearch(event) {
+          if (event.keyCode === 13) {
+            event.preventDefault();
+
+            const searchQuery = document.getElementById("search-bar").value;
+            console.log(searchQuery)
+
+            handleProductPaginationClick(1, searchQuery);
+          }
+        }
+
+
 
       </script>

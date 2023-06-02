@@ -28,8 +28,10 @@ const { isAuthenticate, isAdmin } = require("../middleware/auth");
 
 const Order = require("../Models/orders");
 
+const Product = require("../Models/products");
+
 // pagination
-const { paginatedResults } = require("../utils/pagination");
+const { paginatedResults, paginatedProductResults } = require("../utils/pagination");
 
 // multer
 const upload = require("../utils/multerConfig");
@@ -72,7 +74,7 @@ router.delete("/category/:id", deleteCategory);
 
 // Products
 
-router.get("/products", isAuthenticate, isAdmin, getAllProducts);
+router.get("/products", isAuthenticate, isAdmin, paginatedResults(Product), getAllProducts);
 
 router.get("/product/:id", isAuthenticate, isAdmin, getOneProduct);
 

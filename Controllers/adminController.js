@@ -117,13 +117,24 @@ exports.deleteCategory = catchAsync(async (req, res, next) => {
   res.status(204).json({ message: "Category deleted" });
 });
 
+// exports.getAllProducts = catchAsync(async (req, res) => {
+//   const products = await Product.find({ deleted: false });
+//   res.status(200).json({
+//     status: "success",
+//     data: { products },
+//   });
+// });
+
+
+
 exports.getAllProducts = catchAsync(async (req, res) => {
-  const products = await Product.find({ deleted: false });
+  // const products = await Product.find({ deleted: false });
   res.status(200).json({
     status: "success",
-    data: { products },
+    data: res.paginatedResults,
   });
 });
+
 
 exports.getOneProduct = catchAsync(async (req, res) => {
   const products = await Product.findOne({ _id: req.params.id });
@@ -197,12 +208,7 @@ exports.updateProduct = catchAsync(async (req, res, next) => {
             if (err) console.log(err);
           });
         });
-      } else if (product.image) {
-        // Remove the existing image
-        fs.unlink(product.image, (err) => {
-          if (err) console.log(err);
-        });
-      }
+      } 
       product.image = filePaths;
     }
 

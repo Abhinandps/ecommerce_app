@@ -1,148 +1,252 @@
 <%- include ('../../layouts/adminHeader.ejs') %>
 
+    <style>
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+        }
+
+        .popup-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgb(0, 0, 0);
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .popup-buttons {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .close-popup {
+            margin-right: 10px;
+        }
+    </style>
+
+    <style>
+        .pagination {
+            display: inline-block;
+            max-width: 50%;
+            margin: 0 auto;
+        }
+
+        .pagination-list {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 0 auto;
+        }
+
+        .page-item {
+            display: inline;
+        }
+
+        .page-link {
+            padding: 0.5em 0.75em;
+            text-decoration: none;
+            border: 1px solid #dee2e6;
+            background-color: #191c24;
+            color: #007bff;
+        }
+
+        .page-item.active .page-link {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+    </style>
+
 
     <div class="main-panel">
         <div class="content-wrapper">
             <div class="page-header">
                 <h3 class="page-title">Products</h3>
-                <!-- <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="#">Tables</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Basic tables</li>
-                    </ol>
-                </nav> -->
             </div>
             <div class="row">
+                <!-- Add New Product Popup -->
+                <div class="popup" id="addProductPopup">
+                    <div class="popup-content">
+                        <form class="forms-sample" id="product-form" enctype="multipart/form-data">
+                            <h4 class="card-title">Add New Product</h4>
+                            <div class="form-group">
+                                <label for="exampleInputName1">Product Name</label>
+                                <input type="text" class="form-control" id="product-name" name="name"
+                                    id="exampleInputName1" placeholder="Name">
+                                <p class="text-danger my-2 name-error error"></p>
+                            </div>
 
-                <div class="col-lg-4 col-sm-12 grid-margin stretch-card">
-                    <div class="card">
-                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="exampleSelectGender">Category</label>
+                                <select class="form-control" category id="category-dropdown" name="category">
 
-                            <form class="forms-sample" id="product-form" enctype="multipart/form-data">
-                                <h4 class="card-title">Add New Products</h4>
-                                <div class="form-group">
-                                    <label for="exampleInputName1">Product Name</label>
-                                    <input type="text" class="form-control" id="product-name" name="name"
-                                        id="exampleInputName1" placeholder="Name">
-                                    <p class="text-danger my-2 name-error error"></p>
-                                </div>
+                                    <option></option>
 
-                                <div class="form-group">
-                                    <label for="exampleSelectGender">Category</label>
-                                    <select class="form-control" category id="category-dropdown" name="category">
+                                </select>
+                                <p class="text-danger my-2 category-error error"></p>
+                            </div>
 
-                                        <option></option>
+                            <div class="form-group">
+                                <label>Select Images (2 required):</label> <br>
+                                <input type="file" id="product-img" name="image" class="file-upload-info" multiple>
+                                <p class="text-danger my-2 error error-message"></p>
 
-                                    </select>
-                                    <p class="text-danger my-2 category-error error"></p>
-                                </div>
+                            </div>
 
-                                <div class="form-group">
-                                    <label>Select Images (2 required):</label> <br>
-                                    <input type="file" id="product-img" name="image" class="file-upload-info" multiple>
-                                    <p class="text-danger my-2 error error-message"></p>
-                                    <!-- <div class="input-group col-xs-12">
-                                <input type="text" class="form-control file-upload-info" disabled
-                                    placeholder="Upload Icon">
-                                <span class="input-group-append">
-                                    <button class="file-upload-browse btn btn-primary"
-                                        type="button">Upload</button>
-                                </span>
-                            </div> -->
-                                </div>
+                            <div class="form-group">
+                                <label for="exampleInputCity1">Product Price</label>
+                                <input type="number" name="price" class="form-control" id="price" placeholder="price">
+                                <p class="text-danger my-2 price-error error"></p>
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputCity1">Stock</label>
+                                <input type="number" name="stock" class="form-control " id="stock" placeholder="stock">
+                                <p class="text-danger my-2 stock-error error"></p>
+                            </div>
 
-                                <div class="form-group">
-                                    <label for="exampleInputCity1">Product Price</label>
-                                    <input type="number" name="price" class="form-control" id="price"
-                                        placeholder="price">
-                                    <p class="text-danger my-2 price-error error"></p>
-                                </div>
-                                <div class="form-group">
-                                    <label for="exampleInputCity1">Stock</label>
-                                    <input type="number" name="stock" class="form-control " id="stock"
-                                        placeholder="stock">
-                                    <p class="text-danger my-2 stock-error error"></p>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="exampleTextarea1">Description</label>
-                                    <textarea class="form-control " name="description" id="description"
-                                        rows="4"></textarea>
-                                    <p class="text-danger my-2 desc-error error"></p>
-                                </div>
-                                <button type="submit" class="btn btn-primary mr-2">Submit</button>
-                                <button type="reset" class="btn btn-dark">Cancel</button>
-                            </form>
-
-                            <!-- Hidden form  -->
-                            <form class="forms-sample" id="edit-product-form" style="display:none"
-                                enctype="multipart/form-data">
-                                <h4 class="card-title">Update Products</h4>
-                                <div class="form-group">
-                                    <label for="exampleInputName1">Product Name</label>
-                                    <input type="text" class="form-control" name="name" id="product_name"
-                                        placeholder="Name">
-                                        <p id="productName-error " class="text-danger my-2 error"></p>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="exampleSelectGender">Category</label>
-                                    <select class="form-control category" id="product_dropdown" name="category">
-
-                                        <option></option>
-
-                                    </select>
-                                    <p id="productCategory-error" class="text-danger my-2 error"></p>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Select Images (2 required):</label> <br>
-                                    <input type="file" id="product-img" name="image" class="file-upload-info" multiple>
-                                    <!-- <div class="input-group col-xs-12">
-                                <input type="text" class="form-control file-upload-info" disabled
-                                    placeholder="Upload Icon">
-                                <span class="input-group-append">
-                                    <button class="file-upload-browse btn btn-primary"
-                                        type="button">Upload</button>
-                                </span>
-                            </div> -->
-                                    <p class="text-danger my-2 error file-error"></p>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="exampleInputCity1">Product Price</label>
-                                    <input type="number" name="price" class="form-control price" id="product_price"
-                                        placeholder="price">
-                                    <p id="productPrice-error" class="text-danger my-2 error"></p>
-                                </div>
-                                <div class="form-group">
-                                    <label for="exampleInputCity1">Stock</label>
-                                    <input type="number" name="stock" class="form-control stock" id="product_stock"
-                                        placeholder="stock">
-                                    <p id="productStock-error" class="text-danger my-2  error"></p>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="exampleTextarea1">Description</label>
-                                    <textarea class="form-control description" name="description" id="product_desc"
-                                        rows="4"></textarea>
-                                    <p id="productDesc-error" class="text-danger my-2  error"></p>
-                                </div>
-                                <button type="submit" class="btn btn-success mr-2">Save</button>
-                                <button type="reset" class="btn btn-dark">Cancel</button>
-                            </form> 
-
-
-                        </div>
+                            <div class="form-group">
+                                <label for="exampleTextarea1">Description</label>
+                                <textarea class="form-control " name="description" id="description" rows="4"></textarea>
+                                <p class="text-danger my-2 desc-error error"></p>
+                            </div>
+                            <div class="popup-buttons">
+                                <button type="button" class="btn btn-dark close-popup">Cancel</button>
+                                <button type="submit" class="btn btn-primary ">Submit</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 
-                <div class="col-lg-8 col-sm-12 grid-margin stretch-card">
+                <!-- Update Product Popup -->
+                <div class="popup" id="updateProductPopup">
+                    <div class="popup-content">
+                        <form class="forms-sample" action="post" id="edit-product-form" enctype="multipart/form-data">
+                            <h4 class="card-title">Update Product</h4>
+                            <div class="form-group">
+                                <label for="exampleInputName1">Product Name</label>
+                                <input type="text" class="form-control" name="name" id="product_name"
+                                    placeholder="Name">
+                                <p id="productName-error " class="text-danger my-2 error"></p>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="exampleSelectGender">Category</label>
+                                <select class="form-control category" id="product_dropdown" name="category">
+
+                                    <option></option>
+
+                                </select>
+                                <p id="productCategory-error" class="text-danger my-2 error"></p>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Select Images (2 required):</label> <br>
+                                <input type="file" id="product-img" name="image" class="file-upload-info" multiple>
+
+                                <p class="text-danger my-2 error file-error"></p>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="exampleInputCity1">Product Price</label>
+                                <input type="number" name="price" class="form-control price" id="product_price"
+                                    placeholder="price">
+                                <p id="productPrice-error" class="text-danger my-2 error"></p>
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputCity1">Stock</label>
+                                <input type="number" name="stock" class="form-control stock" id="product_stock"
+                                    placeholder="stock">
+                                <p id="productStock-error" class="text-danger my-2  error"></p>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="exampleTextarea1">Description</label>
+                                <textarea class="form-control description" name="description" id="product_desc"
+                                    rows="4"></textarea>
+                                <p id="productDesc-error" class="text-danger my-2  error"></p>
+                            </div>
+                            <div class="popup-buttons">
+                                <button type="button" class="btn btn-dark close-popup">Cancel</button>
+                                <button type="submit" class="btn btn-success close-popup">Save</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+
+
+
+
+                <div class="col-lg-12 col-sm-12 grid-margin stretch-card">
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title">Products List</h4>
                             <p class="card-description"> You can <code class="text-info">Manage</code>product list
                             </p>
+
+                            <!-- Button to trigger Add New Product Popup -->
+                            <button type="button" class="btn btn-primary" onclick="openPopup('addProductPopup')">Add New
+                                Product</button>
+
+                            <div class="filters">
+
+                                <h2>Filters:</h2>
+
+                                <div class="filter-item">
+                                    <label for="category">Choose Category:</label>
+                                    <select id="category">
+
+                                        <!-- <option value="">All</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="confirmed">Confirmed</option>
+                                        <option value="shipped">Shipped</option>
+                                        <option value="delivered">Delivered</option>
+                                        <option value="cancelled">Canceled</option> -->
+
+                                    </select>
+                                </div>
+
+                                <div class="filter-item">
+                                    <label for="price-range">Price Range:</label>
+                                    <select id="price-range">
+                                        <option value="">All</option>
+                                        <option value="0-500">&#8377;0 - &#8377;500</option>
+                                        <option value="500-1000">&#8377;500 - &#8377;1000</option>
+                                        <option value="1000-2000">&#8377;1000 - &#8377;2000</option>
+                                        <option value="2000-5000">&#8377;2000 - &#8377;5000</option>
+                                        <option value="5000">&#8377;5000 and above</option>
+                                    </select>
+
+                                </div>
+                                <button id="find-filter">Apply Filter</button>
+                                <button id="restore-filter" onclick="location.assign('/products')">Restore</button>
+
+                            </div>
+
+                            <div class="sort-options">
+                                <h2>Sort By:</h2>
+                                <select id="sort-by">
+                                    <option value="stock">Stocks</option>
+                                    <option value="price">Price</option>
+                                </select>
+                                <select id="sort-product">
+                                    <option value="desc">High to Low</option>
+                                    <option value="asc">Low to High</option>
+                                </select>
+                                <button id="find-sort">Apply Sort</button>
+                            </div>
+
                             <div class="table-responsive">
                                 <table class="table table-striped" id="prodcut-table">
                                     <thead>
@@ -163,16 +267,58 @@
                     </div>
                 </div>
 
+                <div id="pagination-container" class="w-100 d-flex g-2 justify-content-center">
 
+                </div>
 
             </div>
         </div>
 
 
         <script>
+
+
+            // Apply Filters button click event
+            document.getElementById("find-filter").addEventListener("click", function () {
+                handleProductPaginationClick(1);
+            });
+
+
+
+            // Apply Sort button click event
+            document.getElementById("find-sort").addEventListener("click", function () {
+                handleProductPaginationClick(1);
+
+            });
+
+            function openPopup(popupId) {
+                var popup = document.getElementById(popupId);
+                if (popup) {
+                    popup.style.display = 'block';
+                }
+            }
+
+            function closePopup(popupId) {
+                var popup = document.getElementById(popupId);
+                if (popup) {
+                    popup.style.display = 'none';
+                }
+            }
+
+            document.addEventListener('click', function (event) {
+                if (event.target.classList.contains('close-popup')) {
+                    var popup = event.target.closest('.popup');
+                    if (popup) {
+                        popup.style.display = 'none';
+                    }
+                }
+            });
+
+
+
             window.onload = async function () {
 
-                await getAllProducts();
+                // await getAllProducts();
                 await getDropdownCategories();
             };
 
@@ -261,11 +407,11 @@
                         fileError.textContent = "";
                     }
 
-                    if(name){
+                    if (name) {
                         nameError.textContent = name
                         fileError.textContent = "";
-                    }else{
-                        nameError.textContent=""
+                    } else {
+                        nameError.textContent = ""
                     }
                 }
             });
