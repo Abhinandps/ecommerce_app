@@ -21,7 +21,12 @@ const {
   getOrder,
   updateOrderStatus,
   orderCancel,
-  getAllCarts
+  getAllCarts,
+  addCoupons,
+  getOneCoupon,
+  getCoupons,
+  updateCoupon,
+  deleteCoupon
 } = require("../Controllers/adminController");
 
 const { isAuthenticate, isAdmin } = require("../middleware/auth");
@@ -31,7 +36,7 @@ const Order = require("../Models/orders");
 const Product = require("../Models/products");
 
 // pagination
-const { paginatedResults, paginatedProductResults } = require("../utils/pagination");
+const { paginatedResults } = require("../utils/pagination");
 
 // multer
 const upload = require("../utils/multerConfig");
@@ -104,6 +109,19 @@ router.route("/orders/:orderID")
   .put(isAdmin,updateOrderStatus)
   .delete(isAdmin,orderCancel)
 
+
+// Coupons
+
+router.post("/coupons", isAdmin, addCoupons)
+
+router.get("/coupons", isAdmin, getCoupons)
+
+router.route("/coupons/:id")
+  .get(isAdmin, getOneCoupon)
+  .patch(isAdmin, updateCoupon)
+  .delete(isAdmin, deleteCoupon)
+
+  
 
 module.exports = router;
 

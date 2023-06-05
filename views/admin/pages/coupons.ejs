@@ -1,0 +1,172 @@
+<%- include ('../../layouts/adminHeader.ejs') %>
+
+
+    <div class="main-panel">
+        <div class="content-wrapper">
+            <div class="page-header">
+                <h3 class="page-title">All Coupon's</h3>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                    </ol>
+                </nav>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body" id="card-body">
+
+                            <form class="forms-sample" id="coupon-form">
+                                <h4 class="card-title">Add Coupon</h4>
+                                <div class="form-group">
+                                    <label for="exampleInputName1">Coupon Code</label>
+                                    <input type="text" class="form-control" name="code" id="code" placeholder="code"
+                                        required>
+                                    <p id="name-error" class="text-danger my-2"></p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exampleInputName1">Discount</label>
+                                    <input type="number" class="form-control" name="value" id="value" placeholder=""
+                                        required>
+                                    <p id="value-error" class="text-danger my-2"></p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exampleInputName1">Expiry Date</label>
+                                    <input type="date" class="form-control" name="expiryDate" id="expiryDate"
+                                        placeholder="" required>
+                                    <p id="date-error" class="text-danger my-2"></p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exampleInputName1">Minimum Orders</label>
+                                    <input type="number" class="form-control" name="minimumOrderValue"
+                                        id="minimumOrderValue" placeholder="" required>
+                                    <p id="minimum-error" class="text-danger my-2"></p>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                                <button type="reset" class="btn btn-dark">Cancel</button>
+                            </form>
+
+                            <form class="forms-sample" id="edit-coupon-form" style="display: none;"
+                                enctype="multipart/form-data">
+                                <h4 class="card-title">Update coupon</h4>
+
+                                <div class="form-group">
+                                    <label for="exampleInputName1">Coupon Code</label>
+                                    <input type="text" class="form-control" name="code" id="code" placeholder="code"
+                                        required>
+                                    <p id="edit-name-error" class="text-danger my-2"></p>
+                                </div>
+
+
+
+
+                                <div class="form-group">
+                                    <label for="exampleInputName1">Discount</label>
+                                    <input type="text" class="form-control" name="value" id="value" placeholder=""
+                                        required>
+                                    <p id="edit-value-error" class="text-danger my-2"></p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exampleInputName1">Expiry Date</label>
+                                    <input type="date" class="form-control" name="expiryDate" id="expiryDate"
+                                        placeholder="" required>
+                                    <p id="edit-date-error" class="text-danger my-2"></p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exampleInputName1">Minimum Orders</label>
+                                    <input type="number" class="form-control" name="minimumOrderValue"
+                                        id="minimumOrderValue" placeholder="" required>
+                                    <p id="edit-minimum-error" class="text-danger my-2"></p>
+                                </div>
+
+
+
+                                <button type="submit" class="btn btn-success mr-2">Save</button>
+                                <button type="reset" class="btn btn-dark">Cancel</button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-8 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">List All Coupons</h4>
+                            <p class="card-description"> You can <code class="text-primary">edit</code> and
+                                <code>delete</code> Coupons
+                            </p>
+                            <div class="table-responsive">
+                                <table class="table" id="user-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Coupon Code</th>
+                                            <th>Coupon Status</th>
+                                            <th>Discount</th>
+                                            <th>Expiry Date</th>
+                                            <th>Minimum Orders</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <script>
+
+            const cardBody = document.getElementById('card-body');
+            const form = document.getElementById('coupon-form');
+            // const nameError = document.getElementById('name-error')
+
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                try {
+                    const formData = {
+                        code: form.querySelector("#code").value,
+                        value: form.querySelector("#value").value,
+                        expiryDate: form.querySelector("#expiryDate").value,
+                        minimumOrderValue: parseInt(
+                            form.querySelector("#minimumOrderValue").value
+                        ),
+                    };
+                    const response = await axios.post('/api/v1/admin/coupons', formData)
+
+                    // nameError.innerHTML = ''
+                    await getAllCoupons();
+                    // console.log(response)
+                } catch (error) {
+                    // const name = error.response.data.message.name
+                    // if (name) {
+                    //     nameError.innerHTML = name
+                    // } else {
+                    //     nameError.innerHTML = ''
+                    // }
+                    console.error(error)
+                }
+            });
+
+
+        </script>
+
+        <script>
+            window.onload = async function () {
+                await getAllCoupons();
+            };
+        </script>
+
+        <%- include ('../../layouts/adminFooter.ejs') %>

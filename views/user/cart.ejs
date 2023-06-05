@@ -18,6 +18,10 @@
         </div>
 
         <div class="proceedSidebar">
+            <div id="couponEditCard" class="couponEditCard">
+
+            </div>
+
             <div class="desc">
                 <p>how are shipping costs calculated? shipping have been applied to your order</p>
             </div>
@@ -26,12 +30,16 @@
             </div>
             <div class="sidebar-details">
                 <div class="group-data">
-                    <div class="data-title">Items( <span item-count>  </span> ):</div>
+                    <div class="data-title">Items( <span item-count> </span> ):</div>
                     <div id="totalPrice" class="title-value">₹<span></span></div>
                 </div>
                 <div class="group-data">
                     <div class="data-title"> shipping & handling:</div>
                     <div class="title-value">₹98.00</div>
+                </div>
+                <div class="group-data">
+                    <div class="data-title">Coupon Discount:</div>
+                    <div class="title-value" style="cursor:pointer;" id="coupon-list"> Apply Coupon </div>
                 </div>
                 <div class="group-data">
                     <div class="data-title">Delivery Charges:</div>
@@ -42,10 +50,60 @@
                     <div class="title-value">₹<span id="totalPayable"></span></div>
                 </div>
                 <button class="btn-proceed" onclick="goToChekOut()">Checkout</button>
+
+
             </div>
         </div>
 
-        
+
+
+
+        <div class="form-popup-bg">
+            <div class="form-container">
+                <button id="btnCloseForm" class="modal-close-btn">
+                    <ion-icon id="btnCloseForm" name="close-outline"></ion-icon>
+                </button>
+                <h1>Apply Coupon</h1>
+                <!-- <p>For more information. Please complete this form.</p> -->
+
+                <form id="applyCoupon" method="post">
+
+                    <div class="form-group">
+                        <input id="code" type="text" placeholder="Enter coupon code" name="code" class="form-control"
+                            required />
+                        <span class="invalid error" id="error-coupon"></span>
+                    </div>
+
+                    <div class="form-group" id="coupon-codes-container">
+
+                        <div class="coupon-code-selection">
+                            <p>ANON500</p>
+
+                            <div class="coupon-details">
+                                <p class="highlight_text">Save ₹501</p>
+                                <p class="more-details">
+                                    Rs.400 off on minimum purchase of Rs. 2599.
+                                    <br>
+                                    Expires On: 09th June 2023 | 12:00 AM
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="bottom-fixed-bar">
+                        <p id="savings">Maximum Savings : ₹0 </p>
+                        <button type="submit">APPLY</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+
+
+
     </div>
     </div>
 
@@ -55,9 +113,72 @@
         };
     </script>
 
-<script>
-    
-  </script>
+    <script>
+        const form = document.querySelector('#applyCoupon')
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault()
+            const input = document.getElementById("code").value
+            $.ajax({
+                type: "GET",
+                url: "/api/v1/user/cart",
+                success: (data) => {
+                    try {
+                        const orderTotal = data.cart.totalPrice
+                        $.ajax({
+                            type: "POST",
+                            url: "/api/v1/user/apply-coupon",
+                            data: {
+                                code: input,
+                                orderTotal
+                            },
+                            success: function (response) {
+                                updateCartTotal(response.finalTotal)
+                                getCart()
+                                window.location.href = '/cart'
+                            },
+                            error: function (error) {
+                                document.getElementById("error-coupon").textContent =error.responseJSON.message 
+                            }
+                        })
+                    } catch (err) {
+                        console.log(err.response)
+                    }
+                }
+            })
+        })
+
+    </script>
+
+
+    <script>
+        function closeForm() {
+            document.querySelector('.form-popup-bg').classList.remove('is-visible');
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var btnOpenForm = document.getElementById('coupon-list');
+            var formPopupBg = document.querySelector('.form-popup-bg');
+            var btnCloseForm = document.getElementById('btnCloseForm');
+
+            /* Contact Form Interactions */
+            btnOpenForm.addEventListener('click', function (event) {
+                event.preventDefault();
+                formPopupBg.classList.add('is-visible');
+            });
+
+            // close popup when clicking x or off popup
+            formPopupBg.addEventListener('click', function (event) {
+                if (event.target.classList.contains('form-popup-bg') || event.target.id === 'btnCloseForm') {
+                    event.preventDefault();
+                    formPopupBg.classList.remove('is-visible');
+                }
+            });
+        });
+
+
+    </script>
+
 
 
     <%- include ('../layouts/footer.ejs') %>

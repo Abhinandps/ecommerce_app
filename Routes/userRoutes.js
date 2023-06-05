@@ -17,7 +17,10 @@ const {
   purchaseItem,
   orderCancel,
   orderHistory,
-  getOrderDetails
+  getOrderDetails,
+  getAllCoupons,
+  applyCoupon,
+  removeCoupon
 } = require("../Controllers/userController");
 
 const { getAllCategories } = require("../Controllers/adminController");
@@ -67,6 +70,15 @@ router.post('/address', isAuthenticate, saveShippingAddress )
 
 
 router.post("/cart/purchase", isAuthenticate, purchaseItem)
+
+
+// Coupons
+
+router.get('/coupons',isAuthenticate, getAllCoupons);
+
+router.post('/apply-coupon',isAuthenticate, applyCoupon);
+
+router.delete("/coupons/remove", isAuthenticate, removeCoupon)
 
 
 // Orders

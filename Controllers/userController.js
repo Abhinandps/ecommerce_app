@@ -7,6 +7,7 @@ const ErrorHandler = require("../Controllers/errorController");
 
 const User = require("../Models/userModel");
 const Order = require("../Models/orders");
+const Coupon = require("../Models/coupen");
 
 const generateOrderID = () => {
   const date = new Date();
@@ -105,8 +106,8 @@ exports.updateCartItem = catchAsync(async (req, res) => {
 
 exports.updateCartTotal = catchAsync(async (req, res) => {
   const { totalPrice } = req.body;
-  console.log(totalPrice)
-  const userId = req.user._id; 
+  console.log(totalPrice);
+  const userId = req.user._id;
   const cart = await Cart.findOneAndUpdate(
     { user: userId },
     { totalPrice: totalPrice },
@@ -160,14 +161,131 @@ exports.saveShippingAddress = catchAsync(async (req, res) => {
   });
 });
 
+// Coupon
+
+exports.getAllCoupons = async (req, res) => {
+  try {
+    const coupons = await Coupon.find();
+    res.json(coupons);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.applyCoupon = async (req, res) => {
+  try {
+    const { code, orderTotal } = req.body;
+    const userId = req.user._id;
+
+    // Function to check if a coupon is active or expired
+    function isCouponActive(coupon) {
+      const currentDate = new Date();
+      const expiryDate = coupon.expiryDate;
+      const isActive = currentDate <= expiryDate;
+
+      if (coupon.isActive !== isActive) {
+        coupon.isActive = isActive;
+        coupon.save();
+      }
+
+      return isActive;
+    }
+
+    const coupon = await Coupon.findOne({ code });
+
+    if (!coupon) {
+      return res.status(404).json({ message: "Coupon not found" });
+    }
+
+    if (!isCouponActive(coupon)) {
+      return res.status(400).json({ message: "Coupon has expired" });
+    }
+
+    if (coupon.usedBy.includes(userId) || coupon.claimedBy.includes(userId)) {
+      return res.status(400).json({ message: "Coupon has already been used" });
+    }
+
+    if (orderTotal < coupon.minimumOrderValue) {
+      return res.status(400).json({
+        message:
+          "Order total does not meet the minimum required amount for this coupon",
+      });
+    }
+
+    // Store the user ID in the usedBy array
+    coupon.usedBy.push(userId);
+    await coupon.save();
+
+    // Calculate the discounted amount and final total
+    let discountedAmount = 0;
+    discountedAmount = coupon.value;
+
+    // Update the discountAmount in the Cart schema
+
+    const cart = await Cart.findOne({ user: userId });
+
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
+
+    cart.discountAmount = discountedAmount;
+    await cart.save();
+
+    const finalTotal = orderTotal - discountedAmount;
+
+    res.json({
+      message: "Coupon applied successfully",
+      discountedAmount,
+      finalTotal,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.removeCoupon = catchAsync(async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const coupon = await Coupon.findOne({ usedBy: userId });
+
+    if (!coupon) {
+      return res.status(404).json({ message: "Coupon not found" });
+    }
+
+    // Remove the user ID from the usedBy array
+    const index = coupon.usedBy.indexOf(userId);
+    if (index > -1) {
+      coupon.usedBy.splice(index, 1);
+    }
+
+    await coupon.save();
+
+    const cart = await Cart.findOne({ user: userId });
+
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
+
+    // Remove the discountAmount from the Cart schema
+    cart.discountAmount = 0;
+    await cart.save();
+
+    res.json({ message: "Coupon removed successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // purchase
 
 exports.purchaseItem = catchAsync(async (req, res, next) => {
-  const { shippingAddress,paymentMethod, totalPrice } = req.body;
-  
+  const { shippingAddress, paymentMethod, totalPrice } = req.body;
+
   console.log(shippingAddress);
 
   // Retrieve the user
+  
   const user = await User.findById(req.user._id);
   if (!user) {
     return next(new AppError("User Not Found", 404));
@@ -240,6 +358,19 @@ exports.purchaseItem = catchAsync(async (req, res, next) => {
 
   await order.save();
 
+  // Store the user ID in the usedBy array
+  const coupon = await Coupon.findOne({ usedBy:req.user._id });
+  if(!coupon){
+    return next(
+      new AppError(
+        "Coupon not found",
+        400
+      )
+    );
+  }
+  coupon.claimedBy.push(req.user._id);
+  await coupon.save();
+
   // Clear the cart after the purchase
   cart.items = [];
   await cart.save();
@@ -283,9 +414,9 @@ exports.orderCancel = catchAsync(async (req, res, next) => {
   if (!order) {
     return next(new AppError("Order not found", 404));
   }
-  
+
   res.json({ message: "Order canceled successfully." });
-  
+
   if (order.status === "cancelled") {
     return next(new AppError("Order is cancelled", 400));
   }

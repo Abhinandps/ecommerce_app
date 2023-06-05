@@ -203,24 +203,24 @@ const handleaddToCart = (productId) => {
     success: function (response) {
       console.log(response);
       getCartCount();
-      showToast()
+      showToast();
       setToastMessage(response.status, response.message);
-
-
     },
   });
 };
+
+
 
 const getCart = () => {
   const row = $(".cart-items");
 
   $.ajax({
     type: "GET",
-    url: "http://127.0.0.1:3000/api/v1/user/cart",
+    url: "/api/v1/user/cart",
     success: function (response) {
       const { cart } = response;
       const data = cart.items;
-      console.log("data" + data);
+      const discountAmount = response.cart.discountAmount || 0;
 
       row.empty();
 
@@ -238,7 +238,7 @@ const getCart = () => {
       data.forEach((item) => {
         $.ajax({
           type: "GET",
-          url: `http://127.0.0.1:3000/api/v1/admin/product/${item.product}`,
+          url: `/api/v1/admin/product/${item.product}`,
           success: function (response) {
             const { data } = response;
             const product = data.products;
@@ -311,8 +311,12 @@ const getCart = () => {
                   try {
                     await updateCartItem(productId, currentValue);
                     getCart();
-                    showToast()
-                    setToastMessage("Cart Updated", `Cart Increment to ${currentValue} items`);
+                    showToast();
+                    setToastMessage(
+                      "Cart Updated",
+                      `Cart Increment to ${currentValue} items`
+                    );
+                    removeCoupon()
                   } catch (error) {
                     console.error(error);
                   }
@@ -333,8 +337,12 @@ const getCart = () => {
                   try {
                     await updateCartItem(productId, currentValue);
                     getCart();
-                    showToast()
-                    setToastMessage("Cart Updated", `Cart Decrement to ${currentValue} items`);
+                    showToast();
+                    setToastMessage(
+                      "Cart Updated",
+                      `Cart Decrement to ${currentValue} items`
+                    );
+                    removeCoupon()
                   } catch (error) {
                     console.error(error);
                   }
@@ -359,6 +367,7 @@ const getCart = () => {
                 console.error(error);
               }
             }
+
           },
         });
       });
@@ -368,15 +377,57 @@ const getCart = () => {
       const productCount = document.querySelector("[item-count]");
       const shippingHandlingFee = 98;
 
+
       const text = totalPrice.querySelector("span");
-      text.textContent = response.totalPrice;
-      totalPayable.textContent = response.totalPrice + shippingHandlingFee;
+      text.textContent = response.cart.totalPrice;
+
+      const couponEditCard = document.getElementById("couponEditCard")
+      if(discountAmount>0){
+        const couponListElement = document.getElementById("coupon-list");
+        couponListElement.textContent = discountAmount
+        couponListElement.classList.add('discount-applied')
+        const couponRemoveCard = `
+        <div class="coupon-handle">
+                    <div class="coupon-left">
+                        <p>1 Coupon applied</p>
+                        <small>You saved additional ₹${discountAmount}</small>
+                    </div>
+                    <div class="coupon-right">
+                        <button onclick="removeCoupon()"> REMOVE </button>
+                    </div>
+                </div>
+        `
+        couponEditCard.innerHTML = couponRemoveCard
+      }else{
+        const couponListElement = document.getElementById("coupon-list");
+        couponListElement.textContent = "Apply Coupon "
+        couponEditCard.innerHTML = ""
+      }
+
+      totalPayable.textContent = response.cart.totalPrice + shippingHandlingFee ;
       productCount.textContent = response.cart.items.length;
 
-      updateCartTotal(response.totalPrice + shippingHandlingFee)
+      // updateCartTotal( response.cart.totalPrice + shippingHandlingFee);
+
     },
   });
+
 };
+
+
+function removeCoupon() {
+  $.ajax({
+    url: '/api/v1/user/coupons/remove',
+    type: 'DELETE',
+    success: function(data) {
+      console.log(data.message); 
+      getCart()
+    },
+    error: function(error) {
+      console.error('Error:', error);
+    }
+  });
+}
 
 const handleRemoveCartItem = (productId) => {
   const confirm = window.confirm("Do you want to remove this item ?");
@@ -387,13 +438,14 @@ const handleRemoveCartItem = (productId) => {
       success: function (response) {
         getCart();
         getCartCount();
-        showToast()
+        removeCoupon()
+        showToast();
         setToastMessage("Removed", "Cart Item Removed ");
-
       },
     });
   }
 };
+
 
 const goToChekOut = () => {
   // const row = $(".cart-items");
@@ -402,7 +454,7 @@ const goToChekOut = () => {
     url: "/api/v1/user/cart",
     success: function (response) {
       if (response.cart.items.length > 0) {
-        getCheckOut()
+        getCheckOut();
         window.location.href = "/checkout";
       }
     },
@@ -455,21 +507,58 @@ const getCheckOut = () => {
         if (selectedAddressId) {
           window.location.href = "/payment?addressId=" + selectedAddressId;
         } else {
-          showToast()
+          showToast();
           setToastMessage("Warning", "Please select a shipping address.");
         }
       });
 
-      text.textContent = response.totalPrice;
-      let totalPriceValue = response.totalPrice + shippingHandlingFee;
-      totalPayable.textContent = totalPriceValue;
+      text.textContent = response.cart.totalPrice;
+      console.log(response)
+      let totalPriceValue = response.cart.totalPrice + shippingHandlingFee;
+      totalPayable.textContent = totalPriceValue ;
       productCount.textContent = response.cart.items.length;
 
-      // Update the cart collection's total value
-      updateCartTotal(totalPriceValue);
+      // // Update the cart collection's total value
+      // updateCartTotal(totalPriceValue);
     },
   });
 };
+
+const getCoupons = () => {
+  const row = $("#coupon-codes-container");
+
+  $.ajax({
+    type: "GET",
+    url: "/api/v1/user/coupons",
+    success: (response) => {
+      console.log(response);
+      row.empty()
+
+      response.forEach((singleCoupon) => {
+
+        const dateString = singleCoupon.expiryDate;
+        /// Splitting the string at the 'T' character
+        const datePart = dateString.split("T")[0];
+
+        const coupon = `
+      <div class="coupon-code-selection">
+      <p>${singleCoupon.code}</p>
+
+      <div class="coupon-details">
+          <p class="highlight_text">Save ₹${singleCoupon.value}</p>
+          <p class="more-details">
+              Rs.${singleCoupon.value-1} off on minimum purchase of Rs. ${singleCoupon.minimumOrderValue}.
+              Expires On: ${datePart} | 12:00 AM
+          </p>
+      </div>
+  </div>`;
+  row.append(coupon);
+      });
+    },
+  });
+};
+
+getCoupons();
 
 const updateCartTotal = (totalPrice) => {
   $.ajax({
@@ -481,7 +570,8 @@ const updateCartTotal = (totalPrice) => {
     success: function (response) {},
     error: function (error) {
       console.error("Error updating cart total:", error);
-      getCheckOut()
+      getCart()
+      getCheckOut();
     },
   });
 };
@@ -489,6 +579,8 @@ const updateCartTotal = (totalPrice) => {
 getCheckOut();
 
 const getPaymentDetails = () => {
+  const shippingHandlingFee = 98;
+
   const totalPayable = document.querySelector("#totalPayable");
   // const productCount = document.querySelector("[item-count]");
   const placeOrderButton = document.querySelector("[place_order]");
@@ -497,10 +589,10 @@ const getPaymentDetails = () => {
     type: "GET",
     url: "/api/v1/user/cart",
     success: function (response) {
-      const cart = response.cart;
-      totalPayable.textContent = cart.totalPrice;
-      updateCartTotal(cart.totalPrice)
-      console.log(cart.totalPrice)
+      const cart = response.cart ;
+      totalPayable.textContent = cart.totalPrice + shippingHandlingFee;
+      updateCartTotal(cart.totalPrice);
+      console.log(cart.totalPrice);
 
       placeOrderButton.addEventListener("click", async () => {
         const selectedPaymentOption = $(
@@ -512,42 +604,39 @@ const getPaymentDetails = () => {
           const addressId = urlParams.get("addressId");
           if (addressId) {
             try {
-              await placeOrder(addressId, selectedPaymentOption, cart);
+              await placeOrder(addressId, selectedPaymentOption, cart,shippingHandlingFee);
             } catch (error) {
               console.log(error);
             }
           }
         } else {
-          showToast()
+          showToast();
           setToastMessage("Warning", "Please select payment method.");
         }
       });
     },
   });
 
-  async function placeOrder(addressId, selectedPaymentOption, response) {
-    console.log(response)
+  async function placeOrder(addressId, selectedPaymentOption, response,shippingHandlingFee) {
+    console.log(response);
     try {
       const axiosResponse = await axios.post("/api/v1/user/cart/purchase", {
         shippingAddress: addressId,
         paymentMethod: selectedPaymentOption,
-        totalPrice: response.totalPrice,
+        totalPrice: response.totalPrice + shippingHandlingFee,
       });
       console.log(axiosResponse.data);
-      showToast()
+      showToast();
+      removeCoupon()
       setToastMessage("Success", "Order placed successfully");
       window.location.href = "/myorders";
     } catch (error) {
       console.error("Error placing order:", error);
-      setToastMessage("Failed",error.response.data.message)
+      setToastMessage("Failed", error.response.data.message);
     }
   }
 };
 
-getPaymentDetails();
+
 
 // getOrders function included in order.ejs
-
-// Event listener for address selection
-
-

@@ -19,7 +19,8 @@ const {
   getOrdersPage,
   getOrderPage,
   getAllOrders,
-  getPaymentPage
+  getPaymentPage,
+  getAllCoupones
 } = require("../Controllers/viewController");
 
 const { isAuthenticate ,isAdmin} = require("../middleware/auth");
@@ -41,6 +42,8 @@ router.get("/orders", isAdmin, getAllOrders)
 
 
 router.get("/order",isAdmin , getOrderPage);
+
+router.get("/coupons",isAdmin , getAllCoupones);
 
 
 

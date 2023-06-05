@@ -87,7 +87,7 @@ Week 3 Project Updations
 [] - Home page
 [] - admin login cleanup
 [] - category delete logic
-[] - order details - admin
+[✔] - order details - admin
 [] - add product UI
 [] - Home page
 [] - guest user experience
@@ -97,8 +97,8 @@ Week 3 Project Updations
 [] 
 [✔] + search, filter, sort, pagination
 [✘] + Coupon management
-[] + Online payment
-[] + Banner management
+[✘] + Online payment
+[✘] + Banner management
 [] + Fix broken UI and use dynamic data
 [] Complete the updates with next week task
 

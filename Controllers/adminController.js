@@ -8,6 +8,7 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const ErrorHandler = require("../Controllers/errorController");
 const Order = require("../Models/orders");
+const Coupon = require("../Models/coupen");
 
 exports.getAllUsers = catchAsync(async (req, res) => {
   const users = await User.find();
@@ -262,6 +263,7 @@ exports.getAllCarts = catchAsync(async (req, res, next) => {
   res.status(200).json({ cartsWithShippingAddress });
 });
 
+
 // Orders
 
 exports.getAllOrders = catchAsync(async (req, res, next) => {
@@ -345,3 +347,57 @@ exports.orderCancel = catchAsync(async (req, res, next) => {
   }
   res.json({ message: "Order canceled successfully." });
 });
+
+// Coupon management
+
+exports.addCoupons = catchAsync(async (req, res) => {
+  const couponData = req.body;
+  const newCoupon = await Coupon.create(couponData);
+
+  
+
+  res.status(201).json(newCoupon);
+});
+
+
+exports.getCoupons = catchAsync(async (req, res) => {
+  const coupons = await Coupon.find();
+  res.json(coupons);
+});
+
+
+exports.getOneCoupon = catchAsync(async (req, res) => {
+  const coupon = await Coupon.findById(req.params.id);
+  if (!coupon) {
+    return res.status(404).json({ message: "Coupon not found" });
+  }
+  res.json(coupon);
+});
+
+
+exports.updateCoupon = catchAsync(async (req, res) => {
+  console.log(req.body)
+  const coupon = await Coupon.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  if (!coupon) {
+    return res.status(404).json({ message: "Coupon not found" });
+  }
+  // coupon.updateStatus();
+  res.json(coupon);
+});
+
+
+exports.deleteCoupon = catchAsync(async (req, res) => {
+  const coupon = await Coupon.findByIdAndDelete(req.params.id);
+  if (!coupon) {
+    return res.status(404).json({ message: "Coupon not found" });
+  }
+  res.json({ message: "Coupon deleted" });
+});
+
+
+
+
+

@@ -41,6 +41,14 @@ exports.getAllProducts = (req, res) => {
 };
 
 
+exports.getAllCoupones = (req,res)=>{
+  if(req.admin){
+    res.render("admin/pages/coupons");
+  }else{
+    res.redirect('/admin/login')
+  }
+}
+
 exports.getAllOrders = (req,res)=>{
   if(req.admin){
     res.render("admin/pages/orders");

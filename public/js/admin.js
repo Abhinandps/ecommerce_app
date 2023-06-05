@@ -469,7 +469,143 @@ const handleProductDelete = (event) => {
   );
 };
 
+// Coupon START
 
+// Categories
+const getAllCoupons = async () => {
+  try {
+    const res = await axios.get("http://127.0.0.1:3000/api/v1/admin/coupons");
+    const data = res.data;
+    console.log(data);
+    // const categories = data.categories;
+    const tableBody = document.querySelector("#user-table tbody");
+
+    tableBody.innerHTML = "";
+
+    data.forEach((coupon) => {
+      const row = document.createElement("tr");
+
+      const editBtn = `<label type="button"  class="badge badge-primary" data-user-id="${coupon._id}" onclick="handleCouponFormEdit(event)"> <i class="mdi mdi-grease-pencil"></i></label>`;
+
+      const dltBtn = `<label type="button"  class="badge badge-danger" data-user-id="${coupon._id}" onclick="handleCouponDelete(event)"> <i class="mdi mdi-delete"></i> </label>`;
+
+      const dateString = coupon.expiryDate;
+      /// Splitting the string at the 'T' character
+      const datePart = dateString.split("T")[0];
+
+      row.innerHTML = `
+              <td>${coupon.code}</td>
+              <td>${coupon.isActive ? '<b class="text-success">Active</b>' : '<b class="text-danger">Expired</b>'}</td>
+              <td>${coupon.value}</td>
+              <td>${datePart}</td>
+              <td>${coupon.minimumOrderValue}</td>
+              <td>${editBtn}</td>
+              <td>${dltBtn}</td>
+            `;
+      tableBody.appendChild(row);
+    });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const handleCouponFormEdit = (event) => {
+  const couponID = event.target.dataset.userId;
+  console.log(couponID);
+
+  const editForm = document.getElementById("edit-coupon-form");
+  $.ajax({
+    type: "GET",
+    url: `http://127.0.0.1:3000/api/v1/admin/coupons/${couponID}`,
+    success: function (response) {
+      console.log(response);
+      const data = response;
+
+      const dateString = data.expiryDate;
+      /// Splitting the string at the 'T' character
+      const datePart = dateString.split("T")[0];
+
+      editForm.querySelector("#code").value = data.code;
+      editForm.querySelector("#value").value = data.value;
+      editForm.querySelector("#expiryDate").value = datePart;
+
+      editForm.querySelector("#minimumOrderValue").value =
+        data.minimumOrderValue;
+
+      const form = document.getElementById("coupon-form");
+      form.style.display = "none";
+      editForm.style.display = "block";
+    },
+    error: function (err) {
+      console.error(err);
+    },
+  });
+
+  // Listen for the edit form submission
+  editForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = {
+      code: editForm.querySelector("#code").value,
+      value: editForm.querySelector("#value").value,
+      expiryDate: editForm.querySelector("#expiryDate").value,
+      minimumOrderValue: parseInt(
+        editForm.querySelector("#minimumOrderValue").value
+      ),
+    };
+
+
+    $.ajax({
+      type: "PATCH",
+      url: `/api/v1/admin/coupons/${couponID}`,
+      data: JSON.stringify(formData),
+      contentType: "application/json",
+      success: function (response) {
+        console.log(response);
+
+        // Hide the edit form and show the add form
+        form.style.display = "block";
+        editForm.style.display = "none";
+
+        getAllCoupons();
+        showToast(`Coupon Updated Successfully`, "success");
+      },
+      error: function (err) {
+        console.error(err);
+      },
+    });
+  });
+};
+
+const handleCouponDelete = (event) => {
+  const couponID = event.target.dataset.userId;
+
+  showCustomConfirmation(
+    "Are you sure you want to delete this item?",
+    function (result) {
+      if (result) {
+        $.ajax({
+          type: "DELETE",
+          url: `/api/v1/admin/coupons/${couponID}`,
+          success: function (response) {
+            console.log(response);
+
+            getAllCoupons();
+            showToast(`Coupon Deleted Successfully`, "danger");
+          },
+          error: function (err) {
+            console.error(err);
+          },
+        });
+      } else {
+        console.log("Deletion canceled");
+      }
+    }
+  );
+
+};
+
+// Coupon END
 
 // --- HANDLE PAGINATION START
 
@@ -556,16 +692,15 @@ const handlePaginationClick = async (pageNumber) => {
       tableBody.innerHTML += row.outerHTML;
     });
 
-    updatePaginationNumbers(data.previous, data.next, pageNumber,"orders");
+    updatePaginationNumbers(data.previous, data.next, pageNumber, "orders");
   } catch (error) {
     console.error(error);
   }
 };
 
-
 // Products
 
-const handleProductPaginationClick = async (pageNumber,searchQuery) => {
+const handleProductPaginationClick = async (pageNumber, searchQuery) => {
   try {
     // Get filter and sort parameters for products
     // const category = document.getElementById("category").value;
@@ -597,18 +732,17 @@ const handleProductPaginationClick = async (pageNumber,searchQuery) => {
     const tableBody = document.getElementsByTagName("tbody")[0];
     tableBody.innerHTML = "";
     data.results.forEach((product) => {
-        const row = document.createElement("tr");
-        const editBtn = `<label type="button"  class="badge badge-primary" data-product-id="${product._id}" onclick="handleProductFormEdit(event)"> <i class="mdi mdi-grease-pencil"></i></label>`;
-  
-        const dltBtn = `<label type="button"  class="badge badge-danger" data-product-id="${product._id}" onclick="handleProductDelete(event)"> <i class="mdi mdi-delete"></i> </label>`;
-       
-  
-        $.ajax({
-          type: "GET",
-          url: `http://127.0.0.1:3000/api/v1/admin/category/${product.category}`,
-          success: function (response) {
-            const categoryName = response.data.categories.name;
-            row.innerHTML = `
+      const row = document.createElement("tr");
+      const editBtn = `<label type="button"  class="badge badge-primary" data-product-id="${product._id}" onclick="handleProductFormEdit(event)"> <i class="mdi mdi-grease-pencil"></i></label>`;
+
+      const dltBtn = `<label type="button"  class="badge badge-danger" data-product-id="${product._id}" onclick="handleProductDelete(event)"> <i class="mdi mdi-delete"></i> </label>`;
+
+      $.ajax({
+        type: "GET",
+        url: `http://127.0.0.1:3000/api/v1/admin/category/${product.category}`,
+        success: function (response) {
+          const categoryName = response.data.categories.name;
+          row.innerHTML = `
             <td>
               ${product.image.map((path, index) => {
                 const newPath = path.replace("public", "");
@@ -627,20 +761,19 @@ const handleProductPaginationClick = async (pageNumber,searchQuery) => {
             <td>${editBtn}</td>
             <td>${dltBtn}</td>
           `;
-            tableBody.innerHTML += row.outerHTML;
-          },
-          error: function (err) {
-            console.error(err);
-          },
-        });
+          tableBody.innerHTML += row.outerHTML;
+        },
+        error: function (err) {
+          console.error(err);
+        },
       });
+    });
 
-    updatePaginationNumbers(data.previous, data.next, pageNumber,"products");
+    updatePaginationNumbers(data.previous, data.next, pageNumber, "products");
   } catch (error) {
     console.error(error);
   }
 };
-
 
 function createPaginationButton(pageNumber, label, isActive, paginationType) {
   var button = document.createElement("button");
@@ -662,27 +795,45 @@ function createPaginationButton(pageNumber, label, isActive, paginationType) {
   return button;
 }
 
-
-const updatePaginationNumbers = (previousPage, nextPage, currentPage, paginationType) => {
+const updatePaginationNumbers = (
+  previousPage,
+  nextPage,
+  currentPage,
+  paginationType
+) => {
   const paginationContainer = document.getElementById("pagination-container");
   if (paginationContainer) {
     paginationContainer.innerHTML = "";
 
     if (previousPage) {
-      const previousButton = createPaginationButton(previousPage.page, "Previous", false, paginationType);
+      const previousButton = createPaginationButton(
+        previousPage.page,
+        "Previous",
+        false,
+        paginationType
+      );
       paginationContainer.appendChild(previousButton);
     }
 
-    const currentButton = createPaginationButton(currentPage, currentPage, true, paginationType);
+    const currentButton = createPaginationButton(
+      currentPage,
+      currentPage,
+      true,
+      paginationType
+    );
     paginationContainer.appendChild(currentButton);
 
     if (nextPage) {
-      const nextButton = createPaginationButton(nextPage.page, "Next", false, paginationType);
+      const nextButton = createPaginationButton(
+        nextPage.page,
+        "Next",
+        false,
+        paginationType
+      );
       paginationContainer.appendChild(nextButton);
     }
   }
 };
-
 
 async function fetchDataAndPaginate(url, currentPage, dataType) {
   try {
@@ -691,7 +842,7 @@ async function fetchDataAndPaginate(url, currentPage, dataType) {
     console.log(data.results);
     const tableBody = document.getElementsByTagName("tbody")[0];
     tableBody.innerHTML = "";
-    
+
     if (dataType === "orders") {
       data.results.forEach((order) => {
         let statusColor;
@@ -707,17 +858,17 @@ async function fetchDataAndPaginate(url, currentPage, dataType) {
         } else {
           statusColor = "danger";
         }
-  
+
         const dateString = order.updatedAt;
 
         /// Splitting the string at the 'T' character
         const datePart = dateString.split("T")[0];
-  
+
         const row = document.createElement("tr");
-  
+
         const statusBadge = `<span class="badge badge-${statusColor}">${order.status}</span>`;
         const editBtn = `<label id="view" type="button"  class="badge badge-primary" data-order-id="${order.orderID}" onclick="handleOrders(event)"> <i class="mdi mdi-eye" muted></i></label>`;
-  
+
         row.innerHTML = `
         <td> ${order.orderID} </td>
         <td> ₹${order.totalPrice} </td>
@@ -731,18 +882,17 @@ async function fetchDataAndPaginate(url, currentPage, dataType) {
       updatePaginationNumbers(data.previous, data.next, currentPage, "orders");
     } else if (dataType === "products") {
       data.results.forEach((product) => {
-      const row = document.createElement("tr");
-      const editBtn = `<label type="button"  class="badge badge-primary" data-product-id="${product._id}" onclick="handleProductFormEdit(event)"> <i class="mdi mdi-grease-pencil"></i></label>`;
+        const row = document.createElement("tr");
+        const editBtn = `<label type="button"  class="badge badge-primary" data-product-id="${product._id}" onclick="handleProductFormEdit(event)"> <i class="mdi mdi-grease-pencil"></i></label>`;
 
-      const dltBtn = `<label type="button"  class="badge badge-danger" data-product-id="${product._id}" onclick="handleProductDelete(event)"> <i class="mdi mdi-delete"></i> </label>`;
-     
+        const dltBtn = `<label type="button"  class="badge badge-danger" data-product-id="${product._id}" onclick="handleProductDelete(event)"> <i class="mdi mdi-delete"></i> </label>`;
 
-      $.ajax({
-        type: "GET",
-        url: `http://127.0.0.1:3000/api/v1/admin/category/${product.category}`,
-        success: function (response) {
-          const categoryName = response.data.categories.name;
-          row.innerHTML = `
+        $.ajax({
+          type: "GET",
+          url: `http://127.0.0.1:3000/api/v1/admin/category/${product.category}`,
+          success: function (response) {
+            const categoryName = response.data.categories.name;
+            row.innerHTML = `
           <td>
             ${product.image.map((path, index) => {
               const newPath = path.replace("public", "");
@@ -761,23 +911,24 @@ async function fetchDataAndPaginate(url, currentPage, dataType) {
           <td>${editBtn}</td>
           <td>${dltBtn}</td>
         `;
-          tableBody.innerHTML += row.outerHTML;
-        },
-        error: function (err) {
-          console.error(err);
-        },
+            tableBody.innerHTML += row.outerHTML;
+          },
+          error: function (err) {
+            console.error(err);
+          },
+        });
       });
-    });
-      updatePaginationNumbers(data.previous, data.next, currentPage, "products");
+      updatePaginationNumbers(
+        data.previous,
+        data.next,
+        currentPage,
+        "products"
+      );
     }
   } catch (error) {
     console.error(error);
   }
 }
-
-
-
-
 
 // Initial render for orders
 if (window.location.pathname.includes("/orders")) {
@@ -789,10 +940,7 @@ if (window.location.pathname.includes("/products")) {
   fetchDataAndPaginate("/api/v1/admin/products", 1, "products");
 }
 
-
 // --- HANDLE PAGINATION END
-
-
 
 const handleOrders = (event) => {
   const orderID = event.target.dataset.orderId;
@@ -810,22 +958,20 @@ const handleOrders = (event) => {
 };
 
 // Apply Filters button click event
-if(document.getElementById("apply-filters")){
-  document.getElementById("apply-filters").addEventListener("click", function () {
-    handlePaginationClick(1);
-  });
+if (document.getElementById("apply-filters")) {
+  document
+    .getElementById("apply-filters")
+    .addEventListener("click", function () {
+      handlePaginationClick(1);
+    });
 }
 
 // Apply Sort button click event
-if(document.getElementById("apply-sort")){
-
+if (document.getElementById("apply-sort")) {
   document.getElementById("apply-sort").addEventListener("click", function () {
     handlePaginationClick(1);
   });
 }
-
-
-
 
 // ------------------------------------------------------------------
 

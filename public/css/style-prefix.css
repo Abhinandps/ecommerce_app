@@ -4311,7 +4311,7 @@ img {
   top: 0;
   height: 100%;
   width: 100%;
-  background-color: #222428c7;
+  background-color: #ffffff;
   opacity: 0;
   visibility: hidden;
   -webkit-transition: opacity 0.3s 0s, visibility 0s 0.3s;
@@ -4394,7 +4394,7 @@ img {
   right: 0;
   border: solid 1px #fff;
 }
-
+/* 
 .form-popup-bg:before {
   content: "";
   opacity: 0.25;
@@ -4403,7 +4403,7 @@ img {
   left: 0;
   right: 0;
   bottom: 0;
-}
+} */
 
 .radio-group {
   display: flex;
@@ -4421,4 +4421,28 @@ img {
   border-radius: var(--border-radius-md);
   font-size: var(--fs-8);
   box-shadow: 1px 2px 3px -3px #555;
+}
+
+
+
+.discount-applied {
+  color: rgb(20, 202, 117);
+}
+.couponEditCard{
+  padding: 10px 0px;
+}
+
+
+.coupon-handle{
+  display: flex;
+    font-size: var(--fs-6);
+    justify-content: space-between;
+    align-items: center;
+    font-weight: var(--weight-600);
+    padding: 10px 0;
+}
+
+.coupon-handle .coupon-left small{
+  font-weight: var(--weight-400);
+    color: var(--ocean-green);
 }
