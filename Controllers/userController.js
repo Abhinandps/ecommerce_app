@@ -2,6 +2,8 @@ const Product = require("../Models/products");
 const Cart = require("../Models/Cart");
 const catchAsync = require("../utils/catchAsync");
 
+const Razorpay = require("razorpay");
+
 const AppError = require("../utils/appError");
 const ErrorHandler = require("../Controllers/errorController");
 
@@ -285,7 +287,7 @@ exports.purchaseItem = catchAsync(async (req, res, next) => {
   console.log(shippingAddress);
 
   // Retrieve the user
-  
+
   const user = await User.findById(req.user._id);
   if (!user) {
     return next(new AppError("User Not Found", 404));
@@ -343,38 +345,84 @@ exports.purchaseItem = catchAsync(async (req, res, next) => {
     );
   }
 
-  // Generate a unique order ID
   const orderID = generateOrderID();
 
-  // Create a new order
-  const order = new Order({
-    orderID: orderID,
-    user: user._id,
-    items: cart.items,
-    shippingAddress,
-    paymentMethod,
-    totalPrice,
-  });
+  // Handle payment based on the payment method
 
-  await order.save();
+  if (paymentMethod === "cod") {
+    // Handle Cash on Delivery (COD) payment
 
-  // Store the user ID in the usedBy array
-  const coupon = await Coupon.findOne({ usedBy:req.user._id });
-  if(!coupon){
-    return next(
-      new AppError(
-        "Coupon not found",
-        400
-      )
-    );
+    // Create a new order
+    const order = new Order({
+      orderID: orderID,
+      user: user._id,
+      items: cart.items,
+      shippingAddress,
+      paymentMethod,
+      totalPrice,
+    });
+
+    await order.save();
+
+    // Store the user ID in the usedBy array
+    const coupon = await Coupon.findOne({ usedBy: req.user._id });
+    if (coupon) {
+      coupon.claimedBy.push(req.user._id);
+      await coupon.save();
+      // return next(new AppError("Coupon not found", 400));
+    }
+
+    // Clear the cart after the purchase
+    cart.items = [];
+    await cart.save();
+
+    res.status(200).json({ message: "Purchase successful." });
+  } else if (paymentMethod === "upi") {
+    // Set up Razorpay instance
+    const razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID ,
+      key_secret: process.env.RAZORPAY_KEY_SECRET ,
+    });
+
+    // Create the Razorpay order
+    const razorpayOrder = await razorpay.orders.create({
+      amount: totalPrice * 100,
+      currency: "INR",
+      receipt: orderID,
+    });
+
+    // Retrieve the Razorpay order ID
+    const razorpayOrderID = razorpayOrder.id;
+
+    // Create a new order with Razorpay order ID
+    const order = new Order({
+      orderID: orderID,
+      user: user._id,
+      items: cart.items,
+      shippingAddress,
+      paymentMethod,
+      totalPrice,
+      razorpayOrderID: razorpayOrderID,
+    });
+
+    await order.save();
+
+    // Store the user ID in the usedBy array
+    const coupon = await Coupon.findOne({ usedBy: req.user._id });
+    if (coupon) {
+      coupon.claimedBy.push(req.user._id);
+      await coupon.save();
+    }
+
+    // Clear the cart after the purchase
+    cart.items = [];
+    await cart.save();
+
+    // Return the Razorpay order ID to the frontend
+    res.status(200).json({ orderID: razorpayOrderID });
+  } else {
+    return next(new AppError("Invalid payment method", 400));
   }
-  coupon.claimedBy.push(req.user._id);
-  await coupon.save();
-
-  // Clear the cart after the purchase
-  cart.items = [];
-  await cart.save();
-  res.status(200).json({ message: "Purchase successful." });
 });
 
 // Orders

@@ -43,6 +43,10 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    razorpayOrderID: {
+      type: String,
+      unique: true,
+    },
   },
   { timestamps: true }
 );

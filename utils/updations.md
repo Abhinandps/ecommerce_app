@@ -96,8 +96,8 @@ Week 3 Project Updations
 [] - $ and ₹
 [] 
 [✔] + search, filter, sort, pagination
-[✘] + Coupon management
-[✘] + Online payment
+[✔] + Coupon management
+[✔] + Online payment
 [✘] + Banner management
 [] + Fix broken UI and use dynamic data
 [] Complete the updates with next week task

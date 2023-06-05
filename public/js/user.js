@@ -209,8 +209,6 @@ const handleaddToCart = (productId) => {
   });
 };
 
-
-
 const getCart = () => {
   const row = $(".cart-items");
 
@@ -316,7 +314,7 @@ const getCart = () => {
                       "Cart Updated",
                       `Cart Increment to ${currentValue} items`
                     );
-                    removeCoupon()
+                    removeCoupon();
                   } catch (error) {
                     console.error(error);
                   }
@@ -342,7 +340,7 @@ const getCart = () => {
                       "Cart Updated",
                       `Cart Decrement to ${currentValue} items`
                     );
-                    removeCoupon()
+                    removeCoupon();
                   } catch (error) {
                     console.error(error);
                   }
@@ -367,7 +365,6 @@ const getCart = () => {
                 console.error(error);
               }
             }
-
           },
         });
       });
@@ -377,15 +374,14 @@ const getCart = () => {
       const productCount = document.querySelector("[item-count]");
       const shippingHandlingFee = 98;
 
-
       const text = totalPrice.querySelector("span");
       text.textContent = response.cart.totalPrice;
 
-      const couponEditCard = document.getElementById("couponEditCard")
-      if(discountAmount>0){
+      const couponEditCard = document.getElementById("couponEditCard");
+      if (discountAmount > 0) {
         const couponListElement = document.getElementById("coupon-list");
-        couponListElement.textContent = discountAmount
-        couponListElement.classList.add('discount-applied')
+        couponListElement.textContent = discountAmount;
+        couponListElement.classList.add("discount-applied");
         const couponRemoveCard = `
         <div class="coupon-handle">
                     <div class="coupon-left">
@@ -396,36 +392,33 @@ const getCart = () => {
                         <button onclick="removeCoupon()"> REMOVE </button>
                     </div>
                 </div>
-        `
-        couponEditCard.innerHTML = couponRemoveCard
-      }else{
+        `;
+        couponEditCard.innerHTML = couponRemoveCard;
+      } else {
         const couponListElement = document.getElementById("coupon-list");
-        couponListElement.textContent = "Apply Coupon "
-        couponEditCard.innerHTML = ""
+        couponListElement.textContent = "Apply Coupon ";
+        couponEditCard.innerHTML = "";
       }
 
-      totalPayable.textContent = response.cart.totalPrice + shippingHandlingFee ;
+      totalPayable.textContent = response.cart.totalPrice + shippingHandlingFee;
       productCount.textContent = response.cart.items.length;
 
       // updateCartTotal( response.cart.totalPrice + shippingHandlingFee);
-
     },
   });
-
 };
-
 
 function removeCoupon() {
   $.ajax({
-    url: '/api/v1/user/coupons/remove',
-    type: 'DELETE',
-    success: function(data) {
-      console.log(data.message); 
-      getCart()
+    url: "/api/v1/user/coupons/remove",
+    type: "DELETE",
+    success: function (data) {
+      console.log(data.message);
+      getCart();
     },
-    error: function(error) {
-      console.error('Error:', error);
-    }
+    error: function (error) {
+      console.error("Error:", error);
+    },
   });
 }
 
@@ -438,14 +431,13 @@ const handleRemoveCartItem = (productId) => {
       success: function (response) {
         getCart();
         getCartCount();
-        removeCoupon()
+        removeCoupon();
         showToast();
         setToastMessage("Removed", "Cart Item Removed ");
       },
     });
   }
 };
-
 
 const goToChekOut = () => {
   // const row = $(".cart-items");
@@ -513,9 +505,9 @@ const getCheckOut = () => {
       });
 
       text.textContent = response.cart.totalPrice;
-      console.log(response)
+      console.log(response);
       let totalPriceValue = response.cart.totalPrice + shippingHandlingFee;
-      totalPayable.textContent = totalPriceValue ;
+      totalPayable.textContent = totalPriceValue;
       productCount.textContent = response.cart.items.length;
 
       // // Update the cart collection's total value
@@ -532,10 +524,9 @@ const getCoupons = () => {
     url: "/api/v1/user/coupons",
     success: (response) => {
       console.log(response);
-      row.empty()
+      row.empty();
 
       response.forEach((singleCoupon) => {
-
         const dateString = singleCoupon.expiryDate;
         /// Splitting the string at the 'T' character
         const datePart = dateString.split("T")[0];
@@ -547,12 +538,14 @@ const getCoupons = () => {
       <div class="coupon-details">
           <p class="highlight_text">Save ₹${singleCoupon.value}</p>
           <p class="more-details">
-              Rs.${singleCoupon.value-1} off on minimum purchase of Rs. ${singleCoupon.minimumOrderValue}.
+              Rs.${singleCoupon.value - 1} off on minimum purchase of Rs. ${
+          singleCoupon.minimumOrderValue
+        }.
               Expires On: ${datePart} | 12:00 AM
           </p>
       </div>
   </div>`;
-  row.append(coupon);
+        row.append(coupon);
       });
     },
   });
@@ -570,7 +563,7 @@ const updateCartTotal = (totalPrice) => {
     success: function (response) {},
     error: function (error) {
       console.error("Error updating cart total:", error);
-      getCart()
+      getCart();
       getCheckOut();
     },
   });
@@ -589,7 +582,7 @@ const getPaymentDetails = () => {
     type: "GET",
     url: "/api/v1/user/cart",
     success: function (response) {
-      const cart = response.cart ;
+      const cart = response.cart;
       totalPayable.textContent = cart.totalPrice + shippingHandlingFee;
       updateCartTotal(cart.totalPrice);
       console.log(cart.totalPrice);
@@ -604,7 +597,12 @@ const getPaymentDetails = () => {
           const addressId = urlParams.get("addressId");
           if (addressId) {
             try {
-              await placeOrder(addressId, selectedPaymentOption, cart,shippingHandlingFee);
+              await placeOrder(
+                addressId,
+                selectedPaymentOption,
+                cart,
+                shippingHandlingFee
+              );
             } catch (error) {
               console.log(error);
             }
@@ -617,26 +615,62 @@ const getPaymentDetails = () => {
     },
   });
 
-  async function placeOrder(addressId, selectedPaymentOption, response,shippingHandlingFee) {
+  async function placeOrder(
+    addressId,
+    selectedPaymentOption,
+    response,
+    shippingHandlingFee
+  ) {
     console.log(response);
     try {
+      const totalPrice = response.totalPrice + shippingHandlingFee
       const axiosResponse = await axios.post("/api/v1/user/cart/purchase", {
         shippingAddress: addressId,
         paymentMethod: selectedPaymentOption,
-        totalPrice: response.totalPrice + shippingHandlingFee,
+        totalPrice
       });
-      console.log(axiosResponse.data);
-      showToast();
-      removeCoupon()
-      setToastMessage("Success", "Order placed successfully");
-      window.location.href = "/myorders";
+
+      if (selectedPaymentOption === "cod") {
+        console.log(axiosResponse.data);
+        showToast();
+        removeCoupon();
+        setToastMessage("Success", "Order placed successfully");
+
+        window.location.href = "/myorders";
+      }else if(selectedPaymentOption === "upi"){
+        const orderID = axiosResponse.data.orderID;
+        const KEY_ID = 'rzp_test_MpNQwQcp20migY'
+        const options = {
+          key: KEY_ID,
+          amount: totalPrice * 100,
+          currency: 'INR',
+          name: 'Anon Stores',
+          description: 'Payment for Purchase',
+          order_id: orderID,
+          handler: function (response) {
+            
+            console.log(response);
+            showToast();
+            removeCoupon();
+            setToastMessage("Success", "Order placed successfully");
+            setTimeout(()=>{
+              window.location.href = "/myorders";
+            },3000)
+          },
+          prefill: {
+            email: 'user@example.com',
+            contact: '9876543210',
+          },
+        };
+
+        const razorpayInstance = new Razorpay(options);
+        razorpayInstance.open();
+      }
     } catch (error) {
       console.error("Error placing order:", error);
       setToastMessage("Failed", error.response.data.message);
     }
   }
 };
-
-
 
 // getOrders function included in order.ejs
