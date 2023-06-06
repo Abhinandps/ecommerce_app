@@ -26,7 +26,13 @@ const {
   getOneCoupon,
   getCoupons,
   updateCoupon,
-  deleteCoupon
+  deleteCoupon,
+  addBanners,
+  getBanners,
+  getOneBanner,
+  updateBanner,
+  deleteBanner
+
 } = require("../Controllers/adminController");
 
 const { isAuthenticate, isAdmin } = require("../middleware/auth");
@@ -40,6 +46,7 @@ const { paginatedResults } = require("../utils/pagination");
 
 // multer
 const upload = require("../utils/multerConfig");
+const Banner = require("../Models/banner");
 
 // middleware
 
@@ -120,6 +127,19 @@ router.route("/coupons/:id")
   .get(isAdmin, getOneCoupon)
   .patch(isAdmin, updateCoupon)
   .delete(isAdmin, deleteCoupon)
+
+
+router.post("/banners", upload.single("image"), addBanners)
+
+router.get("/banners", isAdmin,paginatedResults(Banner), getBanners)
+
+
+router.route("/banners/:id")
+.get(isAdmin, getOneBanner)
+  .put(isAdmin,  upload.single("image"), updateBanner)
+  .delete(isAdmin, deleteBanner)
+
+
 
   
 

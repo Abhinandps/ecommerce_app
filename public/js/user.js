@@ -674,3 +674,5 @@ const getPaymentDetails = () => {
 };
 
 // getOrders function included in order.ejs
+
+

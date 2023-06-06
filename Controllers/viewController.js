@@ -67,6 +67,14 @@ exports.getOrderPage = (req,res)=>{
 }
 
 
+exports.getAllBanners = (req,res)=>{
+  if(req.admin){
+    res.render("admin/pages/banner.ejs")
+  }else{
+    res.redirect('/admin/login')
+  }
+}
+
 // USER
 
 exports.getUserLogin = (req, res) => {

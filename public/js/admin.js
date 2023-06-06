@@ -211,59 +211,13 @@ const getDropdownCategories = async () => {
 const getAllProducts = async () => {
   try {
     let queryString = `/api/v1/admin/products?page=${pageNumber}&limit=5`;
-
     const res = await fetchData(queryString);
-    // const { data } = res.data;
-    // const products = data.products;
-    console.log(res);
-
-    const tableBody = document.getElementsByTagName("tbody")[0];
-    tableBody.innerHTML = "";
-
-    // products.forEach((product) => {
-    //   const row = document.createElement("tr");
-    //   const editBtn = `<label type="button"  class="badge badge-primary" data-product-id="${product._id}" onclick="handleProductFormEdit(event)"> <i class="mdi mdi-grease-pencil"></i></label>`;
-
-    //   const dltBtn = `<label type="button"  class="badge badge-danger" data-product-id="${product._id}" onclick="handleProductDelete(event)"> <i class="mdi mdi-delete"></i> </label>`;
-    //   // const imagePath = product.image;
-    //   // const newPath = imagePath.replace("public", "");
-    //   //
-
-    //   $.ajax({
-    //     type: "GET",
-    //     url: `http://127.0.0.1:3000/api/v1/admin/category/${product.category}`,
-    //     success: function (response) {
-    //       const categoryName = response.data.categories.name;
-    //       row.innerHTML = `
-    //       <td>
-    //         ${product.image.map((path, index) => {
-    //           const newPath = path.replace("public", "");
-    //           if (index === 0) {
-    //             return `<img width=20 src="${newPath}" />`;
-    //           } else {
-    //             return `<img width=20 src="${newPath}" /> ${product.name}`;
-    //           }
-    //         })}
-    //       </td>
-
-    //       <td>${categoryName}</td>
-    //       <td style="white-space: pre-wrap">${product.description}</td>
-    //       <td>${product.stock}</td>
-    //       <td>${product.price}</td>
-    //       <td>${editBtn}</td>
-    //       <td>${dltBtn}</td>
-    //     `;
-    //       tableBody.innerHTML += row.outerHTML;
-    //     },
-    //     error: function (err) {
-    //       console.error(err);
-    //     },
-    //   });
-    // });
   } catch (err) {
     console.error(err);
   }
 };
+
+
 
 const handleProductFormEdit = (event) => {
   const productID = event.target.dataset.productId;
@@ -469,6 +423,123 @@ const handleProductDelete = (event) => {
   );
 };
 
+const handleBannerFormEdit = (event) => {
+  const bannerID = event.target.dataset.bannerId;
+  const editForm = document.getElementById("edit-banner-form");
+
+  const position = editForm.querySelector("#position");
+  const title = editForm.querySelector("#title");
+  const subTitle = editForm.querySelector("#subTitle");
+  const text = editForm.querySelector("#text");
+  const button = editForm.querySelector("#button");
+  const links = editForm.querySelector("#links");
+  const startDate = editForm.querySelector("#startDate");
+  const endDate = editForm.querySelector("#endDate");
+  const status = editForm.querySelector("#status");
+
+  // file error
+  const fileError = document.querySelector(".file-error");
+
+  $.ajax({
+    type: "GET",
+    url: `/api/v1/admin/banners/${bannerID}`,
+    success: async function (response) {
+      const { banner } = response.data;
+      console.log(banner.title);
+
+      let sDate;
+      let eDate;
+
+      if (banner.startDate) {
+        const dateString = banner.startDate
+        sDate = dateString.split("T")[0];
+      }
+      if (banner.endDate) {
+        const dateString = banner.endDate
+        eDate = dateString.split("T")[0];
+      }
+
+      position.value = banner.position;
+      title.value = banner.title;
+      subTitle.value = banner.subTitle;
+      text.value = banner.text;
+      button.value = banner.button;
+      links.value = banner.links;
+      startDate.value = sDate;
+      endDate.value = eDate;
+      status.value = banner.status;
+
+      const form = document.getElementById("banner-form");
+      form.style.display = "none";
+      editForm.style.display = "block";
+    },
+    error: function (err) {
+      console.log(error);
+    },
+  });
+
+  openPopup("updateBannerPopup");
+
+  editForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData(editForm);
+      $.ajax({
+        type: "PUT",
+        url: `/api/v1/admin/banners/${bannerID}`,
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: async function (response) {
+          console.log(response);
+
+          // Hide the edit form and show the add form
+          form.style.display = "block";
+          editForm.style.display = "none";
+
+          window.location.href ="/banners"
+          showToast(`Banner Updated Successfully`, "warning");
+        },
+        error: function (error) {
+          const message = error.responseJSON.message;
+          if (message) {
+            fileError.textContent = message;
+          } else {
+            fileError.textContent = "";
+          }
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  });
+};
+
+const handleBannerDelete = (event) => {
+  const bannerID = event.target.dataset.bannerId;
+
+  showCustomConfirmation(
+    "Are you sure you want to delete the banner?",
+    function (result) {
+      if (result) {
+        $.ajax({
+          type: "DELETE",
+          url: `/api/v1/admin/banners/${bannerID}`,
+          success: async function (response) {
+
+            window.location.href ="/banners"
+          },
+          error: function (err) {
+            console.error(err);
+          },
+        });
+      } else {
+        console.log("Deletion canceled");
+      }
+    }
+  );
+};
+
 // Coupon START
 
 // Categories
@@ -495,7 +566,11 @@ const getAllCoupons = async () => {
 
       row.innerHTML = `
               <td>${coupon.code}</td>
-              <td>${coupon.isActive ? '<b class="text-success">Active</b>' : '<b class="text-danger">Expired</b>'}</td>
+              <td>${
+                coupon.isActive
+                  ? '<b class="text-success">Active</b>'
+                  : '<b class="text-danger">Expired</b>'
+              }</td>
               <td>${coupon.value}</td>
               <td>${datePart}</td>
               <td>${coupon.minimumOrderValue}</td>
@@ -554,7 +629,6 @@ const handleCouponFormEdit = (event) => {
       ),
     };
 
-
     $.ajax({
       type: "PATCH",
       url: `/api/v1/admin/coupons/${couponID}`,
@@ -602,7 +676,6 @@ const handleCouponDelete = (event) => {
       }
     }
   );
-
 };
 
 // Coupon END
@@ -924,6 +997,57 @@ async function fetchDataAndPaginate(url, currentPage, dataType) {
         currentPage,
         "products"
       );
+    } else if (dataType === "banners") {
+      data.results.forEach((banner) => {
+        console.log(banner);
+
+        const editBtn = `<label type="button"  class="badge badge-primary" data-banner-id="${banner._id}" onclick="handleBannerFormEdit(event)"> <i class="mdi mdi-grease-pencil"></i></label>`;
+
+        const dltBtn = `<label type="button"  class="badge badge-danger" data-banner-id="${banner._id}" onclick="handleBannerDelete(event)"> <i class="mdi mdi-delete"></i> </label>`;
+
+        let startDate;
+        let endDate;
+        if (banner.startDate) {
+          const dateString = banner.startDate;
+          startDate = dateString.split("T")[0];
+        }
+        if (banner.endDate) {
+          const dateString = banner.endDate;
+          endDate = dateString.split("T")[0];
+        }
+
+        const link = banner.image;
+        const newPath = link.split("public")[1];
+
+        row = `
+        <tr>
+        <td rowspan="2"> <img src="${newPath}" style="border-radius:0px; width:auto;"> </td>
+        <td rowspan="2">${banner.position}</td>
+        <td class="card-title font-weight-bold display-4 text-primary">${
+          banner.title
+        }</td>
+        <td>${banner.text}</td>
+        <td>${startDate}</td>
+        <td>${banner.links}</td>
+        <td>${editBtn}</td>
+      </tr>
+      <tr>
+        <td class="">${banner.subTitle}</td>
+        <td> <button class="badge badge-dark text-white">${
+          banner.button
+        }</button></td>
+        <td>${endDate}</td>
+        <td class="${
+          banner.status === "active" ? "text-success" : "text-danger"
+        }">${banner.status}</td>
+
+        <td>${dltBtn}</td>
+      </tr>
+      
+        `;
+        tableBody.innerHTML += row;
+      });
+      updatePaginationNumbers(data.previous, data.next, currentPage, "banners");
     }
   } catch (error) {
     console.error(error);
@@ -938,6 +1062,11 @@ if (window.location.pathname.includes("/orders")) {
 // Initial render for products
 if (window.location.pathname.includes("/products")) {
   fetchDataAndPaginate("/api/v1/admin/products", 1, "products");
+}
+
+// Initial render for products
+if (window.location.pathname.includes("/banners")) {
+  fetchDataAndPaginate("/api/v1/admin/banners", 1, "banners");
 }
 
 // --- HANDLE PAGINATION END
@@ -972,6 +1101,17 @@ if (document.getElementById("apply-sort")) {
     handlePaginationClick(1);
   });
 }
+
+// Banners
+
+const getAllBanners = async () => {
+  try {
+    let queryString = `/api/v1/admin/banners?page=1&limit=5`;
+    await fetchData(queryString);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
 // ------------------------------------------------------------------
 

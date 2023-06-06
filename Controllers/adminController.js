@@ -9,6 +9,7 @@ const AppError = require("../utils/appError");
 const ErrorHandler = require("../Controllers/errorController");
 const Order = require("../Models/orders");
 const Coupon = require("../Models/coupen");
+const Banner = require("../Models/banner");
 
 exports.getAllUsers = catchAsync(async (req, res) => {
   const users = await User.find();
@@ -117,14 +118,6 @@ exports.deleteCategory = catchAsync(async (req, res, next) => {
 
   res.status(204).json({ message: "Category deleted" });
 });
-
-// exports.getAllProducts = catchAsync(async (req, res) => {
-//   const products = await Product.find({ deleted: false });
-//   res.status(200).json({
-//     status: "success",
-//     data: { products },
-//   });
-// });
 
 exports.getAllProducts = catchAsync(async (req, res) => {
   // const products = await Product.find({ deleted: false });
@@ -263,7 +256,6 @@ exports.getAllCarts = catchAsync(async (req, res, next) => {
   res.status(200).json({ cartsWithShippingAddress });
 });
 
-
 // Orders
 
 exports.getAllOrders = catchAsync(async (req, res, next) => {
@@ -272,33 +264,6 @@ exports.getAllOrders = catchAsync(async (req, res, next) => {
     data: res.paginatedResults,
   });
 });
-
-// exports.getAllOrders = catchAsync(async (req, res, next) => {
-//   let results = res.paginatedResults.results;
-
-//   console.log(req.query.orderStatus);
-
-//   // if (req.query.orderStatus) {
-//   //   results = results.filter(order => order.orderStatus === req.query.orderStatus);
-//   // }
-
-//   // Prepare the paginated results
-//   const paginatedResults = {
-//     results: results,
-//     next: res.paginatedResults.next,
-//     previous: res.paginatedResults.previous,
-//   };
-
-//   res.status(200).json({
-//     status: "success",
-//     data: paginatedResults,
-//   });
-
-//   res.status(200).json({
-//     status: "success",
-//     data: results,
-//   });
-// });
 
 exports.getOrder = catchAsync(async (req, res, next) => {
   const { orderID } = req.params;
@@ -353,18 +318,13 @@ exports.orderCancel = catchAsync(async (req, res, next) => {
 exports.addCoupons = catchAsync(async (req, res) => {
   const couponData = req.body;
   const newCoupon = await Coupon.create(couponData);
-
-  
-
   res.status(201).json(newCoupon);
 });
-
 
 exports.getCoupons = catchAsync(async (req, res) => {
   const coupons = await Coupon.find();
   res.json(coupons);
 });
-
 
 exports.getOneCoupon = catchAsync(async (req, res) => {
   const coupon = await Coupon.findById(req.params.id);
@@ -374,9 +334,8 @@ exports.getOneCoupon = catchAsync(async (req, res) => {
   res.json(coupon);
 });
 
-
 exports.updateCoupon = catchAsync(async (req, res) => {
-  console.log(req.body)
+  console.log(req.body);
   const coupon = await Coupon.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
@@ -388,7 +347,6 @@ exports.updateCoupon = catchAsync(async (req, res) => {
   res.json(coupon);
 });
 
-
 exports.deleteCoupon = catchAsync(async (req, res) => {
   const coupon = await Coupon.findByIdAndDelete(req.params.id);
   if (!coupon) {
@@ -397,7 +355,116 @@ exports.deleteCoupon = catchAsync(async (req, res) => {
   res.json({ message: "Coupon deleted" });
 });
 
+// Banner management
+
+exports.addBanners = catchAsync(async (req, res) => {
+  const bannerData = req.body;
+  console.log(bannerData);
+  const newBanner = await Banner.create({
+    ...bannerData,
+    image: req.file.path,
+  });
+  res.status(201).json(newBanner);
+});
+
+exports.getBanners = catchAsync(async (req, res) => {
+  res.status(200).json({
+    status: "success",
+    data: res.paginatedResults,
+  });
+});
 
 
+exports.getOneBanner = catchAsync(async (req, res) => {
+  const banner = await Banner.findById(req.params.id);
+  if (!banner) {
+    return res.status(404).json({ message: "banner not found" });
+  }
+  res.status(200).json({
+    status: "success",
+    data: {banner},
+  });
 
+});
 
+exports.updateBanner = catchAsync(async (req, res) => {
+  const {
+    position,
+    title,
+    subTitle,
+    text,
+    button,
+    links,
+    startDate,
+    endDate,
+    status,
+  } = req.body;
+  console.log(req.body);
+  const banner = await Banner.findById(req.params.id);
+
+  if (!banner) {
+    return res.status(404).json({ message: "banner not found" });
+  }
+
+  banner.position = position || banner.position;
+  banner.title = title || banner.title;
+  banner.subTitle = subTitle || banner.subTitle;
+  banner.text = text || banner.text;
+  banner.button = button || banner.button;
+  banner.links = links || banner.links;
+  banner.startDate = startDate || banner.startDate;
+  banner.endDate = endDate || banner.endDate;
+  banner.status = status || banner.status;
+
+  // Remove the old icon file if a new file is uploaded
+  if (req.file) {
+    if (banner.image) {
+      fs.unlink(banner.image, (err) => {
+        if (err) console.log(err);
+      });
+    }
+    banner.image = req.file.path;
+  }
+
+  // Save the updated banner
+  await banner.save();
+
+  res.json(banner);
+});
+
+exports.deleteBanner = catchAsync(async (req, res) => {
+  const banner = await Banner.findByIdAndDelete(req.params.id);
+  if (!banner) {
+    return res.status(404).json({ message: "banner not found" });
+  }
+  res.status(200).json({ message: "banner deleted" });
+});
+
+exports.updateCategory = catchAsync(async (req, res, next) => {
+  const { name, description } = req.body;
+  // 1 find the category for update
+  const category = await Category.findById(req.params.id);
+
+  // 2 if the category exist
+  if (category) {
+    category.name = name || category.name;
+    category.description = description || category.description;
+
+    // Remove the old icon file if a new file is uploaded
+    if (req.file) {
+      if (category.image) {
+        fs.unlink(category.image, (err) => {
+          if (err) console.log(err);
+        });
+      }
+      category.image = req.file.path;
+    }
+
+    // Save the updated category
+    await category.save();
+
+    res.json(category);
+  } else {
+    return next(new AppError("Category not found", 404));
+  }
+});

@@ -69,7 +69,7 @@ Project Updations:
 []return expiry
 [✔]place order is pending
 [✓]Mobile OTP login
-[]sort filter pagination for every list : admin side
+[✓]sort filter pagination for every list : admin side
 [✓]custom alerts
 [✓]category should be unique
 [✓]toaster messages for every server actions
@@ -102,7 +102,7 @@ Week 3 Project Updations
 [] + Fix broken UI and use dynamic data
 [] Complete the updates with next week task
 
-[] Integrate payment methods Razorpay, Paypal.
+[✔] Integrate payment methods Razorpay, Paypal.
 [] Image Zooming, Image Cropping
 [] Admin dashboard
 [] Chart & Graph reports in Admin Side
