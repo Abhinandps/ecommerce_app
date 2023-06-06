@@ -10,6 +10,7 @@ const ErrorHandler = require("../Controllers/errorController");
 const User = require("../Models/userModel");
 const Order = require("../Models/orders");
 const Coupon = require("../Models/coupen");
+const Banner = require("../Models/banner");
 
 const generateOrderID = () => {
   const date = new Date();
@@ -380,8 +381,8 @@ exports.purchaseItem = catchAsync(async (req, res, next) => {
   } else if (paymentMethod === "upi") {
     // Set up Razorpay instance
     const razorpay = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID ,
-      key_secret: process.env.RAZORPAY_KEY_SECRET ,
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET,
     });
 
     // Create the Razorpay order
@@ -468,4 +469,26 @@ exports.orderCancel = catchAsync(async (req, res, next) => {
   if (order.status === "cancelled") {
     return next(new AppError("Order is cancelled", 400));
   }
+});
+
+// Banners
+exports.fetchBanners = catchAsync(async (req, res, next) => {
+  const { position } = req.query;
+
+  const query = {
+    status: "active",
+  };
+
+  if (position) {
+    query.position = position;
+  }
+
+  const banners = await Banner.find(query);
+  if (!banners || banners.length === 0) {
+    return next(new AppError("Banners not found", 404));
+  }
+  res.status(200).json({
+    success: "success",
+    data: banners,
+  });
 });

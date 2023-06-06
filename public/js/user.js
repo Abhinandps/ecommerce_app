@@ -623,11 +623,11 @@ const getPaymentDetails = () => {
   ) {
     console.log(response);
     try {
-      const totalPrice = response.totalPrice + shippingHandlingFee
+      const totalPrice = response.totalPrice + shippingHandlingFee;
       const axiosResponse = await axios.post("/api/v1/user/cart/purchase", {
         shippingAddress: addressId,
         paymentMethod: selectedPaymentOption,
-        totalPrice
+        totalPrice,
       });
 
       if (selectedPaymentOption === "cod") {
@@ -637,29 +637,28 @@ const getPaymentDetails = () => {
         setToastMessage("Success", "Order placed successfully");
 
         window.location.href = "/myorders";
-      }else if(selectedPaymentOption === "upi"){
+      } else if (selectedPaymentOption === "upi") {
         const orderID = axiosResponse.data.orderID;
-        const KEY_ID = 'rzp_test_MpNQwQcp20migY'
+        const KEY_ID = "rzp_test_MpNQwQcp20migY";
         const options = {
           key: KEY_ID,
           amount: totalPrice * 100,
-          currency: 'INR',
-          name: 'Anon Stores',
-          description: 'Payment for Purchase',
+          currency: "INR",
+          name: "Anon Stores",
+          description: "Payment for Purchase",
           order_id: orderID,
           handler: function (response) {
-            
             console.log(response);
             showToast();
             removeCoupon();
             setToastMessage("Success", "Order placed successfully");
-            setTimeout(()=>{
+            setTimeout(() => {
               window.location.href = "/myorders";
-            },3000)
+            }, 3000);
           },
           prefill: {
-            email: 'user@example.com',
-            contact: '9876543210',
+            email: "user@example.com",
+            contact: "9876543210",
           },
         };
 
@@ -674,5 +673,4 @@ const getPaymentDetails = () => {
 };
 
 // getOrders function included in order.ejs
-
 

@@ -1,4 +1,32 @@
+const cron = require('node-cron');
+const Banner = require('../Models/banner');
+
+
+const updateBannerStatus = async () => {
+  try {
+    const banners = await Banner.find();
+
+    for (const banner of banners) {
+      if (banner.endDate) {
+        const endDate = new Date(banner.endDate);
+        if (endDate < new Date()) {
+          banner.status = 'inactive';
+          await banner.save();
+        }
+      }
+    }
+    console.log('Banner status update cron job completed');
+  } catch (error) {
+    console.error('Error updating banner statuses:', error);
+  }
+};
+
+
+
 exports.paginatedResults = (model) => {
+  // updated every 00:00
+  cron.schedule('0 0 * * *', updateBannerStatus)
+  
   return async (req, res, next) => {
     const page = parseInt(req.query.page);
     const limit = parseInt(req.query.limit);

@@ -10,9 +10,10 @@
 
             <div class="container">
 
-                <div class="slider-container has-scrollbar">
+                <div class="slider-container has-scrollbar" id="header-slider-item">
 
-                    <!-- <div class="slider-item">
+
+                    <div class="slider-item">
 
                         <img src="/src/images/banner-1.jpg" alt="women's latest fashion sale" class="banner-img">
 
@@ -30,48 +31,27 @@
 
                         </div>
 
-                    </div> -->
-
+                    </div>
+                    
                     <div class="slider-item">
 
-                        <img src="/src/images/banner-2.jpg" alt="modern sunglasses" class="banner-img">
+                        <img src="/src/images/banner-2.jpg" alt="women's latest fashion sale" class="banner-img">
 
                         <div class="banner-content">
 
-                            <p class="banner-subtitle">Trending accessories</p>
+                            <p class="banner-subtitle">Trending Asscesories</p>
 
-                            <h2 class="banner-title">Modern sunglasses</h2>
+                            <h2 class="banner-title">Modern Sun Glasses</h2>
 
                             <p class="banner-text">
-                                starting at ₹ <b>499</b>.00
+                                starting at &dollar; <b>149</b>.00
                             </p>
 
                             <a href="#" class="banner-btn">Shop now</a>
 
                         </div>
 
-                    </div>
-
-                    <div class="slider-item">
-
-                        <img src="/src/images/banner-3.jpg" alt="new fashion summer sale" class="banner-img">
-
-                        <div class="banner-content">
-
-                            <p class="banner-subtitle">Sale Offer</p>
-
-                            <h2 class="banner-title">New fashion summer sale</h2>
-
-                            <p class="banner-text">
-                                starting at ₹ <b>399</b>.99
-                            </p>
-
-                            <a href="#" class="banner-btn">Shop now</a>
-
-                        </div>
-
-                    </div>
-
+                    </div> 
                 </div>
 
             </div>
@@ -261,6 +241,98 @@
 
 
     </main>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+
+    
+        // Fetch Banners
+
+        const getBanners = () => {
+            // Fetch header banners
+            $.ajax({
+                url: "/api/v1/user/banners?position=header",
+                method: "GET",
+                success: function (headerBanners) {
+                    console.log(headerBanners)
+                    updateHeaderBannersUI(headerBanners.data);
+                },
+                error: function (error) {
+                    console.error("Error fetching header banners:", error);
+                },
+            });
+
+            $.ajax({
+                url: "/api/v1/user/banners?position=footer",
+                method: "GET",
+                success: function (footerBanners) {
+                    updateFooterBannersUI(footerBanners.data);
+                },
+                error: function (error) {
+                    console.error("Error fetching header banners:", error);
+                },
+            });
+        };
+
+        function updateHeaderBannersUI(headerBanners) {
+            const headerBannersContainer = document.querySelector("#header-slider-item");
+            headerBannersContainer.innerHTML = "";
+
+
+            
+
+            headerBanners.forEach((banner) => {
+
+                const imagePath = banner.image;
+                const newPath = imagePath.replace("public", "");
+
+                const bannerElement = document.createElement("div");
+                bannerElement.classList.add("slider-item");
+
+                const imgElement = document.createElement("img");
+                imgElement.src = newPath;
+                imgElement.classList.add("banner-img");
+                bannerElement.appendChild(imgElement);
+
+                const bannerContent = document.createElement("div");
+                bannerContent.classList.add("banner-content");
+
+                const subtitleElement = document.createElement("p");
+                subtitleElement.classList.add("banner-subtitle");
+                subtitleElement.textContent = banner.subTitle;
+                bannerContent.appendChild(subtitleElement);
+
+                const titleElement = document.createElement("h2");
+                titleElement.classList.add("banner-title");
+                titleElement.textContent = banner.title;
+                bannerContent.appendChild(titleElement);
+
+                const textElement = document.createElement("p");
+                textElement.classList.add("banner-text");
+                textElement.innerHTML = `starting at ₹ <b>${banner.text}</b>.00`;
+                bannerContent.appendChild(textElement);
+
+                const btnElement = document.createElement("a");
+                btnElement.href = "#";
+                btnElement.classList.add("banner-btn");
+                btnElement.textContent = banner.button;
+                bannerContent.appendChild(btnElement);
+
+                bannerElement.appendChild(bannerContent);
+
+                headerBannersContainer.appendChild(bannerElement);
+            });
+        }
+
+        // footer pending
+        function updateFooterBannersUI(footerBanners){
+            
+        }
+        getBanners();
+
+
+    </script>
 
 
 

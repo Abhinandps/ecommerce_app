@@ -20,7 +20,8 @@ const {
   getOrderDetails,
   getAllCoupons,
   applyCoupon,
-  removeCoupon
+  removeCoupon,
+  fetchBanners
 } = require("../Controllers/userController");
 
 const { getAllCategories } = require("../Controllers/adminController");
@@ -91,4 +92,6 @@ router.route('/orders/:orderID')
 
 module.exports = router;
 
+// Banners
 
+router.get("/banners", isAuthenticate, fetchBanners)
