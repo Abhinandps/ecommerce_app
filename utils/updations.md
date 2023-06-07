@@ -85,10 +85,10 @@ Workout:4
 Week 3 Project Updations 
 
 [] - Home page
-[] - admin login cleanup
+[✔] - admin login cleanup
 [] - category delete logic
 [✔] - order details - admin
-[] - add product UI
+[✔] - add product UI
 [] - Home page
 [] - guest user experience
 [] - order success and order details page 
