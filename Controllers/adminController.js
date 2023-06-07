@@ -14,6 +14,7 @@ const SalesReport = require("../Models/salesReport");
 
 // Dashboard Start
 
+
 exports.getSalesReportData = catchAsync(async (req, res, next) => {
   const existingSalesReport = await SalesReport.findOne();
 
@@ -87,6 +88,7 @@ exports.getSalesReportData = catchAsync(async (req, res, next) => {
   res.status(200).json({ status: "success", data: salesReports });
 });
 
+
 exports.getSalesGraphData = catchAsync(async (req, res, next) => {
   const currentYear = new Date().getFullYear();
 
@@ -131,7 +133,6 @@ exports.getSalesGraphData = catchAsync(async (req, res, next) => {
 });
 
 
-
 // Dashboard End
 
 exports.getAllUsers = catchAsync(async (req, res) => {
@@ -161,7 +162,7 @@ exports.getOneCategory = catchAsync(async (req, res) => {
 });
 
 exports.getAllCategories = catchAsync(async (req, res) => {
-  const categories = await Category.find();
+  const categories = await Category.find({ isDeleted: false });
   res.status(200).json({
     status: "success",
     result: categories.length,
@@ -222,6 +223,26 @@ exports.updateCategory = catchAsync(async (req, res, next) => {
   }
 });
 
+// exports.deleteCategory = catchAsync(async (req, res, next) => {
+//   const category = await Category.findById(req.params.id);
+
+//   if (!category) {
+//     return next(new AppError("Category not found", 404));
+//   }
+
+//   // Remove the category from the database
+//   await Category.findByIdAndDelete(req.params.id);
+
+//   // Delete the icon file from storage
+//   if (category.image) {
+//     fs.unlink(category.image, (err) => {
+//       if (err) console.log(err);
+//     });
+//   }
+
+//   res.status(204).json({ message: "Category deleted" });
+// });
+
 exports.deleteCategory = catchAsync(async (req, res, next) => {
   const category = await Category.findById(req.params.id);
 
@@ -229,10 +250,9 @@ exports.deleteCategory = catchAsync(async (req, res, next) => {
     return next(new AppError("Category not found", 404));
   }
 
-  // Remove the category from the database
-  await Category.findByIdAndDelete(req.params.id);
+  category.isDeleted = true;
+  await category.save();
 
-  // Delete the icon file from storage
   if (category.image) {
     fs.unlink(category.image, (err) => {
       if (err) console.log(err);

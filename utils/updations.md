@@ -86,11 +86,11 @@ Week 3 Project Updations
 
 [] - Home page
 [✔] - admin login cleanup
-[] - category delete logic
+[✔] - category delete logic
 [✔] - order details - admin
 [✔] - add product UI
 [] - Home page
-[] - guest user experience
+[✗] - guest user experience
 [] - order success and order details page 
 [] - profile 
 [] - $ and ₹
