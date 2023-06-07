@@ -10,6 +10,129 @@ const ErrorHandler = require("../Controllers/errorController");
 const Order = require("../Models/orders");
 const Coupon = require("../Models/coupen");
 const Banner = require("../Models/banner");
+const SalesReport = require("../Models/salesReport");
+
+// Dashboard Start
+
+exports.getSalesReportData = catchAsync(async (req, res, next) => {
+  const existingSalesReport = await SalesReport.findOne();
+
+  if (!existingSalesReport) {
+    const initialSalesReport = new SalesReport({
+      year: new Date().getFullYear(),
+      salesData: [],
+    });
+
+    await initialSalesReport.save();
+  }
+
+  const orders = await Order.find();
+  if (!orders) {
+    return next(new AppError("Order not found", 404));
+  }
+
+  // Loop through the orders and update the sales report
+  orders.forEach(async (order) => {
+    const year = new Date(order.createdAt).getFullYear();
+    const month = new Date(order.createdAt).toLocaleString("default", {
+      month: "long",
+    });
+    const totalSales = order.totalPrice;
+    const product = order.items[0].product.toString();
+    const revenue = totalSales;
+
+    const salesReport = await SalesReport.findOne({ year });
+
+    if (salesReport) {
+      // Update the sales report for the given month
+      const salesData = salesReport.salesData;
+      const existingMonthData = salesData.find((data) => data.month === month);
+
+      if (existingMonthData) {
+        // existingMonthData.totalSales += totalSales;
+      } else {
+        salesData.push({
+          month,
+          totalSales,
+          topSellingProduct: product,
+          revenue,
+        });
+      }
+
+      // Save the updated sales report
+      await salesReport.save();
+    } else {
+      // Create a new sales report for the given year
+      const newSalesReport = new SalesReport({
+        year,
+        salesData: [
+          {
+            month,
+            totalSales,
+            topSellingProduct: product,
+            revenue,
+          },
+        ],
+      });
+
+      // Save the new sales report
+      const createdReport = await newSalesReport.save();
+      console.log("Sales report created:", createdReport);
+    }
+  });
+
+  // Retrieve the sales report data after updating
+  const salesReports = await SalesReport.find();
+
+  res.status(200).json({ status: "success", data: salesReports });
+});
+
+exports.getSalesGraphData = catchAsync(async (req, res, next) => {
+  const currentYear = new Date().getFullYear();
+
+  const graphData = await SalesReport.aggregate([
+  { $match: { year: currentYear } },
+  // Unwind the salesData
+  { $unwind: "$salesData" },
+  // Group by month and product
+  {
+    $group: {
+      _id: { month: "$salesData.month", product: "$salesData.topSellingProduct" },
+      totalSales: { $sum: "$salesData.totalSales" },
+      count: { $sum: 1 }
+    },
+  },
+  // Group by month and accumulate product statistics
+  {
+    $group: {
+      _id: "$_id.month",
+      totalSales: { $sum: "$totalSales" },
+      topSellingProduct: {
+        $push: {
+          product: "$_id.product",
+          count: "$count"
+        }
+      }
+    },
+  },
+  // Project the desired fields and sort by month
+  {
+    $project: {
+      _id: 0,
+      month: "$_id",
+      totalSales: 1,
+      topSellingProduct: 1,
+    },
+  },
+  { $sort: { month: 1 } },
+]);
+
+  res.status(200).json({ status: "success", data: graphData });
+});
+
+
+
+// Dashboard End
 
 exports.getAllUsers = catchAsync(async (req, res) => {
   const users = await User.find();
@@ -374,7 +497,6 @@ exports.getBanners = catchAsync(async (req, res) => {
   });
 });
 
-
 exports.getOneBanner = catchAsync(async (req, res) => {
   const banner = await Banner.findById(req.params.id);
   if (!banner) {
@@ -382,9 +504,8 @@ exports.getOneBanner = catchAsync(async (req, res) => {
   }
   res.status(200).json({
     status: "success",
-    data: {banner},
+    data: { banner },
   });
-
 });
 
 exports.updateBanner = catchAsync(async (req, res) => {

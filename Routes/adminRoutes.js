@@ -4,6 +4,8 @@ const router = express.Router();
 
 const adminAuth = require("../Controllers/adminAuth");
 const {
+  getSalesReportData,
+  getSalesGraphData,
   getAllUsers,
   getOneUsers,
   toggleBlock,
@@ -56,13 +58,25 @@ router.get("/login", (req, res) => {
   res.render("admin/login");
 });
 
+
 router.get("/", (req, res) => {
   res.render("admin/dashboard");
 });
 
+
 router.post("/register", adminAuth.register);
 router.post("/login", adminAuth.login);
 router.get("/logout", adminAuth.logout);
+
+
+// Dashboard
+
+router.get('/sales/report', isAdmin, getSalesReportData)
+
+router.get('/sales/graph/report', isAdmin, getSalesGraphData)
+
+
+
 
 // Users
 
@@ -138,6 +152,10 @@ router.route("/banners/:id")
 .get(isAdmin, getOneBanner)
   .put(isAdmin,  upload.single("image"), updateBanner)
   .delete(isAdmin, deleteBanner)
+
+
+
+
 
 
 

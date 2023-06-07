@@ -98,14 +98,14 @@ Week 3 Project Updations
 [✔] + search, filter, sort, pagination
 [✔] + Coupon management
 [✔] + Online payment
-[✘] + Banner management
+[✔] + Banner management
 [] + Fix broken UI and use dynamic data
 [] Complete the updates with next week task
 
 [✔] Integrate payment methods Razorpay, Paypal.
 [] Image Zooming, Image Cropping
-[] Admin dashboard
-[] Chart & Graph reports in Admin Side
+[✔] Admin dashboard
+[✔] Chart & Graph reports in Admin Side
 [] User profile
 
 Theory:6
