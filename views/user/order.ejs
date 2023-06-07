@@ -49,109 +49,93 @@
 
         const getOrders = () => {
             const row = document.querySelector('[orders-history]')
-            // console.log(row)
             $.ajax({
                 type: "GET",
                 url: "/api/v1/user/orders",
                 success: function (response) {
                     const { data } = response
                     data.forEach((order) => {
-                        order.items.forEach((product) => {
-                            const { product: productID } = product
-                            $.ajax({
-                                type: "GET",
-                                url: `api/v1/admin/product/${productID}`,
-                                success: function (response) {
-                                    // Stored the first response
-                                    const { products } = response.data;
-                                    $.ajax({
-                                        type: "GET",
-                                        url: "/api/v1/user/cart",
-                                        success: function (response) {
-                                            const { cart } = response
-                                            console.log(cart)
-                                            console.log(products)
+                        order.items.forEach((product, index) => {
+                            if (index === 0) {
+                                const { product: productID } = product
+                                $.ajax({
+                                    type: "GET",
+                                    url: `api/v1/admin/product/${productID}`,
+                                    success: function (response) {
 
-                                            let shippingAddress = cart.shippingAddress.find(address => address._id === order.shippingAddress)
-                                            if (!shippingAddress) {
-                                                console.log("no address found")
-                                            }
+                                        const { products } = response.data;
+                                        $.ajax({
+                                            type: "GET",
+                                            url: "/api/v1/user/cart",
+                                            success: function (response) {
+                                                const { cart } = response
 
+                                                let shippingAddress = cart.shippingAddress.find(address => address._id === order.shippingAddress)
+                                                if (!shippingAddress) {
+                                                    console.log("no address found")
+                                                }
 
+                                                const MAX_DESCRIPTION_LENGTH = 50;
 
-                                            const MAX_DESCRIPTION_LENGTH = 50;
+                                                let truncatedDescription = products.description;
+                                                if (truncatedDescription.length > MAX_DESCRIPTION_LENGTH) {
+                                                    truncatedDescription = truncatedDescription.substring(0, MAX_DESCRIPTION_LENGTH) + '...';
+                                                }
 
-                                            let truncatedDescription = products.description;
-                                            if (truncatedDescription.length > MAX_DESCRIPTION_LENGTH) {
-                                                truncatedDescription = truncatedDescription.substring(0, MAX_DESCRIPTION_LENGTH) + '...';
-                                            }
+                                                const orderedDetailsCard = `
+                                            <div class="row" data-order-id="${order.orderID}" onclick="handleOrders(event)">
+                                           <div class="product_details" data-order-id="${order.orderID}" onclick="handleOrders(event)">
 
-                                            const orderedDetailsCard = `<div class="row">
-                                        <div class="product_details">
-
+                                           <div class="product_data_group" data-order-id="${order.orderID}" onclick="handleOrders(event)">
                                             <div class="product_image">
                                                 ${products.image.map((path, index) => {
-                                                const newPath = path.replace("public", "");
-                                                console.log(newPath)
-                                                if (index === 0) {
-                                                    return `<img src="${newPath}" width="100"/>`
-                                                }
-                                            })}
+                                                    const newPath = path.replace("public", "");
+                                                    console.log(newPath)
+                                                    if (index === 0) {
+                                                        return `<img src="${newPath}" width="100"/>`
+                                                    }
+                                                })}
                                             </div>
-                                            <div class="product_name">
+                                            <div class="group_rating">
+                                                <div class="product_name">
                                                 <p>${products.name}</p>
                                             </div>
-                                            <div class="product_desc">
-                                                <p>${truncatedDescription}</p>
+                                            <div class="showcase-rating">
+                                                            <ion-icon name="star" role="img" class="md hydrated" aria-label="star"></ion-icon>
+                                                            <ion-icon name="star" role="img" class="md hydrated" aria-label="star"></ion-icon>
+                                                            <ion-icon name="star" role="img" class="md hydrated" aria-label="star"></ion-icon>
+                                                            <ion-icon name="star-outline" role="img" class="md hydrated" aria-label="star outline"></ion-icon>
+                                                            <ion-icon name="star-outline" role="img" class="md hydrated" aria-label="star outline"></ion-icon>
+                                                        </div>
+                                                </div>
                                             </div>
-                                            <div class="rating">
-                                                5 start
-                                            </div>
+                                        
                                             <div class="product_price">
-                                                <p>MRP <span>${order.totalPrice}/-</span></p>
+                                                <p>₹<span>${order.totalPrice}/-</span></p>
                                             </div>
                                         </div>
 
-                                        <div class="tracking_status">
-                                            ${order.status}
-                                        </div>
-
-                                        <div class="delivery_address">
-                                           <div class="header">
-                                            <p>Delivery Address</p>
+                                        <div class="tracking_status" data-order-id="${order.orderID}" onclick="handleOrders(event)">
+                                            ${order.status === 'delivered'
+                                                        ? '<span class="notification_badge done"></span>'
+                                                        : order.status === 'cancelled'
+                                                            ? '<span class="notification_badge fail"></span>'
+                                                            : ''}
+                                            <p>${order.status}</p>
+                                            ${order.status === 'delivered' ? '<small>Your item has been delivered</small>' : ''}
                                             </div>
-                                            <div class="address">
-                                                <p name>${shippingAddress.custName}</p>
-                                                <address>${shippingAddress.address},${shippingAddress.city},${shippingAddress.state},${shippingAddress.country},${shippingAddress.zipCode}</address>
-                                            </div>
-                                            <div class="conatact">
-                                                <p>${shippingAddress.mobile}</p>
-                                            </div>
+                                           </div>`
+                                                const tempElement = document.createElement('div');
+                                                tempElement.setAttribute("id", "order_item");
+                                                tempElement.innerHTML = orderedDetailsCard;
+                                                row.append(tempElement)
+                                            }
+                                        })
 
-                                        </div>
+                                    }
+                                })
+                            }
 
-                                        <div class="payment_details">
-                                            <p payment-status>Payment Successfull method</p>
-                                            <p payment-method>UPI ID</p>
-                                            <p payment_bank>
-                                                Banking ICICI
-                                            </p>
-                                            <button invoice>Invoice</button>
-                                        </div>
-
-                                        <div class="cancel_order">
-                                            <button id="btnOpenForm" onClick="showPopup('${order.orderID}')" >Cancel Order</button>
-                                        </div>
-                                    </div>`
-                                            const tempElement = document.createElement('div');
-                                            tempElement.setAttribute("id", "order_item");
-                                            tempElement.innerHTML = orderedDetailsCard;
-                                            row.append(tempElement)
-                                        }
-                                    })
-
-                                }
-                            })
 
 
                         })
@@ -161,6 +145,7 @@
             })
 
         }
+
 
         function showPopup(orderId) {
             var btnOpenForm = document.getElementById('btnOpenForm');
@@ -250,17 +235,27 @@
 
 
 
-
-
-
-
-
-
-
         window.onload = function () {
             getOrders()
             getCategories()
         }
+
+
+
+        const handleOrders = (event) => {
+            const orderID = event.target.dataset.orderId;
+
+              $.ajax({
+                type: "GET",
+                url: `api/v1/user/orders/${orderID}`,
+                success: function (response) {
+                  const { data } = response;
+                  localStorage.setItem("myorder", JSON.stringify(data));
+                  window.location.href = "/myorder";
+                },
+              });
+
+        };
 
 
 

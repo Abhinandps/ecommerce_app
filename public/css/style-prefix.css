@@ -2671,6 +2671,13 @@ footer {
   .product-imgs {
     flex-direction: column;
   }
+
+  .row > .tracking_status {
+    display: none;
+  }
+  .row .product_price{
+    display: none;
+  }
 }
 
 @media (min-width: 768px) {
@@ -2882,6 +2889,12 @@ footer {
 /**
  * responsive larger than 1024px screen
  */
+
+ @media (max-width:1024px){
+  .container .header{
+    margin-top: 30px;
+}
+ }
 
 @media (min-width: 1024px) {
   /**
@@ -3987,10 +4000,22 @@ div > .row {
   margin: 20px 0;
   padding: 20px 0px;
 }
-
 .row .product_details {
   font-size: var(--fs-7);
   color: var(--eerie-black);
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  width: 80%;
+  justify-content: space-between;
+}
+
+.row .product_details .showcase-rating {
+  display: flex;
+  align-items: center;
+  color: var(--sandy-brown);
+  justify-content: flex-start;
+  margin: 5px 0;
 }
 
 .row .product_name {
@@ -4013,13 +4038,40 @@ div > .row {
 }
 
 .row > .tracking_status {
+  width: 15em;
   font-size: var(--fs-8);
   text-transform: capitalize;
-  font-weight: var(--weight-600);
-  background: var(--cultured);
+  font-weight: var(--weight-500);
   border-radius: 7px;
-  text-align: center;
   padding: 10px 20px;
+  position: relative;
+  text-align: center;
+}
+
+.row > .tracking_status .done {
+  background: var(--ocean-green);
+}
+
+.row > .tracking_status .fail {
+  background: var(--bittersweet);
+}
+
+.tracking_status > .notification_badge {
+  width: 10px;
+  height: 10px;
+
+  border-radius: 50%;
+  position: absolute;
+  top: 15px;
+  left: 3.5em;
+}
+
+.tracking_status > small {
+  font-size: var(--fs-11);
+  color: var(--spanish-gray);
+  font-weight: normal;
+  text-align: center;
+  margin-top: 5px;
 }
 
 .row .delivery_address .conatact {
@@ -4047,7 +4099,30 @@ div > .row {
   padding: 10px 20px;
   margin: 25px 0;
   border-radius: var(--border-radius-md);
-  box-shadow: 0px 3px 1px var(--spanish-gray);
+  transition: 0.2s;
+  height: 20vh;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#order_item:hover {
+  box-shadow: 1px 1px 11px var(--cultured);
+  cursor: pointer;
+  transform: scale(1.01);
+}
+
+#order_item > .row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product_data_group {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .menu-category-list li a {
@@ -4467,9 +4542,9 @@ img {
 
 .profile-dropDown ul li a {
   font-weight: var(--weight-500);
-  font-size: var(--fs-7)
+  font-size: var(--fs-7);
 }
 
-.profile-dropDown ul li:last-child a{
+.profile-dropDown ul li:last-child a {
   color: var(--bittersweet);
 }

@@ -1,0 +1,248 @@
+<%- include ('../layouts/header.ejs') %>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <div class="container">
+        <div class="header">
+            <p>Tracking My Order</p>
+            <nav>
+                <ul class="menu-category-list">
+                    <li class="meanu-category"><a class="menu-title" href="/orders">Orders</a></li>
+                    <li><a href="#">Deliverd</a></li>
+                    <li><a href="#">Return</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <main id="orders-history">
+            <!-- DYNAMIC DATA COMES  -->
+        </main>
+
+        <div class="form-popup-bg">
+            <div class="form-container">
+                <button id="btnCloseForm" class="modal-close-btn">
+                    <ion-icon id="btnCloseForm" name="close-outline"></ion-icon>
+                </button>
+                <h1>Cancel Order Request</h1>
+                <!-- <p>For more information. Please complete this form.</p> -->
+
+                <form id="reasonForCancel" method="post">
+                    <input type="hidden" id="orderId">
+
+                    <div class="form-group">
+                        <label for="">Reason for Order Canceling</label>
+                        <textarea class="form-control" id="reason" name="reason" type="text" cols="30"
+                            rows="5"></textarea>
+                        <span class="invalid error" id="reason-error"></span>
+
+                    </div>
+
+                    <button type="submit">Order Cancel</button>
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <script>
+        const orderDetails = localStorage.getItem('myorder')
+
+        // console.log(orderDetails)
+        if (orderDetails) {
+            const order = JSON.parse(orderDetails)
+            let currentStatus = order.status
+
+            order.items.forEach((product, index) => {
+                const row = document.querySelector('#orders-history')
+
+                const { product: productID } = product
+                $.ajax({
+                    type: "GET",
+                    url: `api/v1/admin/product/${productID}`,
+                    success: function (productResponse) {
+                        const { products } = productResponse.data;
+
+                        $.ajax({
+                            type: "GET",
+                            url: "/api/v1/user/cart",
+                            success: function (cartResponse) {
+                                const { cart } = cartResponse
+
+                                let shippingAddress = cart.shippingAddress.find(address => address._id === order.shippingAddress)
+                                if (!shippingAddress) {
+                                    console.log("no address found")
+                                }
+
+                                const orderedDetailsCard = `<div class="row">
+              <div class="product_details">
+                <div class="product_image">
+                  ${products.image.map((path, index) => {
+                                    const newPath = path.replace("public", "");
+                                    console.log(newPath)
+                                    if (index === 0) {
+                                        return `<img src="${newPath}" width="100"/>`
+                                    }
+                                })}
+                </div>
+                <div class="product_name">
+                  <p>${products.name}</p>
+                </div>
+                <div class="product_desc">
+                  <p></p>
+                </div>
+                <div class="rating">
+
+                </div>
+                <div class="product_price">
+                  <p>MRP <span>${order.totalPrice}/-</span></p>
+                </div>
+              </div>
+
+              <div class="tracking_status">
+                ${order.status}
+              </div>
+
+              <div class="delivery_address">
+                <div class="header">
+                  <p>Delivery Address</p>
+                </div>
+                <div class="address">
+                  <p name>${shippingAddress.custName}</p>
+                  <address>${shippingAddress.address},${shippingAddress.city},${shippingAddress.state},${shippingAddress.country},${shippingAddress.zipCode}</address>
+                </div>
+                <div class="conatact">
+                  <p>${shippingAddress.mobile}</p>
+                </div>
+              </div>
+
+              <div class="payment_details">
+                <p payment-status>Payment Successfull method</p>
+                <p payment-method>UPI ID</p>
+                <p payment_bank>
+                  Banking ICICI
+                </p>
+                <button invoice>Invoice</button>
+              </div>
+
+              <div class="cancel_order">
+                <button id="btnOpenForm" onClick="showPopup('${order.orderID}')" >Cancel Order</button>
+              </div>
+            </div>`
+
+                                const tempElement = document.createElement('div');
+                                tempElement.setAttribute("id", "order_item");
+                                tempElement.innerHTML = orderedDetailsCard;
+                                row.append(tempElement);
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+
+
+
+
+        function showPopup(orderId) {
+            var btnOpenForm = document.getElementById('btnOpenForm');
+            var formPopupBg = document.querySelector('.form-popup-bg')
+            var btnCloseForm = document.getElementById('btnCloseForm')
+
+            const orderIdInput = document.getElementById('orderId');
+            orderIdInput.value = orderId;
+
+            formPopupBg.classList.add('is-visible')
+
+            formPopupBg.addEventListener('click', function (event) {
+                if (event.target.classList.contains('form-popup-bg') || event.target.id === 'btnCloseForm') {
+                    event.preventDefault();
+                    formPopupBg.classList.remove('is-visible');
+                }
+            });
+        }
+
+
+
+        const form = document.getElementById('reasonForCancel');
+
+        let isValid = true;
+
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            clearErrorMessages();
+
+            // Validate form fields
+            const reason = document.getElementById('reason');
+            const orderIdInput = document.getElementById('orderId');
+            const orderId = orderIdInput.value;
+
+
+            isValid = true;
+
+
+
+            if (!reason.value.trim()) {
+                showError("reason-error", "Please enter the reason.");
+                isValid = false;
+            }
+
+            try {
+                if (isValid) {
+                    $.ajax({
+                        url: `/api/v1/user/orders/${orderId}`,
+                        method: 'PUT',
+                        success: function (response) {
+                            // getOrders()
+                            showToast()
+                            setToastMessage("Cancelled", response.message);
+                        },
+                        error: function (error) {
+                            // Handle the error response
+                        }
+                    });
+
+
+                }
+            } catch (error) {
+                const message = error.response.data.message;
+                console.log(message)
+            }
+        });
+
+        function showError(element, errorMessage) {
+            const errorElement = document.querySelector(`#${element}`)
+            errorElement.textContent = errorMessage
+        }
+
+        function countWords(text) {
+            const trimmedText = text.trim();
+            const words = trimmedText.split(/\s+/);
+            return words.length;
+        }
+
+        function clearErrorMessages() {
+            const errorElements = document.querySelectorAll(".error");
+            errorElements.forEach((element) => {
+                element.textContent = "";
+            });
+        }
+
+
+
+
+        window.onload = function () {
+            getOrders()
+            getCategories()
+        }
+
+
+    </script>
+
+
+
+    <%- include ('../layouts/footer.ejs') %>

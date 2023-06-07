@@ -156,6 +156,15 @@ exports.getOrdersPage = (req,res)=>{
   }
 }
 
+
+exports.getOneOrder = (req,res)=>{
+  if(req.user){
+    res.render("user/orderDetails.ejs")
+  }
+}
+
+
+
 exports.getPaymentPage = (req,res)=>{
   if(req.user){
     res.render("user/payment.ejs")
