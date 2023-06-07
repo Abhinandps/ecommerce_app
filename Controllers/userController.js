@@ -492,3 +492,103 @@ exports.fetchBanners = catchAsync(async (req, res, next) => {
     data: banners,
   });
 });
+
+// Profile
+
+exports.getProfile = catchAsync(async (req, res, next) => {
+  const userId = req.user.id;
+  const userProfile = await User.findById(userId);
+  if (!userProfile) {
+    return next(new AppError("User profile Not Found", 404));
+  }
+
+  const multipleAddress = await Cart.find({ user: userId });
+  res
+    .status(200)
+    .json({ status: "success", data: { userProfile, multipleAddress } });
+});
+
+exports.updateUsername = catchAsync(async (req, res, next) => {
+  const userId = req.user.id;
+  const newUsername = req.body.username;
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { username: newUsername },
+    { new: true, runValidators: true }
+  );
+
+  if (!updatedUser) {
+    return next(new AppError("User Not Found", 404));
+  }
+
+  res.status(200).json({ status: "success", data: updatedUser });
+});
+
+exports.updateEmail = catchAsync(async (req, res, next) => {
+  const userId = req.user.id;
+  const newEmail = req.body.email;
+
+  const existingUser = await User.findOne({ email: newEmail });
+
+  if (existingUser) {
+    return next(new AppError("Email already exists", 404));
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { email: newEmail },
+    { new: true, runValidators: true }
+  );
+
+  if (!updatedUser) {
+    return next(new AppError("User Not Found", 404));
+  }
+
+  res.status(200).json({ status: "success", data: updatedUser });
+});
+
+exports.updateMobile = catchAsync(async (req, res, next) => {
+  const userId = req.user.id;
+  const newMobile = req.body.mobile;
+
+  const existingUser = await User.findOne({ mobile: newMobile });
+
+  if (existingUser) {
+    return next(new AppError("Mobile number already exists", 404));
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { mobile: newMobile },
+    { new: true, runValidators: true }
+  );
+
+  if (!updatedUser) {
+    return next(new AppError("User Not Found", 404));
+  }
+
+  res.status(200).json({ status: "success", data: updatedUser });
+});
+
+exports.updateAvatar = catchAsync(async (req, res, next) => {
+
+  if (!req.file) {
+    return next(new AppError("No Avatar file provided", 400));
+  }
+
+  const avatarPath = req.file.path;
+  const userId = req.user.id;
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { avatar: avatarPath },
+    { new: true }
+  );
+
+  if (!updatedUser) {
+    return next(new AppError("User Not Found", 404));
+  }
+
+  res.status(200).json({ status: "success", data: updatedUser });
+});

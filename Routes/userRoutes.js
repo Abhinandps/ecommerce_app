@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const auth = require("../Controllers/auth");
-const { isAuthenticate ,isAdmin} = require("../middleware/auth");
+const { isAuthenticate, isAdmin } = require("../middleware/auth");
 
 const {
   getHomeProducts,
@@ -21,8 +21,15 @@ const {
   getAllCoupons,
   applyCoupon,
   removeCoupon,
-  fetchBanners
+  fetchBanners,
+  getProfile,
+  updateEmail,
+  updateMobile,
+  updateUsername,
+  updateAvatar
 } = require("../Controllers/userController");
+
+const upload = require("../utils/multerConfig");
 
 const { getAllCategories } = require("../Controllers/adminController");
 const User = require("../Models/userModel");
@@ -34,8 +41,6 @@ router.get("/otp-login", (req, res) => {
   res.render("user/index");
   // }
 });
-
-
 
 router.post("/signup", auth.signup);
 
@@ -50,48 +55,74 @@ router.post("/login", auth.login);
 
 router.get("/logout", auth.logout);
 
-
 // Product
 
-router.get("/products",isAuthenticate,getAllProducts);
-
+router.get("/products", isAuthenticate, getAllProducts);
 
 // Cart Management
 
-router.route("/cart").get(isAuthenticate,getCart).post(isAuthenticate,addToCart);
+router
+  .route("/cart")
+  .get(isAuthenticate, getCart)
+  .post(isAuthenticate, addToCart);
 
-router.route("/cart/:productId").put(isAuthenticate,updateCartItem).delete(isAuthenticate,removeCartItem);
+router
+  .route("/cart/:productId")
+  .put(isAuthenticate, updateCartItem)
+  .delete(isAuthenticate, removeCartItem);
 
-router.patch("/cart/total",isAuthenticate,updateCartTotal)
+router.patch("/cart/total", isAuthenticate, updateCartTotal);
 
-router.get("/cart/items/count", isAuthenticate, getCartItemsCount)
+router.get("/cart/items/count", isAuthenticate, getCartItemsCount);
 
+router.post("/address", isAuthenticate, saveShippingAddress);
 
-router.post('/address', isAuthenticate, saveShippingAddress )
-
-
-router.post("/cart/purchase", isAuthenticate, purchaseItem)
-
+router.post("/cart/purchase", isAuthenticate, purchaseItem);
 
 // Coupons
 
-router.get('/coupons',isAuthenticate, getAllCoupons);
+router.get("/coupons", isAuthenticate, getAllCoupons);
 
-router.post('/apply-coupon',isAuthenticate, applyCoupon);
+router.post("/apply-coupon", isAuthenticate, applyCoupon);
 
-router.delete("/coupons/remove", isAuthenticate, removeCoupon)
-
+router.delete("/coupons/remove", isAuthenticate, removeCoupon);
 
 // Orders
 
-router.get('/orders', isAuthenticate, orderHistory)
+router.get("/orders", isAuthenticate, orderHistory);
 
-router.route('/orders/:orderID')
-  .get(isAuthenticate,getOrderDetails )
-  .put(isAuthenticate, orderCancel)
+router
+  .route("/orders/:orderID")
+  .get(isAuthenticate, getOrderDetails)
+  .put(isAuthenticate, orderCancel);
 
 module.exports = router;
 
 // Banners
 
-router.get("/banners", isAuthenticate, fetchBanners)
+router.get("/banners", isAuthenticate, fetchBanners);
+
+// Manage Profile
+
+// PUT /profile: Update the user's profile.
+// POST /profile/avatar: Upload and update the user's profile picture or avatar.
+
+// PUT /profile/password: Update the user's password.
+// PUT /profile/email: Update the user's email address.
+// PUT /profile/mobile: Update the user's mobile number.
+// PUT /profile/address: Update the user's address.
+
+router.get("/profile", isAuthenticate, getProfile);
+
+router.put("/profile/username", isAuthenticate, updateUsername);
+
+router.put("/profile/email", isAuthenticate, updateEmail);
+
+router.put("/profile/mobile", isAuthenticate, updateMobile);
+
+router.put(
+  "/profile/avatar",
+  upload.single("avatar"),
+  isAuthenticate,
+  updateAvatar
+);

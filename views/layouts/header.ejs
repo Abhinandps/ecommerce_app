@@ -314,28 +314,38 @@
 
                 <div class="header-user-actions">
                     <% if (locals.user) { %>
+
                         <button class="action-btn" data-menu-user-action>
-                            <img class="mobile-user-avatar" src="src/images/testimonial-1.jpg" alt="testimonial">
+                            <img class="mobile-user-avatar"  src="<%= locals.user.avatar.replace('public\\', '') %>" alt="testimonial">
                         </button>
-                        <%=locals.user.username%>
-                            <a href="#" class="logout">Logout</a>
+
+                        <div class="profile-dropDown">
+                            <ul>
+                                <li><small>
+                                        <%=locals.user.username%>
+                                        
+                                    </small></li>
+                                <li> <a href="#">Profile</a></li>
+                                <li> <a href="#" class="logout">Logout</a></li>
+                            </ul>
+                        </div>
 
 
-                            <% } else { %>
-                                <button class="action-btn" data-user-action>
-                                    <ion-icon name="person-outline"></ion-icon>
+                        <% } else { %>
+                            <button class="action-btn" data-user-action>
+                                <ion-icon name="person-outline"></ion-icon>
+                            </button>
+                            <% } %>
+
+                                <button class="action-btn">
+                                    <ion-icon name="heart-outline"></ion-icon>
+                                    <span class="count">0</span>
                                 </button>
-                                <% } %>
 
-                                    <button class="action-btn">
-                                        <ion-icon name="heart-outline"></ion-icon>
-                                        <span class="count">0</span>
-                                    </button>
-
-                                    <button onclick="location.assign('/cart')" class="action-btn">
-                                        <ion-icon name="bag-handle-outline"></ion-icon>
-                                        <span class="count" id="cart_count">0</span>
-                                    </button>
+                                <button onclick="location.assign('/cart')" class="action-btn">
+                                    <ion-icon name="bag-handle-outline"></ion-icon>
+                                    <span class="count" id="cart_count">0</span>
+                                </button>
 
                 </div>
 

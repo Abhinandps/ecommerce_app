@@ -3925,7 +3925,7 @@ footer {
   margin: 0 10px;
 }
 
-.address-details button{
+.address-details button {
   font-size: var(--fs-7);
   font-weight: var(--weight-600);
   color: var(--onyx);
@@ -4423,26 +4423,53 @@ img {
   box-shadow: 1px 2px 3px -3px #555;
 }
 
-
-
 .discount-applied {
   color: rgb(20, 202, 117);
 }
-.couponEditCard{
+.couponEditCard {
   padding: 10px 0px;
 }
 
-
-.coupon-handle{
+.coupon-handle {
   display: flex;
-    font-size: var(--fs-6);
-    justify-content: space-between;
-    align-items: center;
-    font-weight: var(--weight-600);
-    padding: 10px 0;
+  font-size: var(--fs-6);
+  justify-content: space-between;
+  align-items: center;
+  font-weight: var(--weight-600);
+  padding: 10px 0;
 }
 
-.coupon-handle .coupon-left small{
+.coupon-handle .coupon-left small {
   font-weight: var(--weight-400);
-    color: var(--ocean-green);
+  color: var(--ocean-green);
+}
+
+.profile-dropDown {
+  width: 150px;
+  height: 20vh;
+  position: absolute;
+  top: 160px;
+  padding: 10px 0px;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--cultured);
+  background: var(--white);
+  box-shadow: 1px 1px 0px 0px var(--cultured);
+  z-index: 77777;
+}
+
+.profile-dropDown ul li {
+  padding: 6px 20px;
+}
+
+.profile-dropDown ul li:first-child {
+  border-bottom: 1px solid var(--cultured);
+}
+
+.profile-dropDown ul li a {
+  font-weight: var(--weight-500);
+  font-size: var(--fs-7)
+}
+
+.profile-dropDown ul li:last-child a{
+  color: var(--bittersweet);
 }

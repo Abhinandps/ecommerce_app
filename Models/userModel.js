@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema({
       message: "Please provide a valid username.",
     },
   },
+  avatar: {
+    type: String,
+    default: 'src/images/avatar.png'
+  },
   email: {
     type: String,
     match: /^\S+@\S+\.\S+$/,
