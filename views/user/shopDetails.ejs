@@ -415,6 +415,53 @@
         const imgShowcase = document.querySelector(".img-showcase");
         const imgSelect = document.querySelector(".img-select");
 
+        // get the count of cart items
+        const getCartItemCount = async () => {
+            try {
+                const response = await fetch("/api/v1/user/cart/items/count");
+                if (!response.ok) {
+                    throw new Error("Error retrieving cart items count");
+                }
+                const data = await response.json();
+                return data.count;
+            } catch (error) {
+                console.error("Error retrieving cart items count", error);
+                return 0; // Return a default count or handle the error as needed
+            }
+        };
+
+
+        const handleAddToCart = async (productId) => {
+            try {
+                const response = await fetch("/api/v1/user/cart", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        productId,
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error("Error adding item to cart");
+                }
+
+                const responseData = await response.json();
+                console.log(responseData);
+                await getCartCount();
+                showToast();
+                setToastMessage(responseData.status, responseData.message);
+                const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+                cartItems.push({ productId });
+                localStorage.setItem('cartItems', JSON.stringify(cartItems));
+                call()
+            } catch (error) {
+                console.error("Error adding item to cart", error);
+            }
+        };
+
+
 
         if (storedProduct) {
             const product = JSON.parse(storedProduct);
@@ -444,6 +491,8 @@
                 // Append the anchor element to the image showcase
                 imgShowcase.appendChild(img);
             });
+
+
 
             const zoom = mediumZoom('img');
 
@@ -496,6 +545,35 @@
 
             window.addEventListener("resize", slideImage);
 
+
+            const addToCartBtn = document.querySelector('.add-cart-btn')
+
+
+            const productId = product._id;
+
+            async function call() {
+                try {
+                    const count = await getCartItemCount();
+                    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+
+                    if (cartItems.some(item => item.productId === productId)) {
+                        addToCartBtn.textContent = "Go to Cart";
+                        addToCartBtn.onclick = function () {
+                            window.location.href = "/cart";
+                        };
+                    } else {
+                        addToCartBtn.textContent = "Add to Cart";
+                        addToCartBtn.onclick = function () {
+                            handleAddToCart(productId);
+                        };
+                    }
+                } catch (error) {
+                    console.error("Error retrieving cart items count", error);
+                }
+            }
+
+            call();
+
         } else {
             console.log('No product details found.');
         }
@@ -513,6 +591,8 @@
                 image.style.transformOrigin = percentX + '% ' + percentY + '%';
             });
         });
+
+
 
     </script>
 

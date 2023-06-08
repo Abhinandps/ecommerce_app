@@ -207,6 +207,7 @@ const handleaddToCart = (productId) => {
       setToastMessage(response.status, response.message);
     },
   });
+  updateButton();
 };
 
 const getCart = () => {
@@ -423,12 +424,24 @@ function removeCoupon() {
 }
 
 const handleRemoveCartItem = (productId) => {
+  // Find the index of the item with matching productId
+
   const confirm = window.confirm("Do you want to remove this item ?");
   if (confirm) {
+    const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+    const index = cartItems.findIndex((item) => item.productId === productId);
+
+    if (index !== -1) {
+      cartItems.splice(index, 1);
+      localStorage.setItem("cartItems", JSON.stringify(cartItems));
+    }
+
     $.ajax({
       type: "DELETE",
       url: `/api/v1/user/cart/${productId}`,
-      success: function (response) {
+      success:  function (response) {
+        // await call();
+
         getCart();
         getCartCount();
         removeCoupon();
@@ -632,7 +645,7 @@ const getPaymentDetails = () => {
 
       if (selectedPaymentOption === "cod") {
         const popUp = document.querySelector(".order-success-popup");
-        const container = document.querySelector('.container.wrapper')
+        const container = document.querySelector(".container.wrapper");
         popUp.style.display = "block";
 
         container.classList.add("bg-blur");
@@ -645,8 +658,6 @@ const getPaymentDetails = () => {
         // showToast();
         // removeCoupon();
         // setToastMessage("Success", "Order placed successfully");
-
-        
       } else if (selectedPaymentOption === "upi") {
         const orderID = axiosResponse.data.orderID;
         const KEY_ID = "rzp_test_MpNQwQcp20migY";
@@ -660,11 +671,11 @@ const getPaymentDetails = () => {
           handler: function (response) {
             console.log(response);
             const popUp = document.querySelector(".order-success-popup");
-            const container = document.querySelector('.container.wrapper')
+            const container = document.querySelector(".container.wrapper");
             popUp.style.display = "block";
-    
+
             container.classList.add("bg-blur");
-    
+
             setTimeout(function () {
               container.classList.remove("bg-blur");
               window.location.href = "/myorders";
