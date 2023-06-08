@@ -26,7 +26,11 @@ const {
   updateEmail,
   updateMobile,
   updateUsername,
-  updateAvatar
+  updateAvatar,
+  newArrivals,
+  trending,
+  toprated,
+  bestSellers
 } = require("../Controllers/userController");
 
 const upload = require("../utils/multerConfig");
@@ -98,19 +102,23 @@ router
 
 module.exports = router;
 
+
+// Home 
+
+router.get("/newarrivals", isAuthenticate, newArrivals)
+
+router.get("/trending", isAuthenticate, trending)
+
+router.get("/toprated", isAuthenticate, toprated)
+
+router.get("/bestsellers", isAuthenticate, bestSellers)
+
+
 // Banners
 
 router.get("/banners", isAuthenticate, fetchBanners);
 
 // Manage Profile
-
-// PUT /profile: Update the user's profile.
-// POST /profile/avatar: Upload and update the user's profile picture or avatar.
-
-// PUT /profile/password: Update the user's password.
-// PUT /profile/email: Update the user's email address.
-// PUT /profile/mobile: Update the user's mobile number.
-// PUT /profile/address: Update the user's address.
 
 router.get("/profile", isAuthenticate, getProfile);
 

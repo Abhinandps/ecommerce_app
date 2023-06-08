@@ -26,6 +26,8 @@
         rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/medium-zoom/dist/medium-zoom.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
 </head>
 
@@ -316,14 +318,15 @@
                     <% if (locals.user) { %>
 
                         <button class="action-btn" data-menu-user-action>
-                            <img class="mobile-user-avatar"  src="<%= locals.user.avatar.replace('public\\', '') %>" alt="testimonial">
+                            <img class="mobile-user-avatar" src="<%= locals.user.avatar.replace('public\\', '') %>"
+                                alt="testimonial">
                         </button>
 
                         <div class="profile-dropDown">
                             <ul>
                                 <li><small>
                                         <%=locals.user.username%>
-                                        
+
                                     </small></li>
                                 <li> <a href="#">Profile</a></li>
                                 <li> <a href="#" class="logout">Logout</a></li>

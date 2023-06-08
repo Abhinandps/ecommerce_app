@@ -11,6 +11,7 @@ const User = require("../Models/userModel");
 const Order = require("../Models/orders");
 const Coupon = require("../Models/coupen");
 const Banner = require("../Models/banner");
+const SalesReport = require("../Models/salesReport");
 
 const generateOrderID = () => {
   const date = new Date();
@@ -24,10 +25,70 @@ const generateOrderID = () => {
 exports.getHomeProducts = catchAsync(async (req, res) => {
   const products = await Product.find()
     .limit(10) // Limit to 10 products
-    .populate("category", "name"); // Populate category field with name only
+    .populate("category", "name");
 
   res.json(products);
 });
+
+exports.newArrivals = catchAsync(async (req, res) => {
+  const newArrivals = await Product.find().sort({ createdAt: -1 }).limit(5);
+  res.json(newArrivals);
+});
+
+exports.trending = catchAsync(async (req, res) => {
+  const trendingProducts = await Product.find().sort({ views: -1 }).limit(5);
+  res.json(trendingProducts);
+});
+
+exports.toprated = catchAsync(async (req, res) => {
+  const topRatedProducts = await Product.find().sort({ rating: -1 }).limit(5);
+  res.json(topRatedProducts);
+});
+
+
+
+
+exports.bestSellers = catchAsync(async (req, res) => {
+    const salesReport = await SalesReport.find()
+    const salesData = salesReport[0].salesData
+
+
+    // Create an object to store the total sales for each product
+    const productSales = {};
+
+    // Iterate over the sales data to calculate the total sales for each product
+    salesData.forEach((sale) => {
+      const { topSellingProduct, totalSales } = sale;
+      if (topSellingProduct in productSales) {
+        productSales[topSellingProduct] += totalSales;
+      } else {
+        productSales[topSellingProduct] = totalSales;
+      }
+    });
+
+    // Sort the products based on their total sales in descending order
+    const sortedProducts = Object.keys(productSales).sort(
+      (a, b) => productSales[b] - productSales[a]
+    );
+
+    // Limit the result to the top 5 best-selling products
+    const topSellers = sortedProducts.slice(0, 4);
+
+    // Retrieve the details of the top-selling products from product database
+    const topSellerProducts = await Product.find({ _id: { $in: topSellers } });
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        bestSellers: topSellerProducts,
+      },
+    });
+});
+
+
+
+
+
 
 exports.getAllProducts = catchAsync(async (req, res) => {
   const products = await Product.find({ deleted: false }).populate("category"); // Populate category field with full category document
@@ -572,7 +633,6 @@ exports.updateMobile = catchAsync(async (req, res, next) => {
 });
 
 exports.updateAvatar = catchAsync(async (req, res, next) => {
-
   if (!req.file) {
     return next(new AppError("No Avatar file provided", 400));
   }

@@ -5,6 +5,59 @@ const logout = async () => {
   }
 };
 
+const bestSellers = () => {
+  const row = document.getElementById("showcase-container");
+  if (row) {
+    console.log(row);
+    row.innerHTML = "";
+    $.ajax({
+      type: "GET",
+      url: "/api/v1/user/bestsellers",
+      success: function (res) {
+        const products = res.data.bestSellers;
+        products.forEach((product) => {
+          const firstImage = product.image.map((image) => image.split("public")[1])[0];
+          const item = `
+                <div class="showcase">
+
+                  <a href="#" class="showcase-img-box">
+                      <img src="${firstImage}" alt="baby fabric shoes" width="75"
+                          height="75" class="showcase-img">
+                  </a>
+
+                  <div class="showcase-content">
+
+                      <a href="#">
+                          <h4 class="showcase-title">${product.name}</h4>
+                      </a>
+
+                      <div class="showcase-rating">
+                          <ion-icon name="star"></ion-icon>
+                          <ion-icon name="star"></ion-icon>
+                          <ion-icon name="star"></ion-icon>
+                          <ion-icon name="star"></ion-icon>
+                          <ion-icon name="star"></ion-icon>
+                      </div>
+
+                      <div class="price-box">
+                          <del>₹${product.price+299}</del>
+                          <p class="price">₹${product.price}</p>
+                      </div>
+
+                  </div>
+
+              </div>
+`;
+          row.innerHTML += item;
+        });
+      },
+    });
+  }
+};
+
+bestSellers();
+
+
 const getCategories = () => {
   $.ajax({
     type: "GET",
@@ -439,7 +492,7 @@ const handleRemoveCartItem = (productId) => {
     $.ajax({
       type: "DELETE",
       url: `/api/v1/user/cart/${productId}`,
-      success:  function (response) {
+      success: function (response) {
         // await call();
 
         getCart();
