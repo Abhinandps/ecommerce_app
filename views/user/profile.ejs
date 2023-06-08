@@ -1,0 +1,179 @@
+<%- include ('../layouts/header.ejs') %>
+
+
+
+    <main>
+
+        <!--
+      - PRODUCT
+    -->
+
+        <div class="product-container">
+
+            <div class="container">
+
+                <div class="grid-container">
+                    <div class="grid-item">
+                        h'ello abhinand
+                        <!-- <form enctype="multipart/form-data">
+                            <input type="file" avatar>
+                        </form> -->
+                    </div>
+                    <div class="grid-item center">
+                        <div class="input-group">
+                            <div class="head">
+                                <p>personal information</p> <button editOne>Edit</button>
+                            </div>
+                            <form username>
+                                <div class="form-group">
+                                    <label for="username">Username</label>
+                                    <input type="text" name="username" username-field>
+                                </div>
+                                <button type="submit">Save</button>
+                            </form>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="head">
+                                <p>Email Address </p> <button editTwo>Edit</button>
+                            </div>
+
+                            <form email>
+                                <div class="form-group">
+                                    <label for="email">Email</label>
+                                    <input type="email" name="email" id="email-field">
+                                </div>
+                                <button type="submit">Save</button>
+                            </form>
+                        </div>
+
+
+                        <div class="input-group">
+                            <div class="head">
+                                <p>Mobile Number </p> <button editThree>Edit</button>
+                            </div>
+                            <form mobile>
+                                <div class="form-group">
+                                    <label for="mobile">Mobile</label>
+                                    <input type="number" name="mobile" mobile-field>
+                                </div>
+                                <button type="submit">Save</button>
+                            </form>
+
+                        </div>
+
+
+
+                    </div>
+                    <div class="grid-item ">myorders</div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <script>
+        window.onload = async function () {
+            await getProducts()
+            await getCategories()
+        }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+    <script>
+
+        const username = document.querySelector("[username]")
+        const usernameEdit = document.querySelector("[editOne]")
+        const email = document.querySelector("[email]")
+        const emailEdit = document.querySelector("[editTwo]")
+        const mobile = document.querySelector("[mobile]")
+        const mobileEdit = document.querySelector("[editThree]")
+
+        // form fields 
+
+        const usernameField = document.querySelector("[username-field]")
+        const emailField = document.querySelector("#email-field")
+        const mobileField = document.querySelector("[mobile-field]")
+
+
+        const getProfile = () => {
+            $.ajax({
+                type: "GET",
+                url: "/api/v1/user/profile",
+                success: function (response) {
+                    const data = response.data.userProfile
+                    console.log(data);
+                    usernameField.value = data.username
+                    emailField.value = data.email
+                    mobileField.value = data.mobile
+                }
+            })
+        }
+        getProfile()
+
+
+        username.addEventListener('submit', (e) => {
+            e.preventDefault()
+            $.ajax({
+                type: "PUT",
+                url: "/api/v1/user/profile/username",
+                data: {
+                    username: usernameField.value
+                },
+                success: function (response) {
+                    getProfile()
+                }
+            })
+        })
+
+        usernameEdit.addEventListener('click', () => {
+            alert("sdf")
+
+        })
+
+        email.addEventListener('submit', (e) => {
+            e.preventDefault()
+            $.ajax({
+                type: "PUT",
+                url: "/api/v1/user/profile/email",
+                data: {
+                    email: emailField.value 
+                },
+                success: function (response) {
+                    getProfile()
+                }
+            })
+        })
+
+        emailEdit.addEventListener('click', () => {
+            alert("sdf")
+
+        })
+
+        mobile.addEventListener('submit', (e) => {
+            e.preventDefault()
+            $.ajax({
+                type: "PUT",
+                url: "/api/v1/user/profile/email",
+                data: {
+                    mobile: mobileField.value 
+                },
+                success: function (response) {
+                    getProfile()
+                }
+            })
+        })
+
+        mobileEdit.addEventListener('click', () => {
+            alert("sdf")
+
+        })
+
+    </script>
+
+
+    <%- include ('../layouts/footer.ejs') %>

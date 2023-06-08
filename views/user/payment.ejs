@@ -1,6 +1,6 @@
 <%- include ('../layouts/header.ejs') %>
 
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 
     <div class="container wrapper">
@@ -18,13 +18,13 @@
                 <div class="payment-options">
                     <input type="radio" id="cod" name="payment-option" value="cod">
                     <label for="cod">Cash on Delivery</label>
-                  
+
                     <input type="radio" id="card" name="payment-option" value="card">
                     <label for="card">Credit Card</label>
-                  
+
                     <input type="radio" id="upi" name="payment-option" value="upi">
                     <label for="upi">UPI</label>
-                  </div>                  
+                </div>
             </div>
         </div>
 
@@ -46,7 +46,7 @@
                 </div>
                 <div class="group-data">
                     <div class="data-total">total Payable:</div>
-                    <div  class="title-value">₹<span id="totalPayable"></span></div>
+                    <div class="title-value">₹<span id="totalPayable"></span></div>
                 </div>
                 <button class="btn-proceed" place_order>Place Order</button>
             </div>
@@ -122,10 +122,26 @@
         </div>
     </div>
 
+    <div class="order-success-popup">
+        <div class="custom-container">
+            <div class="circle-group">
+                <div class="circle-border"></div>
+            <div class="circle">
+                <div class="success"></div>
+            </div>
+            </div>
+            <div class="message">
+                Order Placed Successfully
+            </div>
+        </div>
+        
+    </div>
+
     <script>
-        window.onload = function() {
+        window.onload = function () {
             getPaymentDetails();
         }
+
     </script>
 
     <%- include ('../layouts/footer.ejs') %>

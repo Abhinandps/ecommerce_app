@@ -91,8 +91,8 @@ Week 3 Project Updations
 [✔] - add product UI
 [] - Home page
 [✗] - guest user experience
-[] - order success and order details page 
-[] - profile 
+[✗] - order success and order details page 
+[✗] - profile 
 [] - $ and ₹
 [] 
 [✔] + search, filter, sort, pagination

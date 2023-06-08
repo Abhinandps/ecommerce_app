@@ -118,6 +118,12 @@ exports.getHome = (req, res) => {
   }
 };
 
+exports.getProfile = (req,res)=>{
+  if(req.user){
+    res.render("user/profile.ejs")
+  }
+}
+
 exports.getShoppingPage = (req, res) => {
   if (req.user) {
     res.render("user/shop.ejs");

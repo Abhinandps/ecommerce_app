@@ -631,12 +631,22 @@ const getPaymentDetails = () => {
       });
 
       if (selectedPaymentOption === "cod") {
-        console.log(axiosResponse.data);
-        showToast();
-        removeCoupon();
-        setToastMessage("Success", "Order placed successfully");
+        const popUp = document.querySelector(".order-success-popup");
+        const container = document.querySelector('.container.wrapper')
+        popUp.style.display = "block";
 
-        window.location.href = "/myorders";
+        container.classList.add("bg-blur");
+
+        setTimeout(function () {
+          container.classList.remove("bg-blur");
+          window.location.href = "/myorders";
+        }, 3000);
+
+        // showToast();
+        // removeCoupon();
+        // setToastMessage("Success", "Order placed successfully");
+
+        
       } else if (selectedPaymentOption === "upi") {
         const orderID = axiosResponse.data.orderID;
         const KEY_ID = "rzp_test_MpNQwQcp20migY";
@@ -649,10 +659,14 @@ const getPaymentDetails = () => {
           order_id: orderID,
           handler: function (response) {
             console.log(response);
-            showToast();
-            removeCoupon();
-            setToastMessage("Success", "Order placed successfully");
-            setTimeout(() => {
+            const popUp = document.querySelector(".order-success-popup");
+            const container = document.querySelector('.container.wrapper')
+            popUp.style.display = "block";
+    
+            container.classList.add("bg-blur");
+    
+            setTimeout(function () {
+              container.classList.remove("bg-blur");
               window.location.href = "/myorders";
             }, 3000);
           },
@@ -673,5 +687,3 @@ const getPaymentDetails = () => {
 };
 
 // getOrders function included in order.ejs
-
-

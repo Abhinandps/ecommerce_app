@@ -10,6 +10,7 @@ const {
   getUserLogin,
   getSignIn,
   getUserSignup,
+  getProfile,
   getHome,
   getOtpForm,
   getShoppingPage,
@@ -62,6 +63,8 @@ router.get("/signup",isAuthenticate , getUserSignup);
 router.get("/verify-otp",isAuthenticate , getOtpForm);
 
 router.get("/",isAuthenticate , getHome);
+
+router.get("/me",isAuthenticate , getProfile);
 
 router.get("/shop",isAuthenticate , getShoppingPage);
 
