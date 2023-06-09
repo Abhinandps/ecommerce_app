@@ -713,6 +713,8 @@ body::-webkit-scrollbar-thumb:hover {
   border: 2px solid var(--cultured);
 }
 
+
+
 .profile-dropdown {
   position: absolute;
   top: 140px;
@@ -2485,6 +2487,42 @@ footer {
  */
 
 @media (max-width: 570px) {
+
+  /*
+  
+  */
+  .bottom-fixed-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    flex-direction: column;
+    padding: 10px;
+    height: 14vh;
+}
+
+.form-popup-bg.is-visible .form-container {
+  position: relative;
+  margin: 0 auto;
+  padding: 20px;
+  width: 100%;
+  height: 100%;
+  background: var(--white);
+  border-radius: var(--border-radius-md);
+}
+
+
+.bottom-fixed-bar #savings {
+  font-size: var(--fs-6);
+  font-weight: var(--weight-600);
+}
+
+.toast {
+  display: none;
+}
+
+
+
   /* LOGIN SIGN UP OTP */
   .modal-content {
     border-radius: 0px;
@@ -4600,9 +4638,77 @@ img {
   color: var(--ocean-green);
 }
 
+.mobile-profile-dropDown{
+  
+  width: 150px;
+  min-height: 10vh;
+  position: absolute;
+  bottom: 80px;
+  right: 0px;
+  padding: 10px 0px;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--cultured);
+  background: var(--white);
+  box-shadow: 1px 1px 0px 0px var(--cultured);
+  z-index: 1;
+  opacity: 0;
+  word-wrap: break-word;
+  animation: flipInX 0.5s forwards;
+}
+
+.mobile-profile-dropDown.close  {
+  animation: flipOutX 0.2s forwards;
+  opacity: 0;
+}
+
+.profile-dropDown.close  {
+  animation: flipOutX 0.2s forwards;
+  opacity: 0;
+}
+
+@keyframes flipInX {
+  from {
+    transform: rotateX(-90deg);
+    opacity: 0;
+  }
+  to {
+    transform: rotateX(0);
+    display: block;
+    opacity: 1;
+  }
+}
+
+@keyframes flipOutX {
+  from {
+    transform: rotateX(0);
+    opacity: 1;
+  }
+  50% {
+    transform: rotateX(-90deg);
+  }
+  to {
+    transform: rotateX(-90deg);
+    opacity: 0;
+    display: none;
+  }
+}
+
+.mobile-profile-dropDown::before {
+  content: '';
+  width: 0;
+  height: 4px;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid var(--white);
+  position: absolute;
+  bottom: -8px;
+  right: 55px;
+  transform: translateX(50%);
+}
+
 .profile-dropDown {
   width: 150px;
-  height: 20vh;
+  min-height: 10vh;
   position: absolute;
   top: 160px;
   padding: 10px 0px;
@@ -4611,22 +4717,27 @@ img {
   background: var(--white);
   box-shadow: 1px 1px 0px 0px var(--cultured);
   z-index: 1;
+  animation: flipInX 0.5s forwards;
 }
 
-.profile-dropDown ul li {
+
+
+
+.profile-dropDown ul li , .mobile-profile-dropDown ul li{
   padding: 6px 20px;
 }
 
-.profile-dropDown ul li:first-child {
+.profile-dropDown ul li:first-child , .mobile-profile-dropDown ul li:first-child{
   border-bottom: 1px solid var(--cultured);
 }
 
-.profile-dropDown ul li a {
+.profile-dropDown ul li a,.mobile-profile-dropDown ul li a {
   font-weight: var(--weight-500);
   font-size: var(--fs-7);
 }
 
-.profile-dropDown ul li:last-child a {
+.profile-dropDown ul li:last-child a, 
+.mobile-profile-dropDown ul li:last-child a{
   color: var(--bittersweet);
 }
 

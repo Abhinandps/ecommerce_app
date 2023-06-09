@@ -5,6 +5,7 @@ const adminlogout = async () => {
   }
 };
 
+
 // Get All Users
 const getUsers = async () => {
   try {
@@ -35,6 +36,7 @@ const getUsers = async () => {
     console.error(error);
   }
 };
+
 
 // Block and Unblock users
 const handleClick = (event) => {
@@ -1187,3 +1189,4 @@ function showCustomConfirmation(message, callback) {
     $(this).remove();
   });
 }
+

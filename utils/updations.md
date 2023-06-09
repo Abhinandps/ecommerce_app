@@ -136,7 +136,7 @@ Features
 
 User side :
 []Invoice download
-[]Offer module(product offer, category offer,Referal offer).
+[]Offer module(product offer, category offer,Referral offer).
 
 Admin side :
 []Admin Dashboard - Chart with filter(yearly,monthly etc.)

@@ -322,7 +322,7 @@
                                 alt="testimonial">
                         </button>
 
-                        <div class="profile-dropDown">
+                        <div class="profile-dropDown close" profile-dropDown>
                             <ul>
                                 <li><small>
                                         <%=locals.user.username%>
@@ -403,7 +403,7 @@
                 <span class="count" id="cart_count_mobile">0</span>
             </button>
 
-            <button class="action-btn">
+            <button onclick="location.assign('/')" class="action-btn">
                 <ion-icon name="home-outline"></ion-icon>
             </button>
 
@@ -417,13 +417,22 @@
                 <button class="action-btn" data-mobile-user-action>
                     <img class="mobile-user-avatar" src="src/images/testimonial-1.jpg" alt="testimonial">
                 </button>
-                <%=locals.user.username%>
-                    <a href="#" class="logout">Logout</a>
-                    <% } else { %>
-                        <button class="action-btn" data-mobile-user-action>
-                            <ion-icon name="person-outline"></ion-icon>
-                        </button>
-                        <% } %>
+
+                <div class="mobile-profile-dropDown close">
+                    <ul>
+                        <li><small>
+                                <%=locals.user.username%>
+
+                            </small></li>
+                        <li> <a href="/me">Profile</a></li>
+                        <li> <a href="#" class="logout">Logout</a></li>
+                    </ul>
+                </div>
+                <% } else { %>
+                    <button class="action-btn" data-mobile-user-action>
+                        <ion-icon name="person-outline"></ion-icon>
+                    </button>
+                    <% } %>
         </div>
 
         <nav class="mobile-navigation-menu  has-scrollbar" data-mobile-menu>
@@ -861,7 +870,7 @@
                 const password = document.getElementById('pass2').value;
                 const confirmpassword = document.getElementById('confirmpass2').value;
 
-                console.log(confirmpassword)
+                // console.log(confirmpassword)
 
                 // const emailError = document.getElementById('[email-error]')
                 // const passError = document.getElementById('[password-error]')
@@ -962,6 +971,41 @@
             const PHONE_REGEX = /^\d{10}$/;
             return PHONE_REGEX.test(phone);
         }
+
+
+        // dropdown animation desktop
+        var desktopAvatar = document.querySelector('[data-menu-user-action]')
+        const desktopDropdown = document.querySelector("[profile-dropDown]")
+
+        desktopAvatar.addEventListener('click',(event)=>{
+            desktopDropdown.classList.toggle('close');
+        })
+
+        // dropdown animation mobile
+
+        var avatar = document.querySelector('[data-mobile-user-action]');
+        const dropdown = document.querySelector(".mobile-profile-dropDown")
+
+
+        avatar.addEventListener('click', function (event) {
+            dropdown.classList.toggle('close');
+        });
+
+        var toggleButtons = document.querySelectorAll('.dropdown-toggle');
+
+        // toggleButtons.forEach(function (button) {
+        //     button.addEventListener('click', function () {
+        //         var dropdown = this.closest('.dropdown');
+
+        //         if (dropdown.classList.contains('open')) {
+        //             dropdown.classList.remove('open');
+        //             dropdown.classList.add('close');
+        //         } else {
+        //             dropdown.classList.remove('close');
+        //             dropdown.classList.add('open');
+        //         }
+        //     });
+        // });
 
 
     </script>
