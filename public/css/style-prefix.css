@@ -4396,11 +4396,92 @@ img {
   z-index: 10000;
 }
 .form-popup-bg.is-visible {
+  background: rgba(0, 0, 0, 0.2);
+  width: 100%;
+  margin: 0 auto;
   opacity: 1;
   visibility: visible;
   -webkit-transition: opacity 0.3s 0s, visibility 0s 0s;
   -moz-transition: opacity 0.3s 0s, visibility 0s 0s;
   transition: opacity 0.3s 0s, visibility 0s 0s;
+}
+
+.form-popup-bg.is-visible .form-container {
+  position: relative;
+  margin: 0 auto;
+  padding: 20px 30px;
+  max-width: 30em;
+  background: var(--white);
+  border-radius: var(--border-radius-md);
+}
+
+.form-popup-bg.is-visible .form-container > h1 {
+  font-size: var(--fs-4);
+  text-transform: uppercase;
+  margin: 20px 0px;
+  color: var(--onyx);
+}
+
+.form-popup-bg.is-visible .form-container .form-group input {
+  width: 100%;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: 1px solid var(--salmon-pink);
+}
+
+.form-popup-bg.is-visible .form-container .coupon-code-selection {
+  padding: 10px 20px;
+}
+.form-popup-bg.is-visible .form-container .coupon-code-selection > p {
+  font-size: var(--fs-4);
+  font-weight: var(--weight-500);
+  color: var(--onyx);
+  margin: 5px 0;
+}
+
+
+.bottom-fixed-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  height: 10vh;
+}
+
+.bottom-fixed-bar button {
+  color: var(--white);
+  background: var(--sandy-brown);
+  font-weight: var(--weight-500);
+  width: 60%;
+  height: 80%;
+  letter-spacing: 1px;
+  border-radius: var(--border-radius-md);
+}
+
+.bottom-fixed-bar #savings {
+  font-size: var(--fs-8);
+  font-weight: var(--weight-600);
+}
+
+.form-popup-bg.is-visible
+  .form-container
+  .coupon-code-selection
+  .coupon-details {
+  line-height: 20px;
+}
+
+.form-popup-bg.is-visible
+  .form-container
+  .coupon-code-selection
+  .highlight_text {
+  font-size: var(--fs-8);
+  color: var(--color-green);
+  font-weight: var(--weight-700);
+}
+
+.coupon-code-selection .more-details {
+  font-size: var(--fs-9);
+  color: var(--eerie-black);
 }
 
 /* 
@@ -4529,7 +4610,7 @@ img {
   border: 1px solid var(--cultured);
   background: var(--white);
   box-shadow: 1px 1px 0px 0px var(--cultured);
-  z-index: 77777;
+  z-index: 1;
 }
 
 .profile-dropDown ul li {
@@ -4553,32 +4634,30 @@ img {
   width: 100%;
   height: 100vh;
   display: grid;
-  padding:20px 0px;
+  padding: 20px 0px;
   grid-template-rows: 1fr 5fr;
   grid-template-columns: 1fr 3fr;
 }
 
-.bg-blur{
+.bg-blur {
   filter: blur(2px);
 }
 
-
-.grid-container .grid-item .head{
+.grid-container .grid-item .head {
   display: flex;
   gap: 20px;
 }
 
-.grid-container .grid-item .form-group{
+.grid-container .grid-item .form-group {
   width: 300px;
 }
-
 
 /* order success svg 
  */
 
- .order-success-popup{
+.order-success-popup {
   display: none;
-  background-color:var(--white);
+  background-color: var(--white);
   position: absolute;
   top: 50%;
   left: 50%;
@@ -4587,13 +4666,11 @@ img {
   width: 300px;
   border-radius: var(--border-radius-md);
   border: 1px solid var(--cultured);
-  
+
   box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
- }
- 
+}
 
-
- :root {
+:root {
   --color-green: var(--ocean-green);
   --circle-size: 60px;
 }
@@ -4609,14 +4686,14 @@ img {
   border-top: 2px solid var(--color-green);
 }
 
-.custom-container .message{
-    padding: 20px;
-    font-size: var(--fs-3);
-    text-align: center;
-    line-height: 1.5em;
-    font-weight: var(--weight-600);
-    color: var(--eerie-black);
-    animation: fadeAnimation 0.3s forwards;
+.custom-container .message {
+  padding: 20px;
+  font-size: var(--fs-3);
+  text-align: center;
+  line-height: 1.5em;
+  font-weight: var(--weight-600);
+  color: var(--eerie-black);
+  animation: fadeAnimation 0.3s forwards;
 }
 
 @keyframes fadeAnimation {
@@ -4633,7 +4710,6 @@ img {
   animation-duration: 1s;
   animation-fill-mode: forwards;
 }
-
 
 .circle,
 .circle-border {
@@ -4701,3 +4777,14 @@ img {
   left: 35%;
   transform: rotateZ(-50deg);
 }
+
+
+.form-popup-bg.is-visible .form-container #add-new-address .field-group{
+  display: flex;
+  gap: 30px;
+}
+
+.form-popup-bg.is-visible .form-container #add-new-address .field-group .form-group:last-child{
+  border: 1px solid red;
+}
+

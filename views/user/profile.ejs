@@ -27,9 +27,9 @@
                             <form username>
                                 <div class="form-group">
                                     <label for="username">Username</label>
-                                    <input type="text" name="username" username-field>
+                                    <input type="text" name="username" username-field disabled>
                                 </div>
-                                <button type="submit">Save</button>
+                                <button type="submit" style="display: none;">Save</button>
                             </form>
                         </div>
 
@@ -41,9 +41,9 @@
                             <form email>
                                 <div class="form-group">
                                     <label for="email">Email</label>
-                                    <input type="email" name="email" id="email-field">
+                                    <input type="email" name="email" id="email-field" disabled>
                                 </div>
-                                <button type="submit">Save</button>
+                                <button type="submit" style="display: none;">Save</button>
                             </form>
                         </div>
 
@@ -55,9 +55,9 @@
                             <form mobile>
                                 <div class="form-group">
                                     <label for="mobile">Mobile</label>
-                                    <input type="number" name="mobile" mobile-field>
+                                    <input type="number" name="mobile" mobile-field disabled>
                                 </div>
-                                <button type="submit">Save</button>
+                                <button type="submit" style="display: none;">Save</button>
                             </form>
 
                         </div>
@@ -113,7 +113,54 @@
                 }
             })
         }
+
         getProfile()
+
+        const editButtonOne = document.querySelector("button[editOne]");
+        const saveButtonOne = document.querySelector("form[username] button[type='submit']");
+
+        const editButtonTwo = document.querySelector("button[editTwo]");
+        const saveButtonTwo = document.querySelector("form[email] button[type='submit']");
+
+        const editButtonThree = document.querySelector("button[editThree]");
+        const saveButtonThree = document.querySelector("form[mobile] button[type='submit']");
+
+        function toggleEditMode(editButton, saveButton, inputField) {
+            editButton.style.display = "none";
+            saveButton.style.display = "block";
+            inputField.disabled = false;
+        }
+
+        function toggleViewMode(editButton, saveButton, inputField) {
+            saveButton.style.display = "none";
+            editButton.style.display = "block";
+            inputField.disabled = true;
+        }
+
+        editButtonOne.addEventListener("click", function () {
+            toggleEditMode(editButtonOne, saveButtonOne, usernameField);
+        });
+
+        saveButtonOne.addEventListener("click", function () {
+            toggleViewMode(editButtonOne, saveButtonOne, usernameField);
+        });
+
+        editButtonTwo.addEventListener("click", function () {
+            toggleEditMode(editButtonTwo, saveButtonTwo, emailField);
+        });
+
+        saveButtonTwo.addEventListener("click", function () {
+            toggleViewMode(editButtonTwo, saveButtonTwo, emailField);
+        });
+
+        editButtonThree.addEventListener("click", function () {
+            toggleEditMode(editButtonThree, saveButtonThree, mobileField);
+        });
+
+        saveButtonThree.addEventListener("click", function () {
+            toggleViewMode(editButtonThree, saveButtonThree, mobileField);
+        });
+
 
 
         username.addEventListener('submit', (e) => {
@@ -126,13 +173,10 @@
                 },
                 success: function (response) {
                     getProfile()
+                    showToast();
+                    setToastMessage("Success", "Username updated Successfully.");
                 }
             })
-        })
-
-        usernameEdit.addEventListener('click', () => {
-            alert("sdf")
-
         })
 
         email.addEventListener('submit', (e) => {
@@ -141,17 +185,19 @@
                 type: "PUT",
                 url: "/api/v1/user/profile/email",
                 data: {
-                    email: emailField.value 
+                    email: emailField.value
                 },
                 success: function (response) {
                     getProfile()
+                    showToast();
+                    setToastMessage("Success", "Email updated Successfully.");
+                },
+                error:function (error){
+                    showToast();
+                    setToastMessage("Fail", error.responseJSON.message);
+                    console.log(error)
                 }
             })
-        })
-
-        emailEdit.addEventListener('click', () => {
-            alert("sdf")
-
         })
 
         mobile.addEventListener('submit', (e) => {
@@ -160,18 +206,16 @@
                 type: "PUT",
                 url: "/api/v1/user/profile/email",
                 data: {
-                    mobile: mobileField.value 
+                    mobile: mobileField.value
                 },
                 success: function (response) {
                     getProfile()
+                    showToast();
+                    setToastMessage("Success", "Mobile updated Successfully.");
                 }
             })
         })
 
-        mobileEdit.addEventListener('click', () => {
-            alert("sdf")
-
-        })
 
     </script>
 

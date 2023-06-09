@@ -91,16 +91,16 @@ Week 3 Project Updations
 [✔] - add product UI
 [] - Home page
 [✗] - guest user experience
-[✗] - order success and order details page 
-[✗] - profile 
-[] - $ and ₹
+[✔] - order success and order details page 
+[✔] - profile 
+[✔] - $ and ₹
 [] 
 [✔] + search, filter, sort, pagination
 [✔] + Coupon management
 [✔] + Online payment
 [✔] + Banner management
-[] + Fix broken UI and use dynamic data
-[] Complete the updates with next week task
+[✔] + Fix broken UI and use dynamic data
+[✔] Complete the updates with next week task
 
 [✔] Integrate payment methods Razorpay, Paypal.
 [] Image Zooming, Image Cropping
@@ -110,6 +110,45 @@ Week 3 Project Updations
 
 Theory:6
 Workout:6
+
+
+Week 4 Updations
+----------------
+
+"Updations:
+-[]Transaction id needed
+-[]Order list ui updates
+-[]Order history
+-[]Product saving not showing any message
+-[]Toaster message missing
+-[]Inform stock is out or not
+-[]Add new address ui
+-[]Dialog message needed for success
+-[]Address not adding properly
+-[]Redirection after payment failure not working
+-[]Keep transaction id
+-[]Dependency injection
+-[]Coupon code -ve discount amount
+
+
+Features
+-----
+
+User side :
+[]Invoice download
+[]Offer module(product offer, category offer,Referal offer).
+
+Admin side :
+[]Admin Dashboard - Chart with filter(yearly,monthly etc.)
+[]Sales Report - Pdf and excel download(with order summary)
+
+
+Score-
+Theory-5.5
+Practical-6
+
+
+"
 
 
 

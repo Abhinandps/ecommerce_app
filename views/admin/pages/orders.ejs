@@ -56,16 +56,20 @@
                             <p class="card-description"> You can change the <code>status</code> of orders
                             </p>
 
+                           <div class="row">
+
+                            <div class="col-lg-6">
+                                <h2>Filters:</h2>
                             <div class="filters">
                                
-                                <h2>Filters:</h2>
-                                <div class="filter-item">
+                                <div class="filter-item ">
                                     <label for="order-id">Order ID:</label>
-                                    <input type="text" id="order-id" placeholder="Enter Order ID...">
+                                    <input type="text" id="order-id" class="form-control " placeholder="Enter Order ID...">
                                   </div>
-                                <div class="filter-item">
+                                  
+                                <div class="filter-item ">
                                   <label for="order-status">Order Status:</label>
-                                  <select id="order-status">
+                                  <select id="order-status" class="form-control ">
                                     <option value="">All</option>
                                     <option value="pending">Pending</option>
                                     <option value="confirmed">Confirmed</option>
@@ -76,7 +80,7 @@
                                 </div>
                                 <div class="filter-item">
                                     <label for="payment-method">Payment Method:</label>
-                                    <select id="payment-method">
+                                    <select id="payment-method" class="form-control ">
                                       <option value="">All</option>
                                       <option value="card">Credit Card</option>
                                       <option value="upi">UPI</option>
@@ -85,27 +89,32 @@
                                   </div>
                                 <div class="filter-item">
                                   <label for="date-range">Date Range:</label>
-                                  <input type="date" id="start-date">
-                                  <input type="date" id="end-date">
+                                  <input type="date" id="start-date" class="form-control ">
+                                  <input type="date" id="end-date" class="form-control ">
                                 </div>
                               
-                                <button id="apply-filters">Apply Filters</button>
-                                <button id="apply-filters" onclick="location.assign('/orders')" >Restore</button>
+                                <button id="apply-filters" class="btn btn-info">Apply Filters</button>
+                                <button id="apply-filters" class="btn btn-secondary" onclick="location.assign('/orders')" >Restore</button>
                               </div>
-                              
-                              <div class="sort-options">
+                            </div>
+                            
+                            <div class="col-lg-6">
                                 <h2>Sort By:</h2>
-                                <select id="sort-by">
-                                  <option value="updatedAt">Order Date</option>
-                                  <option value="totalPrice">Total Amount</option>
-                                  <option value="status">Order Status</option>
-                                </select>
-                                <select id="sort-order">
-                                  <option value="desc">High to Low</option>
-                                  <option value="asc">Low to High</option>
-                                </select>
-                                <button id="apply-sort">Apply Sort</button>
-                              </div>
+                                <div class="sort-options mt-3">
+                                    <select id="sort-by" class="form-control my-3">
+                                      <option value="updatedAt">Order Date</option>
+                                      <option value="totalPrice">Total Amount</option>
+                                      <option value="status">Order Status</option>
+                                    </select>
+                                    <select id="sort-order" class="form-control ">
+                                      <option value="desc">High to Low</option>
+                                      <option value="asc">Low to High</option>
+                                    </select>
+                                    <button id="apply-sort" class="btn btn-info">Apply Sort</button>
+                                  </div>
+                            </div>
+                            
+                           </div>
                               
                               
 

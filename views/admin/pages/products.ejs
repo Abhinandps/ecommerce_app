@@ -203,9 +203,9 @@
 
                                 <h2>Filters:</h2>
 
-                                <div class="filter-item">
+                                <!-- <div class="filter-item">
                                     <label for="category">Choose Category:</label>
-                                    <select id="category">
+                                    <select id="category"> -->
 
                                         <!-- <option value="">All</option>
                                         <option value="pending">Pending</option>
@@ -214,12 +214,12 @@
                                         <option value="delivered">Delivered</option>
                                         <option value="cancelled">Canceled</option> -->
 
-                                    </select>
-                                </div>
+                                    <!-- </select>
+                                </div> -->
 
                                 <div class="filter-item">
                                     <label for="price-range">Price Range:</label>
-                                    <select id="price-range">
+                                    <select id="price-range" class="form-control w-25">
                                         <option value="">All</option>
                                         <option value="0-500">&#8377;0 - &#8377;500</option>
                                         <option value="500-1000">&#8377;500 - &#8377;1000</option>
@@ -229,22 +229,22 @@
                                     </select>
 
                                 </div>
-                                <button id="find-filter">Apply Filter</button>
-                                <button id="restore-filter" onclick="location.assign('/products')">Restore</button>
+                                <button id="find-filter" class="btn btn-info mt-2 mb-3">Apply Filter</button>
+                                <button id="restore-filter"  class="btn btn-secondary mt-2 mb-3" onclick="location.assign('/products')">Restore</button>
 
                             </div>
 
-                            <div class="sort-options">
+                            <div class="sort-options d-flex ">
                                 <h2>Sort By:</h2>
-                                <select id="sort-by">
+                                <select id="sort-by" class="form-control w-25 mx-3">
                                     <option value="stock">Stocks</option>
                                     <option value="price">Price</option>
                                 </select>
-                                <select id="sort-product">
+                                <select id="sort-product" class="form-control w-25 mr-3">
                                     <option value="desc">High to Low</option>
                                     <option value="asc">Low to High</option>
                                 </select>
-                                <button id="find-sort">Apply Sort</button>
+                                <button id="find-sort" class="btn btn-info">Apply Sort</button>
                             </div>
 
                             <div class="table-responsive">
