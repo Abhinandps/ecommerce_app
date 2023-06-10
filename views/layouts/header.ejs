@@ -187,8 +187,22 @@
             <i class="fas fa-solid fa-check check"></i>
 
             <div class="message">
-                <span class="text text-1" id="toast-text-1"></span>
-                <span class="text text-2" id="toast-text-2"></span>
+                <span class="text text-1"></span>
+                <span class="text text-2"></span>
+            </div>
+        </div>
+        <i class="fa-solid fa-xmark close" onclick="closeToast()"></i>
+
+        <div class="progress"></div>
+    </div>
+
+    <div class="mobiletoast" id="mobiletoast">
+        <div class="toast-content">
+            <i class="fas fa-solid fa-check check"></i>
+
+            <div class="message">
+                <span class="text text-1"></span>
+                <span class="text text-2"></span>
             </div>
         </div>
         <i class="fa-solid fa-xmark close" onclick="closeToast()"></i>
@@ -201,7 +215,9 @@
     <script>
         function showToast() {
             const toast = document.getElementById("toast");
+            const mobileToast = document.getElementById("mobiletoast");
             toast.classList.add("active");
+            mobileToast.classList.add("active")
 
             setTimeout(() => {
                 closeToast();
@@ -210,16 +226,29 @@
 
         function closeToast() {
             const toast = document.getElementById("toast");
-            toast.classList.remove("active");
+            const mobileToast = document.getElementById("mobiletoast");
+
+            toast.classList.remove("active")
+            mobileToast.classList.remove("active")
+
         }
 
         // Optional: Customize the toast message
         function setToastMessage(text1, text2) {
-            const toastText1 = document.getElementById("toast-text-1");
-            const toastText2 = document.getElementById("toast-text-2");
+            const toastText1 = document.querySelectorAll(".text.text-1");
+            const toastText2 = document.querySelectorAll(".text.text-2");
+            
 
-            toastText1.textContent = text1;
-            toastText2.textContent = text2;
+            toastText1.forEach((text1Span) => {
+                text1Span.textContent = text1;
+            });
+
+            toastText2.forEach((text2Span) => {
+                text2Span.textContent = text2;
+            });
+
+            
+            
         }
 
 
@@ -446,15 +475,8 @@
             </div>
 
             <ul class="mobile-menu-category-list">
-
                 <li class="menu-category">
-                    <a href="#" class="menu-title">Login</a>
-                </li>
-                <li class="menu-category">
-                    <a href="#" class="menu-title">Home</a>
-                </li>
-                <li class="menu-category">
-                    <a href="#" class="menu-title">Home</a>
+                    <a href="/" class="menu-title">Home</a>
                 </li>
 
                 <li class="menu-category">
@@ -590,7 +612,10 @@
                 </li>
 
                 <li class="menu-category">
-                    <a href="#" class="menu-title">Blog</a>
+                    <a href="/shop" class="menu-title">Shops</a>
+                </li>
+                <li class="menu-category">
+                    <a href="/myorders" class="menu-title">Orders</a>
                 </li>
 
                 <li class="menu-category">
@@ -977,7 +1002,7 @@
         var desktopAvatar = document.querySelector('[data-menu-user-action]')
         const desktopDropdown = document.querySelector("[profile-dropDown]")
 
-        desktopAvatar.addEventListener('click',(event)=>{
+        desktopAvatar.addEventListener('click', (event) => {
             desktopDropdown.classList.toggle('close');
         })
 

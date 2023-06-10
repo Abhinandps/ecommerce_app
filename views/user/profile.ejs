@@ -1,6 +1,6 @@
 <%- include ('../layouts/header.ejs') %>
 
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
     <main>
 
@@ -8,16 +8,119 @@
       - PRODUCT
     -->
 
+        <style>
+            .avatar-upload {
+                position: relative;
+            }
+
+            .profile-pic {
+                width: 100px;
+                max-height: 100px;
+            }
+
+            .file-upload {
+                display: none;
+            }
+
+            .circle {
+                border-radius: 100% !important;
+                overflow: hidden;
+                width: 100px;
+                height: 100px;
+                border: 1px solid var(--cultured);
+            }
+
+
+
+            .p-image {
+                cursor: pointer;
+                position: absolute;
+                top: 70px;
+                z-index: 1;
+                left: 81px;
+                font-size: var(--fs-8);
+                color: var(--onyx);
+                transition: all .3s cubic-bezier(.175, .885, .32, 1.275);
+            }
+
+            .p-image:hover {
+                transition: all .3s cubic-bezier(.175, .885, .32, 1.275);
+            }
+
+            .upload-button {
+                font-size: 1.2em;
+            }
+
+            .upload-button:hover {
+                transition: all .3s cubic-bezier(.175, .885, .32, 1.275);
+                color: #999;
+            }
+
+            .avatar-name {
+                padding: 10px 0;
+                font-size: var(--fs-3);
+                font-weight: var(--weight-600);
+                color: var(--onyx);
+                text-transform: capitalize;
+            }
+        </style>
+
+        <script>
+            $(document).ready(function () {
+
+
+                var readURL = function (input) {
+                    if (input.files && input.files[0]) {
+                        var reader = new FileReader();
+
+                        reader.onload = function (e) {
+                            $('.profile-pic').attr('src', e.target.result);
+                        }
+
+                        reader.readAsDataURL(input.files[0]);
+                    }
+                }
+
+
+                $(".file-upload").on('change', function () {
+                    readURL(this);
+                });
+
+                $(".upload-button").on('click', function () {
+                    $(".file-upload").click();
+                });
+            });
+        </script>
+
         <div class="product-container">
 
             <div class="container">
 
                 <div class="grid-container">
-                    <div class="grid-item">
-                        h'ello abhinand
-                        <!-- <form enctype="multipart/form-data">
-                            <input type="file" avatar>
-                        </form> -->
+                    <div class="grid-item top-left">
+
+
+                        <div class="avatar-upload">
+                            <div class="small-12 medium-2 large-2 columns">
+
+                                <div class="circle">
+                                    <img class="profile-pic"
+                                        src="https://t3.ftcdn.net/jpg/03/46/83/96/360_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg">
+                                </div>
+
+                                <div class="p-image">
+                                    <i class="fa fa-camera upload-button"></i>
+                                    <input class="file-upload" type="file" accept="image/*" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="avatar-name">
+                            <p>h'ello abhinand</p>
+                        </div>
+
+
+
                     </div>
                     <div class="grid-item center">
                         <div class="input-group">
@@ -65,7 +168,7 @@
 
 
                     </div>
-                    <div class="grid-item ">myorders</div>
+                    <div class="grid-item bottom-left">myorders</div>
                 </div>
 
             </div>
@@ -192,7 +295,7 @@
                     showToast();
                     setToastMessage("Success", "Email updated Successfully.");
                 },
-                error:function (error){
+                error: function (error) {
                     showToast();
                     setToastMessage("Fail", error.responseJSON.message);
                     console.log(error)
