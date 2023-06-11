@@ -16,7 +16,9 @@ const bestSellers = () => {
       success: function (res) {
         const products = res.data.bestSellers;
         products.forEach((product) => {
-          const firstImage = product.image.map((image) => image.split("public")[1])[0];
+          const firstImage = product.image.map(
+            (image) => image.split("public")[1]
+          )[0];
           const item = `
                 <div class="showcase">
 
@@ -40,7 +42,7 @@ const bestSellers = () => {
                       </div>
 
                       <div class="price-box">
-                          <del>₹${product.price+299}</del>
+                          <del>₹${product.price + 299}</del>
                           <p class="price">₹${product.price}</p>
                       </div>
 
@@ -56,7 +58,6 @@ const bestSellers = () => {
 };
 
 bestSellers();
-
 
 const getCategories = () => {
   $.ajax({
@@ -651,7 +652,7 @@ const getPaymentDetails = () => {
       const cart = response.cart;
       totalPayable.textContent = cart.totalPrice + shippingHandlingFee;
       updateCartTotal(cart.totalPrice);
-      console.log(cart.totalPrice);
+      // console.log(cart.totalPrice);
 
       placeOrderButton.addEventListener("click", async () => {
         const selectedPaymentOption = $(
@@ -690,11 +691,14 @@ const getPaymentDetails = () => {
     console.log(response);
     try {
       const totalPrice = response.totalPrice + shippingHandlingFee;
-      const axiosResponse = await axios.post("/api/v1/user/cart/purchase", {
-        shippingAddress: addressId,
-        paymentMethod: selectedPaymentOption,
-        totalPrice,
-      });
+      const axiosResponse = await axios.post(
+        "/api/v1/user/cart/initialPayment",
+        {
+          shippingAddress: addressId,
+          paymentMethod: selectedPaymentOption,
+          totalPrice,
+        }
+      );
 
       if (selectedPaymentOption === "cod") {
         const popUp = document.querySelector(".order-success-popup");
@@ -721,23 +725,42 @@ const getPaymentDetails = () => {
           name: "Anon Stores",
           description: "Payment for Purchase",
           order_id: orderID,
-          handler: function (response) {
-            console.log(response);
-            const popUp = document.querySelector(".order-success-popup");
+          handler: async function (response) {
+            if (response.razorpay_payment_id) {
+              const axiosResponse = await axios.post(
+                "/api/v1/user/cart/placeOrder",
+                {
+                  orderID,
+                  shippingAddress: addressId,
+                  paymentMethod: selectedPaymentOption,
+                  totalPrice,
+                }
+              );
+              // console.log(axiosResponse);
+               const popUp = document.querySelector(".order-success-popup");
             const container = document.querySelector(".container.wrapper");
             popUp.style.display = "block";
 
             container.classList.add("bg-blur");
 
+            const overlay = document.querySelector(".overlay")
+            overlay.style.opacity = "1"
             setTimeout(function () {
+              container.classList.remove("overlay");
               container.classList.remove("bg-blur");
               window.location.href = "/myorders";
-            }, 3000);
+              overlay.style.opacity = "0"
+            }, 4000);
+            } 
+           
           },
           prefill: {
             email: "user@example.com",
             contact: "9876543210",
           },
+          notes: {
+            webhookUrl: "/api/v1/user/cart/razorpayWebhook" 
+          }
         };
 
         const razorpayInstance = new Razorpay(options);
@@ -751,5 +774,3 @@ const getPaymentDetails = () => {
 };
 
 // getOrders function included in order.ejs
-
-

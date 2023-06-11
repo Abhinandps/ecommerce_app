@@ -45,50 +45,41 @@ exports.toprated = catchAsync(async (req, res) => {
   res.json(topRatedProducts);
 });
 
-
-
-
 exports.bestSellers = catchAsync(async (req, res) => {
-    const salesReport = await SalesReport.find()
-    const salesData = salesReport[0].salesData
+  const salesReport = await SalesReport.find();
+  const salesData = salesReport[0].salesData;
 
+  // Create an object to store the total sales for each product
+  const productSales = {};
 
-    // Create an object to store the total sales for each product
-    const productSales = {};
+  // Iterate over the sales data to calculate the total sales for each product
+  salesData.forEach((sale) => {
+    const { topSellingProduct, totalSales } = sale;
+    if (topSellingProduct in productSales) {
+      productSales[topSellingProduct] += totalSales;
+    } else {
+      productSales[topSellingProduct] = totalSales;
+    }
+  });
 
-    // Iterate over the sales data to calculate the total sales for each product
-    salesData.forEach((sale) => {
-      const { topSellingProduct, totalSales } = sale;
-      if (topSellingProduct in productSales) {
-        productSales[topSellingProduct] += totalSales;
-      } else {
-        productSales[topSellingProduct] = totalSales;
-      }
-    });
+  // Sort the products based on their total sales in descending order
+  const sortedProducts = Object.keys(productSales).sort(
+    (a, b) => productSales[b] - productSales[a]
+  );
 
-    // Sort the products based on their total sales in descending order
-    const sortedProducts = Object.keys(productSales).sort(
-      (a, b) => productSales[b] - productSales[a]
-    );
+  // Limit the result to the top 5 best-selling products
+  const topSellers = sortedProducts.slice(0, 4);
 
-    // Limit the result to the top 5 best-selling products
-    const topSellers = sortedProducts.slice(0, 4);
+  // Retrieve the details of the top-selling products from product database
+  const topSellerProducts = await Product.find({ _id: { $in: topSellers } });
 
-    // Retrieve the details of the top-selling products from product database
-    const topSellerProducts = await Product.find({ _id: { $in: topSellers } });
-
-    res.status(200).json({
-      status: 'success',
-      data: {
-        bestSellers: topSellerProducts,
-      },
-    });
+  res.status(200).json({
+    status: "success",
+    data: {
+      bestSellers: topSellerProducts,
+    },
+  });
 });
-
-
-
-
-
 
 exports.getAllProducts = catchAsync(async (req, res) => {
   const products = await Product.find({ deleted: false }).populate("category"); // Populate category field with full category document
@@ -341,14 +332,10 @@ exports.removeCoupon = catchAsync(async (req, res) => {
   }
 });
 
-// purchase
+// initialPayment [ COD ] or razorpay orderID generate
 
-exports.purchaseItem = catchAsync(async (req, res, next) => {
+exports.initialPayment = catchAsync(async (req, res, next) => {
   const { shippingAddress, paymentMethod, totalPrice } = req.body;
-
-  console.log(shippingAddress);
-
-  // Retrieve the user
 
   const user = await User.findById(req.user._id);
   if (!user) {
@@ -431,14 +418,13 @@ exports.purchaseItem = catchAsync(async (req, res, next) => {
     if (coupon) {
       coupon.claimedBy.push(req.user._id);
       await coupon.save();
-      // return next(new AppError("Coupon not found", 400));
     }
 
     // Clear the cart after the purchase
     cart.items = [];
     await cart.save();
 
-    res.status(200).json({ message: "Purchase successful." });
+    res.status(200).json({ message: "Order Placed Successfully" });
   } else if (paymentMethod === "upi") {
     // Set up Razorpay instance
     const razorpay = new Razorpay({
@@ -451,40 +437,73 @@ exports.purchaseItem = catchAsync(async (req, res, next) => {
       amount: totalPrice * 100,
       currency: "INR",
       receipt: orderID,
+      payment_capture: 1,
     });
+
+    console.log(razorpayOrder);
 
     // Retrieve the Razorpay order ID
     const razorpayOrderID = razorpayOrder.id;
-
-    // Create a new order with Razorpay order ID
-    const order = new Order({
-      orderID: orderID,
-      user: user._id,
-      items: cart.items,
-      shippingAddress,
-      paymentMethod,
-      totalPrice,
-      razorpayOrderID: razorpayOrderID,
-    });
-
-    await order.save();
-
-    // Store the user ID in the usedBy array
-    const coupon = await Coupon.findOne({ usedBy: req.user._id });
-    if (coupon) {
-      coupon.claimedBy.push(req.user._id);
-      await coupon.save();
-    }
-
-    // Clear the cart after the purchase
-    cart.items = [];
-    await cart.save();
 
     // Return the Razorpay order ID to the frontend
     res.status(200).json({ orderID: razorpayOrderID });
   } else {
     return next(new AppError("Invalid payment method", 400));
   }
+});
+
+exports.razorpayWebhook = catchAsync(async (req,res,next) => {
+  const paymentStatus = req.body.event;
+  if (paymentStatus === 'payment.failed' || paymentStatus === 'payment.cancelled') {
+    return res.status(200).send('Payment failed or cancelled');
+  }
+
+  res.status(200).send('Payment successful');
+})
+
+// place an order with razorpay
+
+exports.placeOrder = catchAsync(async (req, res, next) => {
+  const { orderID, shippingAddress, paymentMethod, totalPrice } = req.body;
+  console.log(orderID, shippingAddress, paymentMethod, totalPrice )
+
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    return next(new AppError("User Not Found", 404));
+  }
+
+  // Retrieve the cart items
+  const cart = await Cart.findOne({ user: req.user._id });
+  if (!cart) {
+    return next(new AppError("Cart Not Found", 404));
+  }
+
+  // Create a new order with Razorpay order ID
+  const order = new Order({
+    orderID: orderID,
+    user: user._id,
+    items: cart.items,
+    shippingAddress,
+    paymentMethod,
+    totalPrice,
+    // razorpayOrderID: razorpayOrderID,
+  });
+
+  await order.save();
+
+  // Store the user ID in the usedBy array
+  const coupon = await Coupon.findOne({ usedBy: req.user._id });
+  if (coupon) {
+    coupon.claimedBy.push(req.user._id);
+    await coupon.save();
+  }
+
+  // Clear the cart after the purchase
+  cart.items = [];
+  await cart.save();
+
+  // Return the Razorpay order ID to the frontend
+  res.status(200).json({ message: "Order Placed Successfully" });
 });
 
 // Orders

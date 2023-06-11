@@ -14,7 +14,7 @@ const {
   removeCartItem,
   getCartItemsCount,
   saveShippingAddress,
-  purchaseItem,
+  placeOrder,
   orderCancel,
   orderHistory,
   getOrderDetails,
@@ -30,7 +30,9 @@ const {
   newArrivals,
   trending,
   toprated,
-  bestSellers
+  bestSellers,
+  initialPayment,
+  razorpayWebhook
 } = require("../Controllers/userController");
 
 const upload = require("../utils/multerConfig");
@@ -81,7 +83,11 @@ router.get("/cart/items/count", isAuthenticate, getCartItemsCount);
 
 router.post("/address", isAuthenticate, saveShippingAddress);
 
-router.post("/cart/purchase", isAuthenticate, purchaseItem);
+router.post("/cart/initialPayment", isAuthenticate, initialPayment);
+
+router.post("/cart/razorpayWebhook", isAuthenticate, razorpayWebhook);
+
+router.post("/cart/placeOrder", isAuthenticate, placeOrder);
 
 // Coupons
 
