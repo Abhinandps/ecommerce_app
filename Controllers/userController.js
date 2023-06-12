@@ -1,3 +1,4 @@
+const fs = require("fs");
 const Product = require("../Models/products");
 const Cart = require("../Models/Cart");
 const catchAsync = require("../utils/catchAsync");
@@ -12,6 +13,7 @@ const Order = require("../Models/orders");
 const Coupon = require("../Models/coupen");
 const Banner = require("../Models/banner");
 const SalesReport = require("../Models/salesReport");
+const { generateInvoice } = require("../utils/generateInvoice");
 
 const generateOrderID = () => {
   const date = new Date();
@@ -452,20 +454,23 @@ exports.initialPayment = catchAsync(async (req, res, next) => {
   }
 });
 
-exports.razorpayWebhook = catchAsync(async (req,res,next) => {
+exports.razorpayWebhook = catchAsync(async (req, res, next) => {
   const paymentStatus = req.body.event;
-  if (paymentStatus === 'payment.failed' || paymentStatus === 'payment.cancelled') {
-    return res.status(200).send('Payment failed or cancelled');
+  if (
+    paymentStatus === "payment.failed" ||
+    paymentStatus === "payment.cancelled"
+  ) {
+    return res.status(200).send("Payment failed or cancelled");
   }
 
-  res.status(200).send('Payment successful');
-})
+  res.status(200).send("Payment successful");
+});
 
 // place an order with razorpay
 
 exports.placeOrder = catchAsync(async (req, res, next) => {
   const { orderID, shippingAddress, paymentMethod, totalPrice } = req.body;
-  console.log(orderID, shippingAddress, paymentMethod, totalPrice )
+  console.log(orderID, shippingAddress, paymentMethod, totalPrice);
 
   const user = await User.findById(req.user._id);
   if (!user) {
@@ -549,6 +554,28 @@ exports.orderCancel = catchAsync(async (req, res, next) => {
   if (order.status === "cancelled") {
     return next(new AppError("Order is cancelled", 400));
   }
+});
+
+// invoice
+
+function generateInvoiceNumber() {
+  const timestamp = Date.now().toString().substr(-6);
+  const random = Math.floor(Math.random() * 10000)
+    .toString()
+    .padStart(4, "0");
+  const invoiceNumber = `${timestamp}-${random}`;
+  return invoiceNumber;
+}
+
+exports.downloadInvoice = catchAsync(async (req, res, next) => {
+  const order = await Order.findOne({ orderID: req.params.orderId });
+
+  if (!order.invoiceNumber) {
+    const invoiceNumber = generateInvoiceNumber();
+    order.invoiceNumber = invoiceNumber;
+    await order.save();
+  }
+  generateInvoice(order, req, res);
 });
 
 // Banners

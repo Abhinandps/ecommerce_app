@@ -18,6 +18,7 @@ const {
   orderCancel,
   orderHistory,
   getOrderDetails,
+  downloadInvoice,
   getAllCoupons,
   applyCoupon,
   removeCoupon,
@@ -100,6 +101,8 @@ router.delete("/coupons/remove", isAuthenticate, removeCoupon);
 // Orders
 
 router.get("/orders", isAuthenticate, orderHistory);
+
+router.get("/orders/:orderId/invoice", isAuthenticate, downloadInvoice)
 
 router
   .route("/orders/:orderID")

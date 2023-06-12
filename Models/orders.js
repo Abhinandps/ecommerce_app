@@ -43,7 +43,7 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    razorpayOrderID: {
+    invoiceNumber: {
       type: String,
       unique: true,
     },

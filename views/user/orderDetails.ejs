@@ -123,7 +123,7 @@
                 <p payment_bank>
                   Banking ICICI
                 </p>
-                <button invoice>Invoice</button>
+                <button onClick="downloadInvoice('${order.orderID}')">Invoice</button>
               </div>
 
               <div class="cancel_order">
@@ -232,6 +232,30 @@
             });
         }
 
+        async function downloadInvoice(orderID) {
+            try {
+                // Make a request to download the invoice PDF
+                const response = await axios.get(`/api/v1/user/orders/${orderID}/invoice/`, {
+                    responseType: 'blob',
+                });
+
+                // Create a download link
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `invoice-${orderID}.pdf`);
+
+                // Trigger the download
+                document.body.appendChild(link);
+                link.click();
+
+                // Clean up the object URL
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Failed to download invoice:', error);
+                // Handle the error appropriately
+            }
+        }
 
 
 
