@@ -5,7 +5,7 @@ const salesReportSchema = new mongoose.Schema({
   salesData: [
     {
       month: String,
-      totalSales: Number,
+      totalSales: {type:Number,default:0},
       topSellingProduct: String,
       revenue: Number,
     },

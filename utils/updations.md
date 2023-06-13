@@ -125,9 +125,9 @@ Updations:
 -[]Inform stock is out or not
 -[]Add new address ui
 -[]Dialog message needed for success
--[]Address not adding properly
+-[✔]Address not adding properly
 -[]Redirection after payment failure not working
--[]Keep transaction id
+-[✔]Keep transaction id
 -[]Dependency injection
 -[]Coupon code -ve discount amount
 
@@ -136,7 +136,7 @@ Features
 -----
 
 User side :
-[]Invoice download
+[✔]Invoice download
 []Offer module(product offer, category offer,Referral offer).
 
 Admin side :

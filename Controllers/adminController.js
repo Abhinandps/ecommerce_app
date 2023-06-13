@@ -14,6 +14,155 @@ const SalesReport = require("../Models/salesReport");
 
 // Dashboard Start
 
+// exports.getSalesReportData = catchAsync(async (req, res, next) => {
+//   const existingSalesReport = await SalesReport.findOne();
+
+//   if (!existingSalesReport) {
+//     const initialSalesReport = new SalesReport({
+//       year: new Date().getFullYear(),
+//       salesData: [],
+//     });
+
+//     await initialSalesReport.save();
+//   }
+
+//   const orders = await Order.find({status:"delivered"});
+
+//   if (!orders) {
+//     return next(new AppError("Order not found", 404));
+//   }
+
+//   // Loop through the orders and update the sales report
+//   orders.forEach(async (order) => {
+
+//     const year = new Date(order.createdAt).getFullYear();
+//     const month = new Date(order.createdAt).toLocaleString("default", {
+//       month: "long",
+//     });
+//     const totalSales = order.totalPrice;
+//     const product = order.items[0].product.toString();
+//     const revenue = totalSales;
+
+//     const salesReport = await SalesReport.findOne({ year });
+
+//     if (salesReport) {
+//       // Update the sales report for the given month
+//       const salesData = salesReport.salesData;
+//       const existingMonthData = salesData.find((data) => data.month === month);
+
+//       if (existingMonthData) {
+//         // existingMonthData.totalSales += totalSales;
+//       } else {
+//         salesData.push({
+//           month,
+//           totalSales,
+//           topSellingProduct: product,
+//           revenue,
+//         });
+//       }
+
+//       // Save the updated sales report
+//       await salesReport.save();
+//     } else {
+//       // Create a new sales report for the given year
+//       const newSalesReport = new SalesReport({
+//         year,
+//         salesData: [
+//           {
+//             month,
+//             totalSales,
+//             topSellingProduct: product,
+//             revenue,
+//           },
+//         ],
+//       });
+
+//       // Save the new sales report
+//       const createdReport = await newSalesReport.save();
+//       console.log("Sales report created:", createdReport);
+//     }
+//   });
+
+//   // Retrieve the sales report data after updating
+//   const salesReports = await SalesReport.find();
+
+//   res.status(200).json({ status: "success", data: salesReports });
+// });
+
+// exports.getSalesReportData = catchAsync(async (req, res, next) => {
+//   const existingSalesReport = await SalesReport.findOne();
+
+//   if (!existingSalesReport) {
+//     const initialSalesReport = new SalesReport({
+//       year: new Date().getFullYear(),
+//       salesData: [],
+//     });
+
+//     await initialSalesReport.save();
+//   }
+
+//   const orders = await Order.find({status:"delivered"});
+
+//   if (!orders) {
+//     return next(new AppError("Order not found", 404));
+//   }
+
+//   // Loop through the orders and update the sales report
+//   orders.forEach(async (order) => {
+
+//     const year = new Date(order.createdAt).getFullYear();
+//     const month = new Date(order.createdAt).toLocaleString("default", {
+//       month: "long",
+//     });
+//     const totalSales = order.totalPrice;
+//     const product = order.items[0].product.toString();
+//     const revenue = totalSales;
+
+//     const salesReport = await SalesReport.findOne({ year });
+
+//     if (salesReport) {
+//       // Update the sales report for the given month
+//       const salesData = salesReport.salesData;
+//       const existingMonthData = salesData.find((data) => data.month === month);
+
+//       if (existingMonthData) {
+//         // existingMonthData.totalSales += totalSales;
+//       } else {
+//         salesData.push({
+//           month,
+//           totalSales,
+//           topSellingProduct: product,
+//           revenue,
+//         });
+//       }
+
+//       // Save the updated sales report
+//       await salesReport.save();
+//     } else {
+//       // Create a new sales report for the given year
+//       const newSalesReport = new SalesReport({
+//         year,
+//         salesData: [
+//           {
+//             month,
+//             totalSales,
+//             topSellingProduct: product,
+//             revenue,
+//           },
+//         ],
+//       });
+
+//       // Save the new sales report
+//       const createdReport = await newSalesReport.save();
+//       console.log("Sales report created:", createdReport);
+//     }
+//   });
+
+//   // Retrieve the sales report data after updating
+//   const salesReports = await SalesReport.find();
+
+//   res.status(200).json({ status: "success", data: salesReports });
+// });
 
 exports.getSalesReportData = catchAsync(async (req, res, next) => {
   const existingSalesReport = await SalesReport.findOne();
@@ -27,111 +176,152 @@ exports.getSalesReportData = catchAsync(async (req, res, next) => {
     await initialSalesReport.save();
   }
 
-  const orders = await Order.find();
+  const orders = await Order.find({ status: "delivered" });
+
   if (!orders) {
     return next(new AppError("Order not found", 404));
   }
 
-  // Loop through the orders and update the sales report
-  orders.forEach(async (order) => {
+  // console.log(orders.length);
+
+
+  // Aggregate sales data from all orders
+  const aggregatedData = orders.reduce((data, order,index) => {
+
+    console.log(index)
+
     const year = new Date(order.createdAt).getFullYear();
     const month = new Date(order.createdAt).toLocaleString("default", {
       month: "long",
     });
+
     const totalSales = order.totalPrice;
-    const product = order.items[0].product.toString();
+
+
+    
+
+    const productsQuantity = {};
+
+    for (const item of order.items) {
+      const { product, quantity } = item;
+        if (productsQuantity.hasOwnProperty(product)) {
+          productsQuantity[product] += quantity;
+        } else {
+          productsQuantity[product] = quantity;
+        }
+    }
+
+console.log(productsQuantity)
+  
+
+    let highestQuantity = 0;
+    let highestQuantityProduct = null;
+
+    for (const [product, quantity] of Object.entries(productsQuantity)) {
+      if (quantity > highestQuantity) {
+        highestQuantity = quantity;
+        highestQuantityProduct = product.toString();
+      }
+    }
+
+ 
+    // const product = highestQuantityProduct.toString();
+    // console.log(highestQuantity)
+
     const revenue = totalSales;
 
-    const salesReport = await SalesReport.findOne({ year });
+    const existingMonthData = data.find(
+      (entry) => entry.year === year && entry.month === month
+    );
 
-    if (salesReport) {
-      // Update the sales report for the given month
-      const salesData = salesReport.salesData;
-      const existingMonthData = salesData.find((data) => data.month === month);
-
-      if (existingMonthData) {
-        // existingMonthData.totalSales += totalSales;
-      } else {
-        salesData.push({
-          month,
-          totalSales,
-          topSellingProduct: product,
-          revenue,
-        });
+    if (existingMonthData) {
+      existingMonthData.totalSales += totalSales;
+      existingMonthData.revenue += totalSales;
+      if (highestQuantity > existingMonthData.highestQuantity) {
+        existingMonthData.topSellingProduct = highestQuantityProduct;
       }
-
-      // Save the updated sales report
-      await salesReport.save();
     } else {
-      // Create a new sales report for the given year
-      const newSalesReport = new SalesReport({
+      data.push({
         year,
-        salesData: [
-          {
-            month,
-            totalSales,
-            topSellingProduct: product,
-            revenue,
-          },
-        ],
+        month,
+        totalSales,
+        topSellingProduct: highestQuantityProduct,
+        revenue,
       });
-
-      // Save the new sales report
-      const createdReport = await newSalesReport.save();
-      console.log("Sales report created:", createdReport);
     }
-  });
 
-  // Retrieve the sales report data after updating
-  const salesReports = await SalesReport.find();
+    return data;
+  }, []);
 
-  res.status(200).json({ status: "success", data: salesReports });
+
+
+  // Find the existing sales report
+  const salesReport = await SalesReport.findOne();
+
+  if (salesReport) {
+    // Update the sales report with the aggregated data
+    salesReport.salesData = aggregatedData;
+    await salesReport.save();
+  } else {
+    // Create a new sales report with the aggregated data
+    const newSalesReport = new SalesReport({
+      year: new Date().getFullYear(),
+      salesData: aggregatedData,
+    });
+    await newSalesReport.save();
+  }
+
+  // Retrieve the updated sales report data
+  const updatedSalesReport = await SalesReport.findOne();
+
+  res.status(200).json({ status: "success", data: updatedSalesReport });
 });
-
 
 exports.getSalesGraphData = catchAsync(async (req, res, next) => {
   const currentYear = new Date().getFullYear();
 
   const graphData = await SalesReport.aggregate([
-  { $match: { year: currentYear } },
-  // Unwind the salesData
-  { $unwind: "$salesData" },
-  // Group by month and product
-  {
-    $group: {
-      _id: { month: "$salesData.month", product: "$salesData.topSellingProduct" },
-      totalSales: { $sum: "$salesData.totalSales" },
-      count: { $sum: 1 }
+    { $match: { year: currentYear } },
+    // Unwind the salesData
+    { $unwind: "$salesData" },
+    // Group by month and product
+    {
+      $group: {
+        _id: {
+          month: "$salesData.month",
+          product: "$salesData.topSellingProduct",
+        },
+        totalSales: { $sum: "$salesData.totalSales" },
+        count: { $sum: 1 },
+      },
     },
-  },
-  // Group by month and accumulate product statistics
-  {
-    $group: {
-      _id: "$_id.month",
-      totalSales: { $sum: "$totalSales" },
-      topSellingProduct: {
-        $push: {
-          product: "$_id.product",
-          count: "$count"
-        }
-      }
+    // Group by month and accumulate product statistics
+    {
+      $group: {
+        _id: "$_id.month",
+        totalSales: { $sum: "$totalSales" },
+        topSellingProduct: {
+          $push: {
+            product: "$_id.product",
+            count: "$count",
+          },
+        },
+      },
     },
-  },
-  // Project the desired fields and sort by month
-  {
-    $project: {
-      _id: 0,
-      month: "$_id",
-      totalSales: 1,
-      topSellingProduct: 1,
+    // Project the desired fields and sort by month
+    {
+      $project: {
+        _id: 0,
+        month: "$_id",
+        totalSales: 1,
+        topSellingProduct: 1,
+      },
     },
-  },
-  { $sort: { month: 1 } },
-]);
+    { $sort: { month: 1 } },
+  ]);
 
   res.status(200).json({ status: "success", data: graphData });
 });
-
 
 // Dashboard End
 
