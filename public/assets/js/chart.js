@@ -4,133 +4,116 @@ $(function () {
    * Data and config for chartjs
    */
   "use strict";
-
-  $.ajax({
-    type: "GET",
-    url: "/api/v1/admin/sales/graph/report",
-    success: async function (response) {
-      const labels = response.data.map((data) => data.month);
-      const sales = response.data.map((data) => data.totalSales);
-
-      var data = {
-        labels: labels,
-        datasets: [
-          {
-            label: " Total Sales ",
-            data: sales,
-            backgroundColor: [
-              "rgba(255, 99, 132, 0.2)",
-              "rgba(54, 162, 235, 0.2)",
-              "rgba(255, 206, 86, 0.2)",
-              "rgba(75, 192, 192, 0.2)",
-              "rgba(153, 102, 255, 0.2)",
-              "rgba(255, 159, 64, 0.2)",
-            ],
-            borderColor: [
-              "rgba(255,99,132,1)",
-              "rgba(54, 162, 235, 1)",
-              "rgba(255, 206, 86, 1)",
-              "rgba(75, 192, 192, 1)",
-              "rgba(153, 102, 255, 1)",
-              "rgba(255, 159, 64, 1)",
-            ],
-            borderWidth: 1,
-            fill: false,
-          },
-        ],
-      };
-
-      if ($("#barChart").length) {
-        var barChartCanvas = $("#barChart").get(0).getContext("2d");
-        // This will get the first returned node in the jQuery collection.
-        var barChart = new Chart(barChartCanvas, {
-          type: "bar",
-          data: data,
-          options: options,
-        });
-      }
-
-      const highestCountProducts = response.data.map((entry) => {
-        const sortedProducts = entry.topSellingProduct.sort(
-          (a, b) => b.count - a.count
-        );
-
-        return {
-          month: entry.month,
-          topSellingProduct: sortedProducts[0],
-        };
-      });
-
-      console.log(highestCountProducts);
-
-      const productNames = await Promise.all(
-        highestCountProducts.map(async (entry) => {
-          try {
-            const res = await new Promise((resolve, reject) => {
-              $.ajax({
-                type: "GET",
-                url: `/api/v1/admin/product/${entry.topSellingProduct.product}`,
-                success: resolve,
-                error: reject,
+  $(document).ready(function () {
+    let responseData;
+  
+    function handleFilterChange() {
+      const filterSelect = document.getElementById("filter");
+      const selectedFilter = filterSelect.value;
+  
+      $.ajax({
+        url: `/api/v1/admin/sales/graph/report?filter=${selectedFilter}`,
+        method: "GET",
+        success: function (data) {
+          responseData = data.data;
+          console.log(responseData);
+  
+          if (responseData) {
+            var data = {
+              labels:responseData.sales.labels ,
+              datasets: [
+                {
+                  label: "Total Sales ",
+                  data: responseData.sales.data,
+                  backgroundColor: [
+                    "rgba(255, 99, 132, 0.2)",
+                    "rgba(54, 162, 235, 0.2)",
+                    "rgba(255, 206, 86, 0.2)",
+                    "rgba(75, 192, 192, 0.2)",
+                    "rgba(153, 102, 255, 0.2)",
+                    "rgba(255, 159, 64, 0.2)",
+                  ],
+                  borderColor: [
+                    "rgba(255,99,132,1)",
+                    "rgba(54, 162, 235, 1)",
+                    "rgba(255, 206, 86, 1)",
+                    "rgba(75, 192, 192, 1)",
+                    "rgba(153, 102, 255, 1)",
+                    "rgba(255, 159, 64, 1)",
+                  ],
+                  borderWidth: 1,
+                  fill: false,
+                },
+              ],
+            };
+  
+            var doughnutPieData = {
+              datasets: [
+                {
+                  data: responseData.products.data,
+                  backgroundColor: [
+                    "rgba(255, 99, 132, 0.5)",
+                    "rgba(54, 162, 235, 0.5)",
+                    "rgba(255, 206, 86, 0.5)",
+                    "rgba(75, 192, 192, 0.5)",
+                    "rgba(153, 102, 255, 0.5)",
+                    "rgba(255, 159, 64, 0.5)",
+                  ],
+                  borderColor: [
+                    "rgba(255,99,132,1)",
+                    "rgba(54, 162, 235, 1)",
+                    "rgba(255, 206, 86, 1)",
+                    "rgba(75, 192, 192, 1)",
+                    "rgba(153, 102, 255, 1)",
+                    "rgba(255, 159, 64, 1)",
+                  ],
+                },
+              ],
+              labels: responseData.products.labels,
+            };
+  
+            var doughnutPieOptions = {
+              responsive: true,
+              animation: {
+                animateScale: true,
+                animateRotate: true,
+              },
+            };
+  
+            if ($("#barChart").length) {
+              var barChartCanvas = $("#barChart").get(0).getContext("2d");
+              var barChart = new Chart(barChartCanvas, {
+                type: "bar",
+                data: data,
+                options: options,
               });
-            });
-            return res.data.products.name;
-          } catch (error) {
-            console.error(error);
-            return null;
+            }
+  
+            if ($("#doughnutChart").length) {
+              var doughnutChartCanvas = $("#doughnutChart").get(0).getContext("2d");
+              var doughnutChart = new Chart(doughnutChartCanvas, {
+                type: "doughnut",
+                data: doughnutPieData,
+                options: doughnutPieOptions,
+              });
+            }
+          } else {
+            console.log("No response data available.");
           }
-        })
-      );
-
-      var doughnutPieData = {
-        datasets: [
-          {
-            data: highestCountProducts.map(
-              (entry) => entry.topSellingProduct.count
-            ),
-            backgroundColor: [
-              "rgba(255, 99, 132, 0.5)",
-              "rgba(54, 162, 235, 0.5)",
-              "rgba(255, 206, 86, 0.5)",
-              "rgba(75, 192, 192, 0.5)",
-              "rgba(153, 102, 255, 0.5)",
-              "rgba(255, 159, 64, 0.5)",
-            ],
-            borderColor: [
-              "rgba(255,99,132,1)",
-              "rgba(54, 162, 235, 1)",
-              "rgba(255, 206, 86, 1)",
-              "rgba(75, 192, 192, 1)",
-              "rgba(153, 102, 255, 1)",
-              "rgba(255, 159, 64, 1)",
-            ],
-          },
-        ],
-
-        labels: productNames.map((productName, index) => {
-        const entry = highestCountProducts[index];
-        return productName ? `${entry.month} - ${productName}` : "";
-      }),
-    };
-
-      var doughnutPieOptions = {
-        responsive: true,
-        animation: {
-          animateScale: true,
-          animateRotate: true,
         },
-      };
-
-      if ($("#doughnutChart").length) {
-        var doughnutChartCanvas = $("#doughnutChart").get(0).getContext("2d");
-        var doughnutChart = new Chart(doughnutChartCanvas, {
-          type: "doughnut",
-          data: doughnutPieData,
-          options: doughnutPieOptions,
-        });
-      }
-    },
+        error: function (error) {
+          console.error(error);
+        },
+      });
+    }
+  
+    handleFilterChange(); // Trigger the initial API call based on the default selected option
+  
+    $("#filter").on("change", function () {
+      handleFilterChange();
+    });
   });
+  
 
   var multiLineData = {
     labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
@@ -385,86 +368,69 @@ $(function () {
       ],
     },
   };
+
   // Get context with jQuery - using jQuery's .get() method.
-  if ($("#barChart").length) {
-    var barChartCanvas = $("#barChart").get(0).getContext("2d");
-    // This will get the first returned node in the jQuery collection.
-    var barChart = new Chart(barChartCanvas, {
-      type: "bar",
-      data: data,
-      options: options,
-    });
-  }
 
-  if ($("#lineChart").length) {
-    var lineChartCanvas = $("#lineChart").get(0).getContext("2d");
-    var lineChart = new Chart(lineChartCanvas, {
-      type: "line",
-      data: data,
-      options: options,
-    });
-  }
+  // if ($("#lineChart").length) {
+  //   var lineChartCanvas = $("#lineChart").get(0).getContext("2d");
+  //   var lineChart = new Chart(lineChartCanvas, {
+  //     type: "line",
+  //     data: data,
+  //     options: options,
+  //   });
+  // }
 
-  if ($("#linechart-multi").length) {
-    var multiLineCanvas = $("#linechart-multi").get(0).getContext("2d");
-    var lineChart = new Chart(multiLineCanvas, {
-      type: "line",
-      data: multiLineData,
-      options: options,
-    });
-  }
+  // if ($("#linechart-multi").length) {
+  //   var multiLineCanvas = $("#linechart-multi").get(0).getContext("2d");
+  //   var lineChart = new Chart(multiLineCanvas, {
+  //     type: "line",
+  //     data: multiLineData,
+  //     options: options,
+  //   });
+  // }
 
-  if ($("#areachart-multi").length) {
-    var multiAreaCanvas = $("#areachart-multi").get(0).getContext("2d");
-    var multiAreaChart = new Chart(multiAreaCanvas, {
-      type: "line",
-      data: multiAreaData,
-      options: multiAreaOptions,
-    });
-  }
+  // if ($("#areachart-multi").length) {
+  //   var multiAreaCanvas = $("#areachart-multi").get(0).getContext("2d");
+  //   var multiAreaChart = new Chart(multiAreaCanvas, {
+  //     type: "line",
+  //     data: multiAreaData,
+  //     options: multiAreaOptions,
+  //   });
+  // }
 
-  if ($("#doughnutChart").length) {
-    var doughnutChartCanvas = $("#doughnutChart").get(0).getContext("2d");
-    var doughnutChart = new Chart(doughnutChartCanvas, {
-      type: "doughnut",
-      data: doughnutPieData,
-      options: doughnutPieOptions,
-    });
-  }
+  // if ($("#pieChart").length) {
+  //   var pieChartCanvas = $("#pieChart").get(0).getContext("2d");
+  //   var pieChart = new Chart(pieChartCanvas, {
+  //     type: "pie",
+  //     data: doughnutPieData,
+  //     options: doughnutPieOptions,
+  //   });
+  // }
 
-  if ($("#pieChart").length) {
-    var pieChartCanvas = $("#pieChart").get(0).getContext("2d");
-    var pieChart = new Chart(pieChartCanvas, {
-      type: "pie",
-      data: doughnutPieData,
-      options: doughnutPieOptions,
-    });
-  }
+  // if ($("#areaChart").length) {
+  //   var areaChartCanvas = $("#areaChart").get(0).getContext("2d");
+  //   var areaChart = new Chart(areaChartCanvas, {
+  //     type: "line",
+  //     data: areaData,
+  //     options: areaOptions,
+  //   });
+  // }
 
-  if ($("#areaChart").length) {
-    var areaChartCanvas = $("#areaChart").get(0).getContext("2d");
-    var areaChart = new Chart(areaChartCanvas, {
-      type: "line",
-      data: areaData,
-      options: areaOptions,
-    });
-  }
+  // if ($("#scatterChart").length) {
+  //   var scatterChartCanvas = $("#scatterChart").get(0).getContext("2d");
+  //   var scatterChart = new Chart(scatterChartCanvas, {
+  //     type: "scatter",
+  //     data: scatterChartData,
+  //     options: scatterChartOptions,
+  //   });
+  // }
 
-  if ($("#scatterChart").length) {
-    var scatterChartCanvas = $("#scatterChart").get(0).getContext("2d");
-    var scatterChart = new Chart(scatterChartCanvas, {
-      type: "scatter",
-      data: scatterChartData,
-      options: scatterChartOptions,
-    });
-  }
-
-  if ($("#browserTrafficChart").length) {
-    var doughnutChartCanvas = $("#browserTrafficChart").get(0).getContext("2d");
-    var doughnutChart = new Chart(doughnutChartCanvas, {
-      type: "doughnut",
-      data: browserTrafficData,
-      options: doughnutPieOptions,
-    });
-  }
+  // if ($("#browserTrafficChart").length) {
+  //   var doughnutChartCanvas = $("#browserTrafficChart").get(0).getContext("2d");
+  //   var doughnutChart = new Chart(doughnutChartCanvas, {
+  //     type: "doughnut",
+  //     data: browserTrafficData,
+  //     options: doughnutPieOptions,
+  //   });
+  // }
 });

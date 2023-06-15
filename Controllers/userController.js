@@ -47,6 +47,7 @@ exports.toprated = catchAsync(async (req, res) => {
   res.json(topRatedProducts);
 });
 
+
 exports.bestSellers = catchAsync(async (req, res) => {
   const salesReport = await SalesReport.find();
   const salesData = salesReport[0].salesData;
@@ -82,6 +83,9 @@ exports.bestSellers = catchAsync(async (req, res) => {
     },
   });
 });
+
+
+
 
 exports.getAllProducts = catchAsync(async (req, res) => {
   const products = await Product.find({ deleted: false }).populate("category"); // Populate category field with full category document

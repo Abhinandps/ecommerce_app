@@ -164,164 +164,651 @@ const SalesReport = require("../Models/salesReport");
 //   res.status(200).json({ status: "success", data: salesReports });
 // });
 
-exports.getSalesReportData = catchAsync(async (req, res, next) => {
-  const existingSalesReport = await SalesReport.findOne();
+// try
 
-  if (!existingSalesReport) {
-    const initialSalesReport = new SalesReport({
-      year: new Date().getFullYear(),
-      salesData: [],
-    });
+// exports.getSalesReportData = catchAsync(async (req, res, next) => {
+//   const existingSalesReport = await SalesReport.findOne();
 
-    await initialSalesReport.save();
-  }
+//   if (!existingSalesReport) {
+//     const initialSalesReport = new SalesReport({
+//       year: new Date().getFullYear(),
+//       salesData: [],
+//     });
 
-  const orders = await Order.find({ status: "delivered" });
+//     await initialSalesReport.save();
+//   }
 
-  if (!orders) {
-    return next(new AppError("Order not found", 404));
-  }
+//   const orders = await Order.find({ status: "delivered" });
 
-  // console.log(orders.length);
+//   if (!orders) {
+//     return next(new AppError("Order not found", 404));
+//   }
 
+//   // Get all unique years from the orders
+//   const uniqueYears = [
+//     ...new Set(orders.map((order) => new Date(order.createdAt).getFullYear())),
+//   ];
 
-  // Aggregate sales data from all orders
-  const aggregatedData = orders.reduce((data, order,index) => {
+//   // Iterate over each unique year
+//   for (const year of uniqueYears) {
 
-    console.log(index)
+//     // Filter orders for the current year
+//     const ordersOfYear = orders.filter(
+//       (order) => new Date(order.createdAt).getFullYear() === year
+//     );
 
-    const year = new Date(order.createdAt).getFullYear();
-    const month = new Date(order.createdAt).toLocaleString("default", {
-      month: "long",
-    });
+//     console.log(ordersOfYear)
+//     console.log("---NEXT---")
 
-    const totalSales = order.totalPrice;
+//     // Aggregate sales data from all orders
+//     const aggregatedData = ordersOfYear.reduce((data, order, index) => {
+//       const year = new Date(order.createdAt).getFullYear();
+//       const month = new Date(order.createdAt).toLocaleString("default", {
+//         month: "long",
+//       });
 
+//       // console.log(year, month);
 
-    
+//       const totalSales = order.totalPrice;
 
-    const productsQuantity = {};
+//       const productsQuantity = {};
 
-    for (const item of order.items) {
-      const { product, quantity } = item;
-        if (productsQuantity.hasOwnProperty(product)) {
-          productsQuantity[product] += quantity;
-        } else {
-          productsQuantity[product] = quantity;
-        }
-    }
+//       for (const item of order.items) {
+//         const { product, quantity } = item;
+//         if (productsQuantity.hasOwnProperty(product)) {
+//           productsQuantity[product] += quantity;
+//         } else {
+//           productsQuantity[product] = quantity;
+//         }
+//       }
 
-console.log(productsQuantity)
-  
+//       // console.log(productsQuantity)
 
-    let highestQuantity = 0;
-    let highestQuantityProduct = null;
+//       let highestQuantity = 0;
+//       let highestQuantityProduct = null;
 
-    for (const [product, quantity] of Object.entries(productsQuantity)) {
-      if (quantity > highestQuantity) {
-        highestQuantity = quantity;
-        highestQuantityProduct = product.toString();
-      }
-    }
+//       for (const [product, quantity] of Object.entries(productsQuantity)) {
+//         if (quantity > highestQuantity) {
+//           highestQuantity = quantity;
+//           highestQuantityProduct = product.toString();
+//         }
+//       }
 
- 
-    // const product = highestQuantityProduct.toString();
-    // console.log(highestQuantity)
+//       // const product = highestQuantityProduct.toString();
+//       // console.log(highestQuantity)
 
-    const revenue = totalSales;
+//       const revenue = totalSales;
 
-    const existingMonthData = data.find(
-      (entry) => entry.year === year && entry.month === month
-    );
+//       const existingMonthData = data.find(
+//         (entry) => entry.year === year && entry.month === month
+//       );
 
-    if (existingMonthData) {
-      existingMonthData.totalSales += totalSales;
-      existingMonthData.revenue += totalSales;
-      if (highestQuantity > existingMonthData.highestQuantity) {
-        existingMonthData.topSellingProduct = highestQuantityProduct;
-      }
-    } else {
-      data.push({
-        year,
-        month,
-        totalSales,
-        topSellingProduct: highestQuantityProduct,
-        revenue,
-      });
-    }
+//       if (existingMonthData) {
+//         existingMonthData.totalSales += totalSales;
+//         existingMonthData.revenue += totalSales;
+//         if (highestQuantity > existingMonthData.highestQuantity) {
+//           existingMonthData.topSellingProduct = highestQuantityProduct;
+//         }
+//       } else {
+//         data.push({
+//           year,
+//           month,
+//           totalSales,
+//           topSellingProduct: highestQuantityProduct,
+//           revenue,
+//         });
+//       }
 
-    return data;
-  }, []);
+//       return data;
+//     }, []);
 
+//     // Find the existing sales report
+//     const salesReport = await SalesReport.findOne({ year });
 
+//     if (salesReport) {
+//       // Update the sales report with the aggregated data
+//       salesReport.salesData = aggregatedData;
+//       await salesReport.save();
+//     } else {
+//       // Create a new sales report with the aggregated data
+//       const newSalesReport = new SalesReport({
+//         year: new Date().getFullYear(),
+//         salesData: aggregatedData,
+//       });
+//       await newSalesReport.save();
+//     }
+//   }
 
-  // Find the existing sales report
-  const salesReport = await SalesReport.findOne();
+//   // Retrieve the updated sales report data
+//   const updatedSalesReport = await SalesReport.findOne();
 
-  if (salesReport) {
-    // Update the sales report with the aggregated data
-    salesReport.salesData = aggregatedData;
-    await salesReport.save();
-  } else {
-    // Create a new sales report with the aggregated data
-    const newSalesReport = new SalesReport({
-      year: new Date().getFullYear(),
-      salesData: aggregatedData,
-    });
-    await newSalesReport.save();
-  }
+//   res.status(200).json({ status: "success", data: updatedSalesReport });
+// });
 
-  // Retrieve the updated sales report data
-  const updatedSalesReport = await SalesReport.findOne();
+// exports.getSalesReportData = catchAsync(async (req, res, next) => {
+//   const existingSalesReport = await SalesReport.findOne();
 
-  res.status(200).json({ status: "success", data: updatedSalesReport });
-});
+//   if (!existingSalesReport) {
+//     const initialSalesReport = new SalesReport({
+//       year: new Date().getFullYear(),
+//       salesData: [],
+//     });
 
-exports.getSalesGraphData = catchAsync(async (req, res, next) => {
-  const currentYear = new Date().getFullYear();
+//     await initialSalesReport.save();
+//   }
 
-  const graphData = await SalesReport.aggregate([
-    { $match: { year: currentYear } },
-    // Unwind the salesData
-    { $unwind: "$salesData" },
-    // Group by month and product
-    {
-      $group: {
-        _id: {
-          month: "$salesData.month",
-          product: "$salesData.topSellingProduct",
-        },
-        totalSales: { $sum: "$salesData.totalSales" },
-        count: { $sum: 1 },
-      },
-    },
-    // Group by month and accumulate product statistics
-    {
-      $group: {
-        _id: "$_id.month",
-        totalSales: { $sum: "$totalSales" },
-        topSellingProduct: {
-          $push: {
-            product: "$_id.product",
-            count: "$count",
-          },
-        },
-      },
-    },
-    // Project the desired fields and sort by month
-    {
-      $project: {
-        _id: 0,
-        month: "$_id",
-        totalSales: 1,
-        topSellingProduct: 1,
-      },
-    },
-    { $sort: { month: 1 } },
-  ]);
+//   const orders = await Order.find({ status: "delivered" });
 
-  res.status(200).json({ status: "success", data: graphData });
-});
+//   if (!orders) {
+//     return next(new AppError("Order not found", 404));
+//   }
+
+//   // console.log(orders.length);
+
+//   // Aggregate sales data from all orders
+//   const aggregatedData = orders.reduce((data, order,index) => {
+
+//     const year = new Date(order.createdAt).getFullYear();
+//     const month = new Date(order.createdAt).toLocaleString("default", {
+//       month: "long",
+//     });
+
+//     console.log(year , month)
+
+//     const totalSales = order.totalPrice;
+
+//     const productsQuantity = {};
+
+//     for (const item of order.items) {
+//       const { product, quantity } = item;
+//         if (productsQuantity.hasOwnProperty(product)) {
+//           productsQuantity[product] += quantity;
+//         } else {
+//           productsQuantity[product] = quantity;
+//         }
+//     }
+
+// // console.log(productsQuantity)
+
+//     let highestQuantity = 0;
+//     let highestQuantityProduct = null;
+
+//     for (const [product, quantity] of Object.entries(productsQuantity)) {
+//       if (quantity > highestQuantity) {
+//         highestQuantity = quantity;
+//         highestQuantityProduct = product.toString();
+//       }
+//     }
+
+//     // const product = highestQuantityProduct.toString();
+//     // console.log(highestQuantity)
+
+//     const revenue = totalSales;
+
+//     const existingMonthData = data.find(
+//       (entry) => entry.year === year && entry.month === month
+//     );
+
+//     if (existingMonthData) {
+//       existingMonthData.totalSales += totalSales;
+//       existingMonthData.revenue += totalSales;
+//       if (highestQuantity > existingMonthData.highestQuantity) {
+//         existingMonthData.topSellingProduct = highestQuantityProduct;
+//       }
+//     } else {
+//       data.push({
+//         year,
+//         month,
+//         totalSales,
+//         topSellingProduct: highestQuantityProduct,
+//         revenue,
+//       });
+//     }
+
+//     return data;
+//   }, []);
+
+//   // Find the existing sales report
+//   const salesReport = await SalesReport.findOne();
+
+//   if (salesReport) {
+//     // Update the sales report with the aggregated data
+//     salesReport.salesData = aggregatedData;
+//     await salesReport.save();
+//   } else {
+//     // Create a new sales report with the aggregated data
+//     const newSalesReport = new SalesReport({
+//       year: new Date().getFullYear(),
+//       salesData: aggregatedData,
+//     });
+//     await newSalesReport.save();
+//   }
+
+//   // Retrieve the updated sales report data
+//   const updatedSalesReport = await SalesReport.findOne();
+
+//   res.status(200).json({ status: "success", data: updatedSalesReport });
+// });
+
+// optional
+// almost working one
+// exports.getSalesReportData = catchAsync(async (req, res, next) => {
+//   const orders = await Order.find({ status: "delivered" });
+
+//   if (!orders || orders.length === 0) {
+//     return next(new AppError("No delivered orders found", 404));
+//   }
+
+//   // Get all unique years from the orders
+//   const uniqueYears = [
+//     ...new Set(orders.map((order) => new Date(order.createdAt).getFullYear())),
+//   ];
+
+//   // Iterate over each unique year
+//   for (const year of uniqueYears) {
+//     // console.log(year);
+//     // Filter orders for the current year
+//     const ordersOfYear = orders.filter(
+//       (order) => new Date(order.createdAt).getFullYear() === year
+//     );
+//     const productsQuantity = {};
+
+//     // Aggregate sales data from all orders
+//     const aggregatedData = ordersOfYear.reduce((data, order, index) => {
+//       const month = new Date(order.createdAt).toLocaleString("default", {
+//         month: "long",
+//       });
+
+//       const totalSales = order.totalPrice;
+
+//       for (const item of order.items) {
+//         const { product, quantity } = item;
+
+//         if (productsQuantity.hasOwnProperty(product)) {
+//           productsQuantity[product] += quantity;
+//         } else {
+//           productsQuantity[product] = quantity;
+//         }
+//       }
+
+//       let highestQuantity = 0;
+//       let highestQuantityProduct = null;
+
+//       const promises = [];
+
+//       for (const [product, quantity] of Object.entries(productsQuantity)) {
+//         const promise = Product.findById({ _id: product })
+//           .exec()
+//           .then((singleProduct) => {
+//             const totalSales = quantity;
+//             if (quantity > highestQuantity) {
+//               highestQuantity = quantity;
+//               highestQuantityProduct = {
+//                 _id: singleProduct._id.toString(),
+//                 name: singleProduct.name,
+//                 totalSales,
+//               };
+//             } else if (
+//               highestQuantityProduct &&
+//               highestQuantityProduct._id === singleProduct._id.toString()
+//             ) {
+//               highestQuantityProduct.totalSales += quantity;
+//             }
+//           })
+//           .catch((error) => {
+//             console.error(error);
+//           });
+//         promises.push(promise);
+//       }
+
+//       Promise.all(promises)
+//         .then(() => {
+//           console.log(highestQuantityProduct, highestQuantity);
+//           const revenue = totalSales;
+
+//           const existingMonthData = data.find(
+//             (entry) => entry.year === year && entry.month === month
+//           );
+
+//           if (existingMonthData) {
+//             existingMonthData.totalSales += totalSales;
+//             existingMonthData.revenue += totalSales;
+//             if (highestQuantity > existingMonthData.highestQuantity) {
+//               existingMonthData.topSellingProduct = highestQuantityProduct;
+//             }
+//           } else {
+//             data.push({
+//               year,
+//               month,
+//               totalSales,
+//               topSellingProduct: highestQuantityProduct,
+//               revenue,
+//             });
+//           }
+//         })
+//         .catch((error) => {
+//           console.error(error);
+//         });
+//       return data;
+//     }, []);
+
+//     //  Update the totalSales in productsQuantity
+//     // for (const [product, quantity] of Object.entries(productsQuantity)) {
+//     //   const matchingData = aggregatedData.find(
+//     //     (data) => data.topSellingProduct._id === product
+//     //   );
+//     //   if (matchingData) {
+//     //     matchingData.topSellingProduct.totalSales = quantity;
+//     //   }
+//     // }
+
+//     // Find the existing sales report for the current year
+//     const salesReport = await SalesReport.findOne({ year });
+
+//     if (salesReport) {
+//       // Update the sales report with the aggregated data
+//       salesReport.salesData = aggregatedData;
+//       await salesReport.save();
+//     } else {
+//       // Create a new sales report with the aggregated data for the current year
+//       const newSalesReport = new SalesReport({
+//         year,
+//         salesData: aggregatedData,
+//       });
+//       await newSalesReport.save();
+//     }
+//   }
+
+//   // Retrieve all sales reports
+//   const updatedSalesReports = await SalesReport.find();
+
+//   res.status(200).json({ status: "success", data: updatedSalesReports });
+// });
+
+// exports.getSalesGraphData = catchAsync(async (req, res, next) => {
+//   const salesReport = await SalesReport.findOne(); // Assuming you have a single sales report document
+
+//   let graphData = salesReport.salesData.map((data) => ({
+//     totalSales: data.totalSales,
+//     topSellingProduct: data.topSellingProduct,
+//     month: data.month,
+//   }));
+
+//   if (req.query.filter === "yearly") {
+//     const currentYear = new Date().getFullYear();
+//     graphData = graphData.filter((data) => data.month.includes(currentYear));
+//   } else if (req.query.filter === "monthly") {
+//     const currentMonth = new Date().toLocaleString('default', { month: 'long' });
+//     graphData = graphData.filter((data) => data.month === currentMonth);
+//   }
+
+//   res.status(200).json({ status: "success", data: graphData });
+// });
+
+// exports.getSalesGraphData = catchAsync(async (req, res, next) => {
+//   const { filter, year } = req.query;
+
+//   let salesReports;
+
+//   if (filter === "yearly") {
+//     // Retrieve all sales reports
+//     salesReports = await SalesReport.aggregate([
+//       {
+//         $unwind: "$salesData",
+//       },
+//       {
+//         $group: {
+//           _id: "$year",
+//           year: { $first: "$year" },
+//           totalSales: { $sum: "$salesData.totalSales" },
+//           revenue: { $sum: "$salesData.totalSales" },
+//           salesData: { $push: "$salesData" },
+//         },
+//       },
+//     ]);
+
+//     // Get the top-selling product for each year
+//     salesReports.forEach((report) => {
+//       const topSellingProduct = report.salesData.reduce(
+//         (prev, current) =>
+//           current.totalSales > prev.totalSales ? current : prev,
+//         { totalSales: 0 }
+//       ).topSellingProduct;
+
+//       report.topSellingProduct = topSellingProduct;
+//     });
+
+//   } else if (filter === "monthly") {
+//     // Filter sales reports based on the provided year
+//     salesReports = await SalesReport.aggregate([
+//       {
+//         $match: {
+//           year: parseInt(year),
+//         },
+//       },
+//       {
+//         $unwind: "$salesData",
+//       },
+//       {
+//         $project: {
+//           year: "$year",
+//           month: "$salesData.month",
+//           totalSales: "$salesData.totalSales",
+//           revenue: "$salesData.totalSales",
+//           topSellingProduct: "$salesData.topSellingProduct",
+//         },
+//       },
+//     ]);
+//   } else {
+//     // Invalid filter value
+//     return next(new AppError("Invalid filter", 400));
+//   }
+
+//   if (!salesReports || salesReports.length === 0) {
+//     return next(new AppError("Sales reports not found", 404));
+//   }
+
+//   res.status(200).json({
+//     status: "success",
+//     data: salesReports.map((report) => ({
+//       year: report.year,
+//       month: report.month,
+//       totalSales: report.totalSales,
+//       revenue: report.totalSales,
+//       topSellingProduct: report.topSellingProduct,
+//     })),
+//   });
+// });
+
+// exports.getSalesGraphData = catchAsync(async (req, res, next) => {
+//   const { filter, year, month } = req.query;
+
+//   console.log(req.query)
+
+//   let salesReports;
+
+//   if (filter === "yearly") {
+//     // Retrieve all sales reports
+//     salesReports = await SalesReport.aggregate([
+//       {
+//         $unwind: "$salesData",
+//       },
+//       {
+//         $group: {
+//           _id: "$year",
+//           year: { $first: "$year" },
+//           totalSales: { $sum: "$salesData.totalSales" },
+//           revenue: { $sum: "$salesData.totalSales" },
+//           salesData: { $push: "$salesData" },
+//         },
+//       },
+//     ]);
+
+//     // Get the top-selling product for the entire year
+//     salesReports.forEach((report) => {
+//       const topSellingProduct = report.salesData.reduce(
+//         (prev, current) =>
+//           current.totalSales > prev.totalSales ? current : prev,
+//         { totalSales: 0 }
+//       ).topSellingProduct;
+
+//       report.topSellingProduct = topSellingProduct;
+//     });
+//   } else if (filter === "specific-year") {
+//     // Filter sales reports based on the provided year
+//     salesReports = await SalesReport.aggregate([
+//       {
+//         $match: {
+//           year: parseInt(year),
+//         },
+//       },
+//       {
+//         $unwind: "$salesData",
+//       },
+//       {
+//         $project: {
+//           year: "$year",
+//           month: "$salesData.month",
+//           totalSales: "$salesData.totalSales",
+//           revenue: "$salesData.totalSales",
+//           topSellingProduct: "$salesData.topSellingProduct",
+//         },
+//       },
+//     ]);
+//   } else if (filter === "specific-month") {
+//     // Filter sales reports based on the provided year and month
+//     salesReports = await SalesReport.aggregate([
+//       {
+//         $match: {
+//           year: parseInt(year),
+//           "salesData.month": month,
+//         },
+//       },
+//       {
+//         $unwind: "$salesData",
+//       },
+//       {
+//         $project: {
+//           year: "$year",
+//           month: "$salesData.month",
+//           totalSales: "$salesData.totalSales",
+//           revenue: "$salesData.totalSales",
+//           topSellingProduct: "$salesData.topSellingProduct",
+//         },
+//       },
+//     ]);
+//   } else {
+//     // Invalid filter value
+//     return next(new AppError("Invalid filter", 400));
+//   }
+
+//   if (!salesReports || salesReports.length === 0) {
+//     return next(new AppError("Sales reports not found", 404));
+//   }
+
+//   res.status(200).json({
+//     status: "success",
+//     data: salesReports.map((report) => ({
+//       year: report.year,
+//       month: report.month,
+//       totalSales: report.totalSales,
+//       revenue: report.totalSales,
+//       topSellingProduct: report.topSellingProduct,
+//     })),
+//   });
+// });
+
+// exports.getSalesGraphData = catchAsync(async (req, res, next) => {
+//   const currentYear = new Date().getFullYear();
+
+//   const graphData = await SalesReport.aggregate([
+//     { $match: { year: currentYear } },
+//     // Unwind the salesData
+//     { $unwind: "$salesData" },
+//     // Group by month and product
+//     {
+//       $group: {
+//         _id: {
+//           month: "$salesData.month",
+//           product: "$salesData.topSellingProduct",
+//         },
+//         totalSales: { $sum: "$salesData.totalSales" },
+//         count: { $sum: 1 },
+//       },
+//     },
+//     // Group by month and accumulate product statistics
+//     {
+//       $group: {
+//         _id: "$_id.month",
+//         totalSales: { $sum: "$totalSales" },
+//         topSellingProduct: {
+//           $push: {
+//             product: "$_id.product",
+//             count: "$count",
+//           },
+//         },
+//       },
+//     },
+//     // Project the desired fields and sort by month
+//     {
+//       $project: {
+//         _id: 0,
+//         month: "$_id",
+//         totalSales: 1,
+//         topSellingProduct: 1,
+//       },
+//     },
+//     { $sort: { month: 1 } },
+//   ]);
+
+//   res.status(200).json({ status: "success", data: graphData });
+// });
+
+// exports.getSalesGraphData = catchAsync(async (req, res, next) => {
+//   const currentYear = new Date().getFullYear();
+
+//   const graphData = await SalesReport.aggregate([
+//     { $match: { year: currentYear } },
+//     // Unwind the salesData
+//     { $unwind: "$salesData" },
+//     // Group by month and product
+//     {
+//       $group: {
+//         _id: {
+//           month: "$salesData.month",
+//           product: "$salesData.topSellingProduct",
+//         },
+//         totalSales: { $sum: "$salesData.totalSales" },
+//         count: { $sum: 1 },
+//       },
+//     },
+//     // Group by month and accumulate product statistics
+//     {
+//       $group: {
+//         _id: "$_id.month",
+//         totalSales: { $sum: "$totalSales" },
+//         topSellingProduct: {
+//           $push: {
+//             product: "$_id.product",
+//             count: "$count",
+//           },
+//         },
+//       },
+//     },
+//     // Project the desired fields and sort by month
+//     {
+//       $project: {
+//         _id: 0,
+//         month: "$_id",
+//         totalSales: 1,
+//         topSellingProduct: 1,
+//       },
+//     },
+//     { $sort: { month: 1 } },
+//   ]);
+
+//   res.status(200).json({ status: "success", data: graphData });
+// });
 
 // Dashboard End
 
@@ -798,4 +1285,810 @@ exports.updateCategory = catchAsync(async (req, res, next) => {
   } else {
     return next(new AppError("Category not found", 404));
   }
+});
+
+// Try new Thing for bennter
+
+// exports.getSalesReportData = catchAsync(async (req, res, next) => {
+//   // const { year, filter, month, week } = req.query;
+//   const currentDate = new Date();
+//   const year = currentDate.getFullYear();
+//   const month = currentDate.getMonth() + 1;
+//   const week = Math.ceil((currentDate.getDate() - currentDate.getDay() + 1) / 7);
+//   const filter = "yearly"
+//   console.log(year, filter,month, week )
+
+//   let salesReport;
+
+//   if (filter === "yearly") {
+//     salesReport = await createSalesReport(Number(year), "yearly");
+//   } else if (filter === "monthly") {
+//     salesReport = await createSalesReport(Number(year),"monthly",Number(month));
+//   } else if (filter === "weekly") {
+//     salesReport = await createSalesReport(Number(year), "weekly", Number(week));
+//   } else {
+//     return res.status(400).json({ message: "Invalid filter" });
+//   }
+
+//   res.status(200).json({ data: salesReport });
+// });
+
+// async function createSalesReport(year, filter, week, month) {
+//   let startDate, endDate;
+
+//   if (filter === 'yearly') {
+//     startDate = new Date(year, 0, 1); // January 1st of the year
+//     endDate = new Date(year, 11, 31, 23, 59, 59); // December 31st of the year
+//   } else if (filter === 'monthly') {
+//     startDate = new Date(year, month - 1, 1); // First day of the given month
+//     endDate = new Date(year, month, 0, 23, 59, 59); // Last day of the given month
+//   } else if (filter === 'weekly') {
+//     startDate = getStartDateOfWeek(year, week);
+//     endDate = getEndDateOfWeek(year, week);
+//   }
+
+//   // Query the database for existing sales report document
+//   const existingReport = await SalesReport.findOne({
+//     year: year,
+//     filter: filter,
+//     week: week
+//   });
+
+//   if (existingReport) {
+//     // Update the existing sales report
+//     existingReport.startDate = startDate;
+//     existingReport.endDate = endDate;
+//     existingReport.totalSales = 0; // Reset total sales
+//     existingReport.topSellingProducts = []; // Reset top-selling products
+
+//     // Query the database for orders matching the conditions
+//     const orders = await Order.find({
+//       status: 'delivered',
+//       createdAt: { $gte: startDate, $lte: endDate }
+//     })
+//     .populate('items.product')
+//     .exec();
+
+//     // Calculate sales and top-selling product for each order
+//     for (const order of orders) {
+//       const totalSales = order.items.reduce((acc, item) => {
+//         const product = item.product;
+//         const quantity = item.quantity;
+//         const price = product.price;
+//         const sale = quantity * price;
+//         return acc + sale;
+//       }, 0);
+
+//       existingReport.totalSales += totalSales;
+
+//       for (const item of order.items) {
+//         const productId = item.product._id;
+//         const productName = item.product.name;
+//         const sale = item.quantity * item.product.price;
+
+//         const existingProduct = existingReport.topSellingProducts.find(p => p.productId === productId);
+//         if (existingProduct) {
+//           existingProduct.sales += sale;
+//         } else {
+//           existingReport.topSellingProducts.push({
+//             productId: productId,
+//             name: productName,
+//             sales: sale
+//           });
+//         }
+//       }
+//     }
+
+//     // Sort the top-selling products by sales in descending order
+//     existingReport.topSellingProducts.sort((a, b) => b.sales - a.sales);
+
+//     // Update the existing sales report in the database
+//     await existingReport.save();
+
+//     return existingReport;
+//   } else {
+//     // Create a new sales report document
+//     const salesReport = new SalesReport({
+//       year: year,
+//       filter: filter,
+//       week: week,
+//       startDate: startDate,
+//       endDate: endDate,
+//       totalSales: 0,
+//       topSellingProducts: []
+//     });
+
+//     // Query the database for orders matching the conditions
+//     const orders = await Order.find({
+//       status: 'delivered',
+//       createdAt: { $gte: startDate, $lte: endDate }
+//     })
+//     .populate('items.product')
+//     .exec();
+
+//     // Calculate sales and top-selling product for each order
+//     for (const order of orders) {
+//       const totalSales = order.items.reduce((acc, item) => {
+//         const product = item.product;
+//         const quantity = item.quantity;
+//         const price = product.price;
+//         const sale = quantity * price;
+//         return acc + sale;
+//       }, 0);
+
+//       salesReport.totalSales += totalSales;
+
+//       for (const item of order.items) {
+//         const productId = item.product._id;
+//         const productName = item.product.name;
+//         const sale = item.quantity * item.product.price;
+//         console.log(salesReport)
+
+//         // const existingProduct = salesReport.topSellingProducts.find(p => p.productId === productId);
+//       //   if (existingProduct) {
+//       //     existingProduct.sales += sale;
+//       //   } else {
+//       //     salesReport.topSellingProducts.push({
+//       //       productId: productId,
+//       //       name: productName,
+//       //       sales: sale
+//       //     });
+//       //   }
+//       }
+//     }
+
+//     // Sort the top-selling products by sales in descending order
+//     // salesReport.topSellingProducts.sort((a, b) => b.sales - a.sales);
+
+//     // Save the new sales report to the database
+//     await salesReport.save();
+
+//     return salesReport;
+//   }
+// }
+
+// try another
+
+exports.getSalesReportData = catchAsync(async (req, res, next) => {
+  const orders = await Order.find({
+    status: "delivered",
+  })
+    .populate("items.product")
+    .exec();
+
+  const salesReport = orders.map((order) => ({
+    orderID: order.orderID,
+    userID: order.user,
+    products: order.items.map((item) => ({
+      product: item.product,
+      quantity: item.quantity,
+    })),
+    totalPrice: order.totalPrice,
+    orderDate: order.createdAt,
+  }));
+
+  // // Generate sales report data based on the filtered timeframe
+  // // const filteredSalesReport = filterData(salesReport, "yearly");
+
+  // const salesByMonth = {};
+  // const salesByYear = {};
+  // const salesByWeek = {};
+
+  // salesReport.forEach((entry) => {
+  //   const year = entry.orderDate.getFullYear();
+  //   const month = entry.orderDate.getMonth();
+  //   // Sales by week
+  //   const week = getWeekNumber(entry.orderDate);
+
+  //   // Get the start and end dates of the week
+  //   const startDate = getWeekStartDate(entry.orderDate);
+  //   const endDate = getWeekEndDate(entry.orderDate);
+
+  //   const totalSales = entry.totalPrice;
+
+  //   entry.products.forEach((product) => {
+  //     const productID = product.product._id;
+  //     const quantity = product.quantity;
+  //     const saledPrice = entry.totalPrice / product.quantity;
+
+  //     // Sales by month
+  //     if (salesByMonth.hasOwnProperty(year)) {
+  //       if (salesByMonth[year].hasOwnProperty(month)) {
+  //         if (salesByMonth[year][month].hasOwnProperty(productID)) {
+  //           salesByMonth[year][month][productID].quantity += quantity;
+  //           salesByMonth[year][month][productID].totalSaledPrice +=
+  //             saledPrice * quantity;
+  //         } else {
+  //           salesByMonth[year][month][productID] = {
+  //             name: product.product.name,
+  //             quantity: quantity,
+  //             totalSaledPrice: saledPrice * quantity,
+  //           };
+  //         }
+  //         salesByMonth[year][month].totalSales += totalSales;
+  //       } else {
+  //         salesByMonth[year][month] = {
+  //           [productID]: {
+  //             name: product.product.name,
+  //             quantity: quantity,
+  //             totalSaledPrice: saledPrice * quantity,
+  //           },
+  //           totalSales: totalSales,
+  //         };
+  //       }
+  //     } else {
+  //       salesByMonth[year] = {
+  //         [month]: {
+  //           [productID]: {
+  //             name: product.product.name,
+  //             quantity: quantity,
+  //             totalSaledPrice: saledPrice * quantity,
+  //           },
+  //           totalSales: totalSales,
+  //         },
+  //       };
+  //     }
+
+  //     // Sales by year
+  //     if (salesByYear.hasOwnProperty(year)) {
+  //       if (salesByYear[year].hasOwnProperty(productID)) {
+  //         salesByYear[year][productID].quantity += quantity;
+  //         salesByYear[year][productID].totalSaledPrice += saledPrice * quantity;
+  //       } else {
+  //         salesByYear[year][productID] = {
+  //           name: product.product.name,
+  //           quantity: quantity,
+  //           totalSaledPrice: saledPrice * quantity,
+  //         };
+  //       }
+  //       salesByYear[year].totalSales += totalSales;
+  //     } else {
+  //       salesByYear[year] = {
+  //         [productID]: {
+  //           name: product.product.name,
+  //           quantity: quantity,
+  //           totalSaledPrice: saledPrice * quantity,
+  //         },
+  //         totalSales: totalSales,
+  //       };
+  //     }
+
+  //     // Sales by week
+  //     if (salesByWeek.hasOwnProperty(year)) {
+  //       if (salesByWeek[year].hasOwnProperty(week)) {
+  //         if (salesByWeek[year][week].hasOwnProperty(productID)) {
+  //           salesByWeek[year][week][productID].quantity += quantity;
+  //           salesByWeek[year][week][productID].totalSaledPrice +=
+  //             saledPrice * quantity;
+  //         } else {
+  //           salesByWeek[year][week][productID] = {
+  //             name: product.product.name,
+  //             quantity: quantity,
+  //             totalSaledPrice: saledPrice * quantity,
+  //           };
+  //         }
+  //         salesByWeek[year][week].totalSales += totalSales;
+  //       } else {
+  //         salesByWeek[year][week] = {
+  //           [productID]: {
+  //             name: product.product.name,
+  //             quantity: quantity,
+  //             totalSaledPrice: saledPrice * quantity,
+  //           },
+  //           totalSales: totalSales,
+  //           startDate: startDate,
+  //           endDate: endDate,
+  //         };
+  //       }
+  //     } else {
+  //       salesByWeek[year] = {
+  //         [week]: {
+  //           [productID]: {
+  //             name: product.product.name,
+  //             quantity: quantity,
+  //             totalSaledPrice: saledPrice * quantity,
+  //           },
+  //           totalSales: totalSales,
+  //           startDate: startDate,
+  //           endDate: endDate,
+  //         },
+  //       };
+  //     }
+  //   });
+  // });
+
+  // function getMonthName(monthNumber) {
+  //   const monthNames = [
+  //     "January",
+  //     "February",
+  //     "March",
+  //     "April",
+  //     "May",
+  //     "June",
+  //     "July",
+  //     "August",
+  //     "September",
+  //     "October",
+  //     "November",
+  //     "December",
+  //   ];
+  //   return monthNames[monthNumber];
+  // }
+
+  // function getWeekNumber(date) {
+  //   const yearStart = new Date(date.getFullYear(), 0, 1);
+  //   const weekNumber = Math.ceil(
+  //     ((date - yearStart) / 86400000 + yearStart.getDay() + 1) / 7
+  //   );
+  //   return weekNumber;
+  // }
+
+  // // Function to get the start date of the week
+  // function getWeekStartDate(date) {
+  //   const weekStart = new Date(date);
+  //   weekStart.setDate(date.getDate() - date.getDay() + 1); // Set to the first day (Monday) of the week
+  //   return weekStart.toISOString().slice(0, 10); // Format as "YYYY-MM-DD"
+  // }
+
+  // // Function to get the end date of the week
+  // function getWeekEndDate(date) {
+  //   const weekEnd = new Date(date);
+  //   weekEnd.setDate(date.getDate() - date.getDay() + 7); // Set to the last day (Sunday) of the week
+  //   return weekEnd.toISOString().slice(0, 10); // Format as "YYYY-MM-DD"
+  // }
+
+  // // Prepare sales report data for the chart
+  // const salesChartDataByMonth = Object.keys(salesByMonth).map((year) => ({
+  //   year: year,
+  //   salesByMonth: Object.keys(salesByMonth[year]).map((month) => ({
+  //     month: getMonthName(parseInt(month)),
+  //     topProduct:
+  //       salesByMonth[year][month][
+  //         Object.keys(salesByMonth[year][month]).reduce((a, b) =>
+  //           salesByMonth[year][month][a].totalSaledPrice >
+  //           salesByMonth[year][month][b].totalSaledPrice
+  //             ? a
+  //             : b
+  //         )
+  //       ],
+  //     totalSales: salesByMonth[year][month].totalSales,
+  //   })),
+  // }));
+
+  // const salesChartDataByYear = Object.keys(salesByYear).map((year) => ({
+  //   year: year,
+  //   topProduct:
+  //     salesByYear[year][
+  //       Object.keys(salesByYear[year]).reduce((a, b) =>
+  //         salesByYear[year][a].totalSaledPrice >
+  //         salesByYear[year][b].totalSaledPrice
+  //           ? a
+  //           : b
+  //       )
+  //     ],
+  //   totalSales: salesByYear[year].totalSales,
+  // }));
+
+  // const salesChartDataByWeek = Object.keys(salesByWeek).map((year) => ({
+  //   year: year,
+  //   salesByWeek: Object.keys(salesByWeek[year]).map((week) => ({
+  //     week: week,
+  //     startDate: salesByWeek[year][week].startDate,
+  //     endDate: salesByWeek[year][week].endDate,
+  //     topProduct:
+  //       salesByWeek[year][week][
+  //         Object.keys(salesByWeek[year][week]).reduce((a, b) =>
+  //           salesByWeek[year][week][a].totalSaledPrice >
+  //           salesByWeek[year][week][b].totalSaledPrice
+  //             ? a
+  //             : b
+  //         )
+  //       ],
+  //     totalSales: salesByWeek[year][week].totalSales,
+  //   })),
+  // }));
+
+  res.json({
+    status: "success",
+    result: salesReport.length,
+    data: salesReport,
+  });
+});
+
+// function filterData(salesData, timeframe) {
+//   const currentDate = new Date();
+//   let filteredData = [];
+
+//   switch (timeframe) {
+//     case "yearly":
+//       // Get the past 5 years to the current year
+//       for (let i = 0; i < 5; i++) {
+//         const year = currentDate.getFullYear() - i;
+//         filteredData.push(year.toString());
+//       }
+//       break;
+
+//     case "monthly":
+//       // Get the months of the current year
+//       const currentYear = currentDate.getFullYear();
+//       const currentMonth = currentDate.getMonth();
+//       const months = [];
+//       for (let i = 0; i <= currentMonth; i++) {
+//         months.push(
+//           new Date(currentYear, i).toLocaleString("default", { month: "long" })
+//         );
+//       }
+//       filteredData = months;
+//       break;
+
+//     case "weekly":
+//       // Get the current week (considering each week starts on Monday)
+//       const currentWeekStart = new Date(
+//         currentDate.setDate(currentDate.getDate() - currentDate.getDay() + 1)
+//       );
+//       const currentWeekEnd = new Date(
+//         currentDate.setDate(currentDate.getDate() + 6)
+//       );
+//       const daysOfWeek = [
+//         "Sunday",
+//         "Monday",
+//         "Tuesday",
+//         "Wednesday",
+//         "Thursday",
+//         "Friday",
+//         "Saturday",
+//       ];
+//       filteredData = daysOfWeek.slice(
+//         currentWeekStart.getDay(),
+//         currentWeekEnd.getDay() + 1
+//       );
+//       break;
+
+//     default:
+//       filteredData = [];
+//       break;
+//   }
+
+//   return filteredData;
+// }
+
+exports.getSalesChartData = catchAsync(async (req, res, next) => {
+  const { filter } = req.query;
+
+  const orders = await Order.find({
+    status: "delivered",
+  })
+    .populate("items.product")
+    .exec();
+
+  const salesReport = orders.map((order) => ({
+    orderID: order.orderID,
+    userID: order.user,
+    products: order.items.map((item) => ({
+      product: item.product,
+      quantity: item.quantity,
+    })),
+    totalPrice: order.totalPrice,
+    orderDate: order.createdAt,
+  }));
+
+  // Filter Options
+  const salesByMonth = {};
+  const salesByYear = {};
+  const salesByWeek = {};
+
+  salesReport.forEach((entry) => {
+    const year = entry.orderDate.getFullYear();
+    const month = entry.orderDate.getMonth();
+    const week = getWeekNumber(entry.orderDate);
+
+    // Get the start and end dates of the week
+    const startDate = getWeekStartDate(entry.orderDate);
+    const endDate = getWeekEndDate(entry.orderDate);
+
+    const totalSales = entry.totalPrice;
+
+    entry.products.forEach((product) => {
+      const productID = product.product._id;
+      const quantity = product.quantity;
+      const saledPrice = entry.totalPrice / product.quantity;
+
+      // Sales by month
+      if (salesByMonth.hasOwnProperty(year)) {
+        if (salesByMonth[year].hasOwnProperty(month)) {
+          if (salesByMonth[year][month].hasOwnProperty(productID)) {
+            salesByMonth[year][month][productID].quantity += quantity;
+            salesByMonth[year][month][productID].totalSaledPrice +=
+              saledPrice * quantity;
+          } else {
+            salesByMonth[year][month][productID] = {
+              name: product.product.name,
+              quantity: quantity,
+              totalSaledPrice: saledPrice * quantity,
+            };
+          }
+          salesByMonth[year][month].totalSales += totalSales;
+        } else {
+          salesByMonth[year][month] = {
+            [productID]: {
+              name: product.product.name,
+              quantity: quantity,
+              totalSaledPrice: saledPrice * quantity,
+            },
+            totalSales: totalSales,
+          };
+        }
+      } else {
+        salesByMonth[year] = {
+          [month]: {
+            [productID]: {
+              name: product.product.name,
+              quantity: quantity,
+              totalSaledPrice: saledPrice * quantity,
+            },
+            totalSales: totalSales,
+          },
+        };
+      }
+
+      // Sales by year
+      if (salesByYear.hasOwnProperty(year)) {
+        if (salesByYear[year].hasOwnProperty(productID)) {
+          salesByYear[year][productID].quantity += quantity;
+          salesByYear[year][productID].totalSaledPrice += saledPrice * quantity;
+        } else {
+          salesByYear[year][productID] = {
+            name: product.product.name,
+            quantity: quantity,
+            totalSaledPrice: saledPrice * quantity,
+          };
+        }
+        salesByYear[year].totalSales += totalSales;
+      } else {
+        salesByYear[year] = {
+          [productID]: {
+            name: product.product.name,
+            quantity: quantity,
+            totalSaledPrice: saledPrice * quantity,
+          },
+          totalSales: totalSales,
+        };
+      }
+
+      // Sales by week
+      if (salesByWeek.hasOwnProperty(year)) {
+        if (salesByWeek[year].hasOwnProperty(week)) {
+          if (salesByWeek[year][week].hasOwnProperty(productID)) {
+            salesByWeek[year][week][productID].quantity += quantity;
+            salesByWeek[year][week][productID].totalSaledPrice +=
+              saledPrice * quantity;
+          } else {
+            salesByWeek[year][week][productID] = {
+              name: product.product.name,
+              quantity: quantity,
+              totalSaledPrice: saledPrice * quantity,
+            };
+          }
+          salesByWeek[year][week].totalSales += totalSales;
+        } else {
+          salesByWeek[year][week] = {
+            [productID]: {
+              name: product.product.name,
+              quantity: quantity,
+              totalSaledPrice: saledPrice * quantity,
+            },
+            totalSales: totalSales,
+            startDate: startDate,
+            endDate: endDate,
+          };
+        }
+      } else {
+        salesByWeek[year] = {
+          [week]: {
+            [productID]: {
+              name: product.product.name,
+              quantity: quantity,
+              totalSaledPrice: saledPrice * quantity,
+            },
+            totalSales: totalSales,
+            startDate: startDate,
+            endDate: endDate,
+          },
+        };
+      }
+    });
+  });
+
+  function getMonthName(monthNumber) {
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    return monthNames[monthNumber];
+  }
+  // Function to get the week number
+  function getWeekNumber(date) {
+    const yearStart = new Date(date.getFullYear(), 0, 1);
+    const weekNumber = Math.ceil(
+      ((date - yearStart) / 86400000 + yearStart.getDay() + 1) / 7
+    );
+    return weekNumber;
+  }
+
+  // Function to get the start date of the week
+  function getWeekStartDate(date) {
+    const weekStart = new Date(date);
+    weekStart.setDate(date.getDate() - date.getDay() + 1); // Set to the first day (Monday) of the week
+    return weekStart.toISOString().slice(0, 10); // Format as "YYYY-MM-DD"
+  }
+
+  // Function to get the end date of the week
+  function getWeekEndDate(date) {
+    const weekEnd = new Date(date);
+    weekEnd.setDate(date.getDate() - date.getDay() + 7); // Set to the last day (Sunday) of the week
+    return weekEnd.toISOString().slice(0, 10); // Format as "YYYY-MM-DD"
+  }
+
+  // Prepare sales report data for the chart
+  const salesChartDataByMonth = Object.keys(salesByMonth).map((year) => ({
+    year: year,
+    salesByMonth: Object.keys(salesByMonth[year]).map((month) => ({
+      month: getMonthName(parseInt(month)),
+      topProduct:
+        salesByMonth[year][month][
+          Object.keys(salesByMonth[year][month]).reduce((a, b) =>
+            salesByMonth[year][month][a].totalSaledPrice >
+            salesByMonth[year][month][b].totalSaledPrice
+              ? a
+              : b
+          )
+        ],
+      totalSales: salesByMonth[year][month].totalSales,
+    })),
+  }));
+
+  const salesChartDataByYear = Object.keys(salesByYear).map((year) => ({
+    year: year,
+    topProduct:
+      salesByYear[year][
+        Object.keys(salesByYear[year]).reduce((a, b) =>
+          salesByYear[year][a].totalSaledPrice >
+          salesByYear[year][b].totalSaledPrice
+            ? a
+            : b
+        )
+      ],
+    totalSales: salesByYear[year].totalSales,
+  }));
+
+  const salesChartDataByWeek = Object.keys(salesByWeek).map((year) => ({
+    year: year,
+    salesByWeek: Object.keys(salesByWeek[year]).map((week) => ({
+      week: week,
+      startDate: salesByWeek[year][week].startDate,
+      endDate: salesByWeek[year][week].endDate,
+      topProduct:
+        salesByWeek[year][week][
+          Object.keys(salesByWeek[year][week]).reduce((a, b) =>
+            salesByWeek[year][week][a].totalSaledPrice >
+            salesByWeek[year][week][b].totalSaledPrice
+              ? a
+              : b
+          )
+        ],
+      totalSales: salesByWeek[year][week].totalSales,
+    })),
+  }));
+
+  // Filtered Value for sent as response
+  let filteredSalesChartData;
+  if (filter == "yearly") {
+    filteredSalesChartData = salesChartDataByYear;
+  } else if (filter == "monthly") {
+    filteredSalesChartData = salesChartDataByMonth;
+  } else {
+    filteredSalesChartData = salesChartDataByWeek;
+  }
+
+  const salesChartData = {
+    sales: {
+      data: filteredSalesChartData.map(item => {
+        if(filter === "yearly"){
+          return item.totalSales
+        }else if (filter === "monthly") {
+          const currentYear = new Date().getFullYear();
+          if (item.year == currentYear) {
+            return item.salesByMonth.map(month=>month.totalSales)
+          }
+        }else{
+          const currentYear = new Date().getFullYear();
+          if (item.year == currentYear) {
+            return item.salesByWeek.map(week=>week.totalSales)
+          }
+        }
+
+      }).flat().filter(value => value !== undefined),
+      labels: filteredSalesChartData.map(item => {
+        if (filter === "yearly") {
+          return item.year;
+        } else if (filter === "monthly") {
+          const currentYear = new Date().getFullYear();
+          if (item.year == currentYear) {
+            return item.salesByMonth.map(month=>month.month)
+          }
+        } else{
+          const currentYear = new Date().getFullYear();
+          if (item.year == currentYear) {
+            return item.salesByWeek.map(week=>{ return `${week.startDate} - ${week.endDate}` })
+          }
+        }
+      }).flat().filter(value => value !== undefined)
+    },
+    products: {
+      data:  filteredSalesChartData.map((item) => {
+        if (item.salesByWeek) {
+          const currentYear = new Date().getFullYear();
+          if (item.year == currentYear) {
+            return item.salesByWeek.map((week) =>week.topProduct.totalSaledPrice);
+          }
+          
+        }else if (item.salesByMonth) {
+          for (const month of item.salesByMonth) {
+            if (month?.topProduct?.totalSaledPrice) {
+              return month.topProduct.totalSaledPrice;
+            }
+          }
+          return null; // Return null if no valid totalSaledPrice is found
+        }
+        else{
+          return item.topProduct.totalSaledPrice
+        }
+      }).flat().filter(value => value !== undefined),
+      labels: filteredSalesChartData.map(item => {
+        if(filter == "yearly"){
+          if (typeof item.topProduct === "string") {
+            return item.topProduct;
+          } else {
+            let name=item.topProduct.name
+
+            if(name) return `${item.year} - ${name}`
+           
+          }
+        } else if(item.salesByMonth){
+          const currentYear = new Date().getFullYear();
+          if (item.year == currentYear) {
+            return item.salesByMonth.map(month=> {return `${month.month} - ${month.topProduct.name}`})
+          }
+        }
+        else{
+          const currentYear = new Date().getFullYear();
+          if (item.year == currentYear) {
+            return item.salesByWeek.map(week=> {return `${week.startDate} - ${week.endDate} - ${week.topProduct.name}`})
+          }
+        }
+
+        
+      }).flat().filter(value => value !== undefined)
+    }
+  };
+
+  console.log(salesChartData)
+
+ 
+
+  res.json({
+    status: "success",
+    result: salesChartData.length,
+    data: salesChartData,
+  });
 });

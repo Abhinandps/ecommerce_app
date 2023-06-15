@@ -5,7 +5,6 @@ const router = express.Router();
 const adminAuth = require("../Controllers/adminAuth");
 const {
   getSalesReportData,
-  getSalesGraphData,
   getAllUsers,
   getOneUsers,
   toggleBlock,
@@ -33,7 +32,8 @@ const {
   getBanners,
   getOneBanner,
   updateBanner,
-  deleteBanner
+  deleteBanner,
+  getSalesChartData
 
 } = require("../Controllers/adminController");
 
@@ -73,7 +73,7 @@ router.get("/logout", adminAuth.logout);
 
 router.get('/sales/report', isAdmin, getSalesReportData)
 
-router.get('/sales/graph/report', isAdmin, getSalesGraphData)
+router.get('/sales/graph/report', isAdmin, getSalesChartData)
 
 
 
