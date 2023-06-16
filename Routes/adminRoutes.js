@@ -33,7 +33,8 @@ const {
   getOneBanner,
   updateBanner,
   deleteBanner,
-  getSalesChartData
+  getSalesChartData,
+  getMetricsData
 
 } = require("../Controllers/adminController");
 
@@ -75,6 +76,7 @@ router.get('/sales/report', isAdmin, getSalesReportData)
 
 router.get('/sales/graph/report', isAdmin, getSalesChartData)
 
+router.get('/sales/data', isAdmin, getMetricsData)
 
 
 

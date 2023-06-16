@@ -143,8 +143,6 @@ Admin side :
 [✔]Admin Dashboard - Chart with filter(yearly,monthly etc.)
 []Sales Report - Pdf and excel download(with order summary)
 
-
-
 Score-
 Theory-5.5
 Practical-6

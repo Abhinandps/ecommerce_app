@@ -120,7 +120,7 @@ router.get("/trending", isAuthenticate, trending)
 
 router.get("/toprated", isAuthenticate, toprated)
 
-router.get("/bestsellers", isAuthenticate, bestSellers)
+// router.get("/bestsellers", isAuthenticate, bestSellers)
 
 
 // Banners

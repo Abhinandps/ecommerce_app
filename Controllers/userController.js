@@ -12,7 +12,8 @@ const User = require("../Models/userModel");
 const Order = require("../Models/orders");
 const Coupon = require("../Models/coupen");
 const Banner = require("../Models/banner");
-const SalesReport = require("../Models/salesReport");
+
+
 const { generateInvoice } = require("../utils/generateInvoice");
 
 const generateOrderID = () => {
@@ -48,41 +49,41 @@ exports.toprated = catchAsync(async (req, res) => {
 });
 
 
-exports.bestSellers = catchAsync(async (req, res) => {
-  const salesReport = await SalesReport.find();
-  const salesData = salesReport[0].salesData;
+// exports.bestSellers = catchAsync(async (req, res) => {
+//   const salesReport = await SalesReport.find();
+//   const salesData = salesReport[0].salesData;
 
-  // Create an object to store the total sales for each product
-  const productSales = {};
+//   // Create an object to store the total sales for each product
+//   const productSales = {};
 
-  // Iterate over the sales data to calculate the total sales for each product
-  salesData.forEach((sale) => {
-    const { topSellingProduct, totalSales } = sale;
-    if (topSellingProduct in productSales) {
-      productSales[topSellingProduct] += totalSales;
-    } else {
-      productSales[topSellingProduct] = totalSales;
-    }
-  });
+//   // Iterate over the sales data to calculate the total sales for each product
+//   salesData.forEach((sale) => {
+//     const { topSellingProduct, totalSales } = sale;
+//     if (topSellingProduct in productSales) {
+//       productSales[topSellingProduct] += totalSales;
+//     } else {
+//       productSales[topSellingProduct] = totalSales;
+//     }
+//   });
 
-  // Sort the products based on their total sales in descending order
-  const sortedProducts = Object.keys(productSales).sort(
-    (a, b) => productSales[b] - productSales[a]
-  );
+//   // Sort the products based on their total sales in descending order
+//   const sortedProducts = Object.keys(productSales).sort(
+//     (a, b) => productSales[b] - productSales[a]
+//   );
 
-  // Limit the result to the top 5 best-selling products
-  const topSellers = sortedProducts.slice(0, 4);
+//   // Limit the result to the top 5 best-selling products
+//   const topSellers = sortedProducts.slice(0, 4);
 
-  // Retrieve the details of the top-selling products from product database
-  const topSellerProducts = await Product.find({ _id: { $in: topSellers } });
+//   // Retrieve the details of the top-selling products from product database
+//   const topSellerProducts = await Product.find({ _id: { $in: topSellers } });
 
-  res.status(200).json({
-    status: "success",
-    data: {
-      bestSellers: topSellerProducts,
-    },
-  });
-});
+//   res.status(200).json({
+//     status: "success",
+//     data: {
+//       bestSellers: topSellerProducts,
+//     },
+//   });
+// });
 
 
 
