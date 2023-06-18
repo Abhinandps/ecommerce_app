@@ -5,7 +5,6 @@
     <a href="http://127.0.0.1:3000/api/v1/admin/logout">logout</a> -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-
   <!-- partial -->
   <div class="main-panel">
 
@@ -73,9 +72,7 @@
         </div>
       </div>
 
-      <button style="position: absolute;bottom: 50px;right: 27px;" id="exportButton" class="btn btn-success">
-        <i class="fa-solid fa-file-export"></i> Export
-      </button>
+     
 
 
       <div class="row">
@@ -88,25 +85,22 @@
             <div class="card-body">
               <h4 class="card-title">Sale statistics</h4>
               
-              <div class="row">
+              <div class="row  d-flex mb-3">
 
-                <div class="col-lg-6 mb-5">
-                  <label for="filter">Filter:</label>
-                  <select id="filter" class="form-control">
+                <div class="col-lg-6 py-3 ">
+                  <!-- <label for="filter">Filter:</label> -->
+                  <select id="filter" class="form-control bg-secondary">
                     <option value="yearly" selected>Yearly</option>
                     <option value="monthly">Monthly</option>
                     <option value="weekly">Weekly</option>
                   </select>
                 </div>
 
-                <!-- <div class="col-lg-6">
-                  <label for="year">Year:</label>
-                  <select id="year" class="form-control">
-                    <option value="2021">2021</option>
-                    <option value="2022">2022</option>
-                    <option value="2023">2023</option>
-                  </select>
-                </div> -->
+                <div class="col-lg-6  d-flex justify-content-end my-auto ">
+                  <button id="exportButton" class="btn btn-secondary">
+                    <i class="fa-solid fa-file-export"></i> Export
+                  </button>
+                </div>
 
               </div>
               <canvas id="barChart" style="height:230px"></canvas>

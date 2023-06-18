@@ -34,7 +34,9 @@ const {
   updateBanner,
   deleteBanner,
   getSalesChartData,
-  getMetricsData
+  getMetricsData,
+  generateStockReport,
+  generateCancellationReport,
 
 } = require("../Controllers/adminController");
 
@@ -78,7 +80,17 @@ router.get('/sales/graph/report', isAdmin, getSalesChartData)
 
 router.get('/sales/data', isAdmin, getMetricsData)
 
+// Reports 
 
+router.get('/stock/report',isAdmin, generateStockReport)
+
+router.get('/cancelled/report', isAdmin, generateCancellationReport)
+
+// Excel|Pdf
+
+// router.get("/download/excel", isAdmin, getExcelReport)
+
+// router.get("/download/pdf", isAdmin, getPdfReport)
 
 // Users
 

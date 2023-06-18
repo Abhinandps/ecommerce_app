@@ -10,7 +10,7 @@ const ErrorHandler = require("../Controllers/errorController");
 const Order = require("../Models/orders");
 const Coupon = require("../Models/coupen");
 const Banner = require("../Models/banner");
-
+const { generatePDF, generateCSV } = require("../utils/generateReport");
 
 exports.getAllUsers = catchAsync(async (req, res) => {
   const users = await User.find();
@@ -487,33 +487,7 @@ exports.updateCategory = catchAsync(async (req, res, next) => {
   }
 });
 
-// Generate Report Of Data
-exports.getSalesReportData = catchAsync(async (req, res, next) => {
-  const orders = await Order.find({
-    status: "delivered",
-  })
-    .populate("items.product")
-    .exec();
-
-  const salesReport = orders.map((order) => ({
-    orderID: order.orderID,
-    userID: order.user,
-    products: order.items.map((item) => ({
-      product: item.product,
-      quantity: item.quantity,
-    })),
-    totalPrice: order.totalPrice,
-    orderDate: order.createdAt,
-  }));
-
-  res.json({
-    status: "success",
-    result: salesReport.length,
-    data: salesReport,
-  });
-});
-
-
+// Filtered Chart Data
 exports.getSalesChartData = catchAsync(async (req, res, next) => {
   const { filter } = req.query;
 
@@ -764,90 +738,102 @@ exports.getSalesChartData = catchAsync(async (req, res, next) => {
 
   const salesChartData = {
     sales: {
-      data: filteredSalesChartData.map(item => {
-        if(filter === "yearly"){
-          return item.totalSales
-        }else if (filter === "monthly") {
-          const currentYear = new Date().getFullYear();
-          if (item.year == currentYear) {
-            return item.salesByMonth.map(month=>month.totalSales)
-          }
-        }else{
-          const currentYear = new Date().getFullYear();
-          if (item.year == currentYear) {
-            return item.salesByWeek.map(week=>week.totalSales)
-          }
-        }
-
-      }).flat().filter(value => value !== undefined),
-      labels: filteredSalesChartData.map(item => {
-        if (filter === "yearly") {
-          return item.year;
-        } else if (filter === "monthly") {
-          const currentYear = new Date().getFullYear();
-          if (item.year == currentYear) {
-            return item.salesByMonth.map(month=>month.month)
-          }
-        } else{
-          const currentYear = new Date().getFullYear();
-          if (item.year == currentYear) {
-            return item.salesByWeek.map(week=>{ return `${week.startDate} - ${week.endDate}` })
-          }
-        }
-      }).flat().filter(value => value !== undefined)
-    },
-    products: {
-      data:  filteredSalesChartData.map((item) => {
-        if (item.salesByWeek) {
-          const currentYear = new Date().getFullYear();
-          if (item.year == currentYear) {
-            return item.salesByWeek.map((week) =>week.topProduct.totalSaledPrice);
-          }
-          
-        }else if (item.salesByMonth) {
-          for (const month of item.salesByMonth) {
-            if (month?.topProduct?.totalSaledPrice) {
-              return month.topProduct.totalSaledPrice;
+      data: filteredSalesChartData
+        .map((item) => {
+          if (filter === "yearly") {
+            return item.totalSales;
+          } else if (filter === "monthly") {
+            const currentYear = new Date().getFullYear();
+            if (item.year == currentYear) {
+              return item.salesByMonth.map((month) => month.totalSales);
+            }
+          } else {
+            const currentYear = new Date().getFullYear();
+            if (item.year == currentYear) {
+              return item.salesByWeek.map((week) => week.totalSales);
             }
           }
-          return null; // Return null if no valid totalSaledPrice is found
-        }
-        else{
-          return item.topProduct.totalSaledPrice
-        }
-      }).flat().filter(value => value !== undefined),
-      labels: filteredSalesChartData.map(item => {
-        if(filter == "yearly"){
-          if (typeof item.topProduct === "string") {
-            return item.topProduct;
+        })
+        .flat()
+        .filter((value) => value !== undefined),
+      labels: filteredSalesChartData
+        .map((item) => {
+          if (filter === "yearly") {
+            return item.year;
+          } else if (filter === "monthly") {
+            const currentYear = new Date().getFullYear();
+            if (item.year == currentYear) {
+              return item.salesByMonth.map((month) => month.month);
+            }
           } else {
-            let name=item.topProduct.name
+            const currentYear = new Date().getFullYear();
+            if (item.year == currentYear) {
+              return item.salesByWeek.map((week) => {
+                return `${week.startDate} - ${week.endDate}`;
+              });
+            }
+          }
+        })
+        .flat()
+        .filter((value) => value !== undefined),
+    },
+    products: {
+      data: filteredSalesChartData
+        .map((item) => {
+          if (item.salesByWeek) {
+            const currentYear = new Date().getFullYear();
+            if (item.year == currentYear) {
+              return item.salesByWeek.map(
+                (week) => week.topProduct.totalSaledPrice
+              );
+            }
+          } else if (item.salesByMonth) {
+            for (const month of item.salesByMonth) {
+              if (month?.topProduct?.totalSaledPrice) {
+                return month.topProduct.totalSaledPrice;
+              }
+            }
+            return null; // Return null if no valid totalSaledPrice is found
+          } else {
+            return item.topProduct.totalSaledPrice;
+          }
+        })
+        .flat()
+        .filter((value) => value !== undefined),
+      labels: filteredSalesChartData
+        .map((item) => {
+          if (filter == "yearly") {
+            if (typeof item.topProduct === "string") {
+              return item.topProduct;
+            } else {
+              let name = item.topProduct.name;
 
-            if(name) return `${item.year} - ${name}`
-           
+              if (name) return `${item.year} - ${name}`;
+            }
+          } else if (item.salesByMonth) {
+            const currentYear = new Date().getFullYear();
+            if (item.year == currentYear) {
+              return item.salesByMonth.map((month) => {
+                return `${month.month} - ${month.topProduct.name}`;
+              });
+            }
+          } else {
+            const currentYear = new Date().getFullYear();
+            if (item.year == currentYear) {
+              return item.salesByWeek.map((week) => {
+                return `${week.startDate} - ${week.endDate} - ${week.topProduct.name}`;
+              });
+            }
           }
-        } else if(item.salesByMonth){
-          const currentYear = new Date().getFullYear();
-          if (item.year == currentYear) {
-            return item.salesByMonth.map(month=> {return `${month.month} - ${month.topProduct.name}`})
-          }
-        }
-        else{
-          const currentYear = new Date().getFullYear();
-          if (item.year == currentYear) {
-            return item.salesByWeek.map(week=> {return `${week.startDate} - ${week.endDate} - ${week.topProduct.name}`})
-          }
-        }
-
-        
-      }).flat().filter(value => value !== undefined)
-    }
+        })
+        .flat()
+        .filter((value) => value !== undefined),
+    },
   };
 
-  filteredSalesChartData.map(data=>{
-    console.log(data)
-  })
-
+  filteredSalesChartData.map((data) => {
+    console.log(data);
+  });
 
   res.json({
     status: "success",
@@ -856,14 +842,18 @@ exports.getSalesChartData = catchAsync(async (req, res, next) => {
   });
 });
 
-
+// Revenue , Sales, Orders
 exports.getMetricsData = catchAsync(async (req, res, next) => {
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth() + 1; // Adding 1 because getMonth() returns zero-based month index
 
   const lastMonthStartDate = new Date(currentYear, currentMonth - 2, 1); // Subtracting 2 from currentMonth to get the last month's index
-  const currentMonthCurrentDate = new Date(currentYear, currentMonth - 1, currentDate.getDate()); // Subtracting 1 from currentMonth to get the current month's index and using current date's day as the current date
+  const currentMonthCurrentDate = new Date(
+    currentYear,
+    currentMonth - 1,
+    currentDate.getDate()
+  ); // Subtracting 1 from currentMonth to get the current month's index and using current date's day as the current date
 
   const orders = await Order.find({
     status: "delivered",
@@ -912,4 +902,467 @@ exports.getMetricsData = catchAsync(async (req, res, next) => {
 });
 
 
+
+
+/*
+REPORTS
+========
+*/
+
+
+// Generate Sales Report Data
+exports.getSalesReportData = catchAsync(async (req, res, next) => {
+  const { startDate, endDate, downloadType } = req.query;
+
+  console.log(startDate, endDate, downloadType);
+
+  if (!startDate || !endDate || !downloadType) {
+    return next(new AppError("error", 401));
+  }
+
+  // Fetch all orders from the database
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  const orders = await Order.find({
+    status: "delivered",
+    createdAt: {
+      $gte: start,
+      $lte: end,
+    },
+  })
+    .populate("items.product")
+    .exec();
+
+  // find user
+  async function findUserName(userID) {
+    const user = await User.findOne({ _id: userID });
+    return user.username;
+  }
+
+  async function getProductNames(items) {
+    const productPromises = items.map((item) => productName(item.product));
+    return Promise.all(productPromises);
+  }
+
+  async function productName(product) {
+    try {
+      const productData = await Product.findById(product._id);
+      return productData ? productData.name : "Unknown Product";
+    } catch (error) {
+      console.error("Error retrieving product:", error);
+      return "Unknown Product";
+    }
+  }
+
+  // Prepare the sales report data
+  const salesReportPromises = orders.map(async (order) => {
+    const formattedOrderedDate = new Date(order.createdAt).toLocaleString(
+      "en-US",
+      {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      }
+    );
+
+    const userName = await findUserName(order.user);
+    const orderID = order.orderID;
+
+    const productNames = await getProductNames(order.items);
+
+    const productRows = order.items.map((item, index) => {
+      const unitPrice = item.product.price;
+      const totalPrice = unitPrice * item.quantity;
+
+      return {
+        orderID: orderID,
+        userName: userName,
+        orderedDate: formattedOrderedDate,
+        productName: productNames[index],
+        quantity: item.quantity,
+        unitPrice: unitPrice,
+        totalPrice: totalPrice,
+        paymentMethod: order.paymentMethod,
+      };
+    });
+
+    return productRows;
+  });
+
+  const salesReport = await Promise.all(salesReportPromises);
+
+  Promise.all(salesReport.flat())
+    .then((salesReportData) => {
+      // Table data
+      const tableData = {
+        headers: [],
+        rows: [],
+      };
+
+      const highlights = {
+        headline: `Sales Report`,
+        date: `${startDate} - ${endDate}`,
+        total: "Total Cancellations:",
+        // count: `${totalCount}`,
+        company: "Anon Stores",
+        Address: "Bangalore Hub,54321 ",
+      };
+
+      const headers = [
+        "Order ID",
+        "User",
+        "Ordered Date",
+        "Product Name",
+        "Quantity",
+        "Unit Price",
+        "Total Price",
+        "Payment Method",
+      ];
+
+      headers.forEach((item) => {
+        tableData.headers.push(item);
+      });
+
+      if (downloadType == "pdf") {
+        salesReportData.forEach((item) => {
+          const rowData = [
+            item.orderID,
+            item.userName,
+            item.orderedDate,
+            item.productName,
+            item.quantity,
+            item.unitPrice,
+            item.totalPrice,
+            item.paymentMethod,
+          ];
+          tableData.rows.push(...[rowData]);
+        });
+        // Generate PDF REPORT
+        generatePDF(tableData, res, highlights);
+      } else if (downloadType == "csv") {
+        salesReportData.forEach((item) => {
+          const rowData = Object.values(item);
+          tableData.rows.push({ ...rowData });
+        });
+        generateCSV(tableData, res);
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+
+  // res.json({
+  //   status: "success",
+  //   result: salesReport.length,
+  //   data: salesReport.flat(), // Flatten the array of arrays into a single array
+  // });
+});
+
+// Stock Report
+exports.generateStockReport = catchAsync(async (req, res, next) => {
+  const { downloadType } = req.query;
+  console.log(downloadType);
+
+  const products = await Product.find();
+
+  const orders = await Order.find();
+
+  const getCategoryName = async (categoryId) => {
+    try {
+      const category = await Category.findById(categoryId);
+      return category ? category.name : "Unknown Category";
+    } catch (error) {
+      console.error("Error retrieving category:", error);
+      return "Unknown Category";
+    }
+  };
+
+  const stockReport = products.map((product) => {
+    const formattedUpdatedDate = new Date(product.updatedAt).toLocaleString(
+      "en-US",
+      {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      }
+    );
+
+    const categoryPromise = getCategoryName(product.category);
+    const productIDPromise = Promise.resolve(product._id); // Create a resolved promise for orderID
+
+    return Promise.all([categoryPromise, productIDPromise])
+      .then(([categoryName, productID]) => {
+        return {
+          productID,
+          productName: product.name,
+          categoryName,
+          totalQuantityOrdered: orders.reduce((total, order) => {
+            const orderItem = order.items.find(
+              (item) => product._id.toString() === item.product.toString()
+            );
+            return total + (orderItem ? orderItem.quantity : 0);
+          }, 0),
+          currentStock: product.stock,
+          lastUpdated: formattedUpdatedDate,
+        };
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  });
+
+  const stockReports = await Promise.all(stockReport);
+
+  Promise.all(stockReports)
+    .then((stockReportReportData) => {
+      // Table data
+      const tableData = {
+        headers: [],
+        rows: [],
+      };
+
+      const highlights = {
+        headline: `Stocks Report`,
+        date: `All products`,
+        total: "Total Cancellations:",
+        // count: `${totalCount}`,
+        company: "Anon Stores",
+        Address: "Bangalore Hub,54321 ",
+      };
+
+      const headers = [
+        "Product ID",
+        "Product Name",
+        "Category",
+        "Total Ordered Quantity",
+        "currentStock",
+        "Last Updated",
+      ];
+
+      headers.forEach((item) => {
+        tableData.headers.push(item);
+      });
+
+      if (downloadType == "pdf") {
+        stockReportReportData.forEach((item) => {
+          const rowData = [
+            item.productID,
+            item.productName,
+            item.categoryName,
+            item.totalQuantityOrdered,
+            item.currentStock,
+            item.lastUpdated,
+          ];
+          tableData.rows.push(...[rowData]);
+        });
+        // Generate PDF REPORT
+        generatePDF(tableData, res, highlights);
+      } else if (downloadType == "csv") {
+        stockReportReportData.forEach((item) => {
+          const rowData = Object.values(item);
+          tableData.rows.push({ ...rowData });
+        });
+        generateCSV(tableData, res);
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+
+  // res.status(200).json({ status: "success", data: products });
+});
+
+// Cancelation Report
+exports.generateCancellationReport = catchAsync(async (req, res, next) => {
+  const { startDate, endDate, downloadType } = req.query;
+
+  console.log(startDate, endDate, downloadType);
+
+  if (!startDate || !endDate || !downloadType) {
+    return next(new AppError("error", 401));
+  }
+
+  // Fetch all orders from the database
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  console.log(start, end);
+
+  const orders = await Order.find({
+    updatedAt: {
+      $gte: start,
+      $lte: end,
+    },
+  });
+
+  // Filter orders that have the status "cancelled"
+  const cancelledOrders = orders.filter(
+    (order) => order.status === "cancelled"
+  );
+
+  // find user
+  async function findUserName(userID) {
+    const user = await User.findOne({ _id: userID });
+    return user.username;
+  }
+
+  // Prepare the cancellation report data
+  const cancellationReport = cancelledOrders.map((order) => {
+    const formattedOrderedDate = new Date(order.createdAt).toLocaleString(
+      "en-US",
+      {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      }
+    );
+
+    const formattedCancellationDate = new Date(order.updatedAt).toLocaleString(
+      "en-US",
+      {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      }
+    );
+
+    const userPromise = findUserName(order.user);
+    const orderIDPromise = Promise.resolve(order.orderID); // Create a resolved promise for orderID
+
+    return Promise.all([userPromise, orderIDPromise])
+      .then(([userName, orderID]) => {
+        return {
+          orderID: orderID,
+          userName: userName,
+          orderedDate: formattedOrderedDate,
+          cancellationReason: order.cancellationReason,
+          cancellationDate: formattedCancellationDate,
+        };
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  });
+
+  Promise.all(cancellationReport)
+    .then((cancellationReportData) => {
+      // Table data
+      const tableData = {
+        headers: [],
+        rows: [],
+      };
+
+      const highlights = {
+        headline: `Cancellation Report`,
+        date: `${startDate} - ${endDate}`,
+        total: "Total Cancellations:",
+        // count: `${totalCount}`,
+        company: "Anon Stores",
+        Address: "Bangalore Hub,54321 ",
+      };
+
+      const headers = [
+        "Order ID",
+        "User",
+        "Ordered Date",
+        "Reason",
+        "Cancellation Date",
+      ];
+
+      headers.forEach((item) => {
+        tableData.headers.push(item);
+      });
+
+      if (downloadType == "pdf") {
+        cancellationReportData.forEach((item) => {
+          const rowData = [
+            item.orderID,
+            item.userName,
+            item.orderedDate,
+            item.cancellationReason,
+            item.cancellationDate,
+          ];
+          tableData.rows.push(...[rowData]);
+        });
+        // Generate PDF REPORT
+        generatePDF(tableData, res, highlights);
+      } else if (downloadType == "csv") {
+        cancellationReportData.forEach((item) => {
+          const rowData = Object.values(item);
+          tableData.rows.push({ ...rowData });
+        });
+        generateCSV(tableData, res);
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+});
+
+// ReturnRefundReport Report < pending... >
+exports.generateReturnRefundReport = catchAsync(async (req, res) => {
+  // Fetch all orders from the database
+  const orders = await Order.find();
+
+  // Filter orders that have the status "returned" and a refund amount
+  const returnedRefundOrders = orders.filter(
+    (order) => order.status === "returned" && order.refundAmount
+  );
+
+  // Prepare the return refund report data
+  const returnRefundReport = returnedRefundOrders.map((order) => {
+    const formattedReturnDate = new Date(order.returnDate).toLocaleString(
+      "en-US",
+      {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      }
+    );
+
+    const formattedRefundDate = new Date(order.refundDate).toLocaleString(
+      "en-US",
+      {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      }
+    );
+
+    return {
+      orderID: order.orderID,
+      userID: order.user,
+      returnReason: order.returnReason,
+      returnDate: formattedReturnDate,
+      refundAmount: order.refundAmount,
+      refundDate: formattedRefundDate,
+    };
+  });
+
+  // Send the return refund report as a response
+  res.status(200).json({
+    status: "success",
+    result: returnRefundReport.length,
+    data: returnRefundReport,
+  });
+});
 

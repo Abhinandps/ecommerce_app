@@ -5,7 +5,6 @@ const adminlogout = async () => {
   }
 };
 
-
 // Get All Users
 const getUsers = async () => {
   try {
@@ -36,7 +35,6 @@ const getUsers = async () => {
     console.error(error);
   }
 };
-
 
 // Block and Unblock users
 const handleClick = (event) => {
@@ -218,8 +216,6 @@ const getAllProducts = async () => {
     console.error(err);
   }
 };
-
-
 
 const handleProductFormEdit = (event) => {
   const productID = event.target.dataset.productId;
@@ -453,11 +449,11 @@ const handleBannerFormEdit = (event) => {
       let eDate;
 
       if (banner.startDate) {
-        const dateString = banner.startDate
+        const dateString = banner.startDate;
         sDate = dateString.split("T")[0];
       }
       if (banner.endDate) {
-        const dateString = banner.endDate
+        const dateString = banner.endDate;
         eDate = dateString.split("T")[0];
       }
 
@@ -499,7 +495,7 @@ const handleBannerFormEdit = (event) => {
           form.style.display = "block";
           editForm.style.display = "none";
 
-          window.location.href ="/banners"
+          window.location.href = "/banners";
           showToast(`Banner Updated Successfully`, "warning");
         },
         error: function (error) {
@@ -528,8 +524,7 @@ const handleBannerDelete = (event) => {
           type: "DELETE",
           url: `/api/v1/admin/banners/${bannerID}`,
           success: async function (response) {
-
-            window.location.href ="/banners"
+            window.location.href = "/banners";
           },
           error: function (err) {
             console.error(err);
@@ -1115,6 +1110,37 @@ const getAllBanners = async () => {
   }
 };
 
+// Download Report
+
+// Block and Unblock users
+const handleReportDownload = () => {
+  showCustomConfirmation(
+    "Are you sure you want to Change this User status ?",
+    function (result) {
+      if (result) {
+        $.ajax({
+          type: "PUT",
+          url: `http://127.0.0.1:3000/api/v1/admin/${userId}/block`,
+          success: function (user) {
+            const btn = $(`label[data-user-id="${user._id}"]`);
+            btn.addClass(user.isBlock ? "badge-danger" : "badge-primary");
+
+            showToast(`User Status Changed Successfully`, "info");
+
+            getUsers();
+          },
+          error: function (err) {
+            console.error(err);
+          },
+        });
+      } else {
+        // User canceled the action
+        console.log("Deletion canceled");
+      }
+    }
+  );
+};
+
 // ------------------------------------------------------------------
 
 function showToast(message, type) {
@@ -1190,3 +1216,217 @@ function showCustomConfirmation(message, callback) {
   });
 }
 
+// ------------------
+
+function openConfirmationDialog() {
+  $("#confirmationDialog").modal("show");
+}
+
+// Function to handle the confirmation action
+function confirmAction() {
+  console.log("Confirmed");
+  $("#confirmationDialog").modal("hide");
+}
+
+function showCustomPopup(message, callback) {
+  var modalHtml = `<div class="modal fade" id="customConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationDialogTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmationDialogTitle">Confirmation</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="filterOptions">Filter Options</label>
+            <select class="form-control" id="filterOptions">
+              <option value="">-- Select an option --</option>
+              <option value="sales">Sales</option>
+              <option value="stock">Stocks</option>
+              <option value="cancelled">Cancellation</option>
+              <option value="return">Return and Refund</option>
+            </select>
+            
+          </div>
+
+          <div class="modal-body">
+          <div class="form-group">
+            <label for="startDate">Start Date</label>
+            <input type="date" class="form-control" id="startDate" required>
+          </div>
+          <div class="form-group">
+            <label for="endDate">End Date</label>
+            <input type="date" class="form-control" id="endDate" required>
+          </div>
+          <div class="form-group">
+            <label for="downloadType">Download Type</label>
+            <select class="form-control" id="downloadType">
+              <option value="pdf">PDF</option>
+              <option value="csv">CSV</option>
+            </select>
+          </div>
+          <div class="invalid-feedback" id="filterOptionsError"></div>
+        </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="downloadButton">Download</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  $("body").append(modalHtml);
+
+  $("#customConfirmationModal").modal("show");
+
+  $("#downloadButton").on("click", function () {
+    var startDate = $("#startDate").val();
+    var endDate = $("#endDate").val();
+    var downloadType = $("#downloadType").val();
+    var selectedOption = $("#filterOptions").val();
+
+    if (selectedOption !== "stock") {
+      // Perform validation for startDate, endDate, downloadType
+      if (!startDate || !endDate) {
+        // Handle validation errors
+        $("#filterOptionsError").text("Please select all options.");
+        alert("Please select all options");
+        console.log("called");
+        return;
+      }
+    }
+
+    if (!startDate && !endDate && downloadType) {
+      console.log("Values : " + startDate, endDate, downloadType)
+      downloadReport(null,null,downloadType);
+    } else {
+      downloadReport(startDate, endDate, downloadType);
+    }
+
+    $("#customConfirmationModal").modal("hide");
+  });
+
+  $("#customConfirmationModal").on("hidden.bs.modal", function () {
+    $(this).remove();
+  });
+}
+
+// Function to download the report
+function downloadReport(startDate, endDate, downloadType) {
+  
+  // Validate the selected filter option
+  var selectedOption = $("#filterOptions").val();
+  if (!selectedOption) {
+    $("#filterOptionsError").text("Please select an option.");
+    return;
+  }
+
+  // Perform the download action based on the selected option
+  if (selectedOption === "sales") {
+    console.log(
+      "Downloading sales report..." + startDate,
+      endDate,
+      downloadType
+    );
+    getReport(startDate, endDate, downloadType, selectedOption);
+
+  } else if (selectedOption === "stock") {
+    console.log("Downloading stocks report...");
+   
+    getReport(null,null,downloadType, selectedOption);
+  } else if (selectedOption === "cancelled") {
+    console.log(
+      "Downloading cancelled report..." + startDate,
+      endDate,
+      downloadType
+    );
+    getReport(startDate, endDate, downloadType, selectedOption);
+  } else if (selectedOption === "return") {
+    console.log("Downloading return report...");
+  }
+
+  // Close the confirmation dialog
+  $("#confirmationDialog").modal("hide");
+}
+
+// Add a click event listener to open the confirmation dialog
+$(document).on("click", "#exportButton", function () {
+  showCustomPopup("Are you sure you want to proceed?", confirmAction);
+});
+
+// function getReport(startDate, endDate, downloadType,selectedOption) {
+//   var data = {
+//     startDate: startDate,
+//     endDate: endDate,
+//     downloadType: downloadType
+//   };
+
+//   var url = `/api/v1/admin/${selectedOption}/report`;
+//   url += '?' + $.param(data);
+
+//   $.ajax({
+//     type: "GET",
+//     url: `/api/v1/admin/${selectedOption}/report`,
+//     data,
+//     responseType: "arraybuffer", // Set the response type to arraybuffer
+//     success: function(response) {
+//       // Create a Blob object from the response data
+//       var blob = new Blob([response], { type: "application/pdf" });
+
+//       // Create a download link for the Blob
+//       var downloadLink = document.createElement("a");
+//       downloadLink.href = URL.createObjectURL(blob);
+//       downloadLink.download = "report.pdf";
+//       downloadLink.click();
+//     },
+//   });
+// }
+
+async function getReport(startDate, endDate, downloadType, selectedOption) {
+
+  try {
+    const response = await axios.get(`/api/v1/admin/${selectedOption}/report`, {
+      responseType: "blob",
+      params: {
+        startDate: startDate,
+        endDate: endDate,
+        downloadType: downloadType,
+      },
+    });
+
+    let contentType;
+    let fileExtension;
+    if (downloadType == "csv") {
+      contentType =
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+      fileExtension = "xlsx";
+    } else if (downloadType === "pdf") {
+      contentType = "application/pdf";
+      fileExtension = "pdf";
+    } else {
+      throw new Error("Invalid download type");
+    }
+
+    const blob = new Blob([response.data], { type: contentType });
+
+    // Create a download link element
+    const a = document.createElement("a");
+    a.href = window.URL.createObjectURL(blob);
+    a.download = `Report.${fileExtension}`;
+    a.style.display = "none";
+
+    // Append the link element to the document body
+    document.body.appendChild(a);
+
+    // Programmatically trigger the click event to start the download
+    a.click();
+
+    // Remove the link element from the document body
+    document.body.removeChild(a);
+  } catch (error) {
+    console.error("Error downloading file:", error);
+  }
+}

@@ -47,6 +47,9 @@ const orderSchema = new mongoose.Schema(
       type: String,
       unique: true,
     },
+    cancellationReason:{
+      type:String
+    }
   },
   { timestamps: true }
 );
