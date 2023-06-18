@@ -20,7 +20,9 @@ const bestSellers = () => {
             (image) => image.split("public")[1]
           )[0];
           const item = `
-                <div class="showcase">
+                <div class="showcase" data-product='${JSON.stringify(
+                  product
+                )}'>
 
                   <a href="#" class="showcase-img-box">
                       <img src="${firstImage}" alt="baby fabric shoes" width="75"
@@ -55,6 +57,19 @@ const bestSellers = () => {
       },
     });
   }
+
+  document.addEventListener("click", function (event) {
+    if (
+      event.target.classList.contains("showcase") ||
+      event.target.closest(".showcase")
+    ) {
+      const button = event.target.classList.contains("showcase")
+        ? event.target
+        : event.target.closest(".showcase");
+      const product = JSON.parse(button.dataset.product);
+      handleViewDetails(product);
+    }})
+
 };
 
 bestSellers();

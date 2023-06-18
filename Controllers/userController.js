@@ -49,43 +49,39 @@ exports.toprated = catchAsync(async (req, res) => {
 });
 
 
-// exports.bestSellers = catchAsync(async (req, res) => {
-//   const salesReport = await SalesReport.find();
-//   const salesData = salesReport[0].salesData;
+exports.bestSellers = catchAsync(async (req, res) => {
+  const orders = await Order.find({ status: "delivered" })
+    .populate("items.product")
+    .exec();
 
-//   // Create an object to store the total sales for each product
-//   const productSales = {};
+  const productSales = {};
 
-//   // Iterate over the sales data to calculate the total sales for each product
-//   salesData.forEach((sale) => {
-//     const { topSellingProduct, totalSales } = sale;
-//     if (topSellingProduct in productSales) {
-//       productSales[topSellingProduct] += totalSales;
-//     } else {
-//       productSales[topSellingProduct] = totalSales;
-//     }
-//   });
+  orders.forEach((order) => {
+    order.items.forEach((item) => {
+      const { product, quantity } = item;
+      const { _id, name, price, image ,description} = product;
+      if (productSales[_id]) {
+        productSales[_id].quantity += quantity;
+      } else {
+        productSales[_id] = { _id, name, quantity, price, image , description };
+      }
+    });
+  });
 
-//   // Sort the products based on their total sales in descending order
-//   const sortedProducts = Object.keys(productSales).sort(
-//     (a, b) => productSales[b] - productSales[a]
-//   );
+  const sortedProducts = Object.values(productSales).sort(
+    (a, b) => b.quantity - a.quantity
+  );
 
-//   // Limit the result to the top 5 best-selling products
-//   const topSellers = sortedProducts.slice(0, 4);
+  const topSellers = sortedProducts.slice(0, 4);
 
-//   // Retrieve the details of the top-selling products from product database
-//   const topSellerProducts = await Product.find({ _id: { $in: topSellers } });
-
-//   res.status(200).json({
-//     status: "success",
-//     data: {
-//       bestSellers: topSellerProducts,
-//     },
-//   });
-// });
-
-
+  res.status(200).json({
+    status: "success",
+    result: topSellers.length,
+    data: {
+      bestSellers: topSellers,
+    },
+  });
+});
 
 
 exports.getAllProducts = catchAsync(async (req, res) => {
