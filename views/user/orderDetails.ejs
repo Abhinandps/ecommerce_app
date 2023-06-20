@@ -2,6 +2,109 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <style>
+        .horizontal.timeline {
+            display: flex;
+            position: relative;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .horizontal.timeline:before {
+            content: '';
+            display: block;
+            position: absolute;
+            /* width: 100%; */
+            height: .2em;
+            background-color: hsl(152, 51%, 52%);
+        }
+
+        .horizontal.timeline .line {
+            display: block;
+            position: absolute;
+
+            height: .2em;
+            background-color: hsl(152, 51%, 52%);
+        }
+
+        .horizontal.timeline .steps {
+            display: flex;
+            position: relative;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .horizontal.timeline .steps .step {
+            display: block;
+            position: relative;
+            bottom: calc(100% + 1em);
+            padding: .33em;
+            margin: 0 2em;
+            box-sizing: content-box;
+            color: hsl(152, 51%, 52%);
+            background-color: currentColor;
+            border: .25em solid white;
+            border-radius: 50%;
+            z-index: 500;
+        }
+
+        .horizontal.timeline .steps .step:first-child {
+            margin-left: 0;
+        }
+
+        .horizontal.timeline .steps .step:last-child {
+            margin-right: 0;
+            color: hsl(0, 0%, 85%);
+        }
+
+        .horizontal.timeline .steps .step span {
+            position: absolute;
+            top: calc(100% + 1em);
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            color: #000;
+            opacity: .4;
+        }
+
+        .horizontal.timeline .steps .step.current:before {
+            content: '';
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 1em;
+            background-color: currentColor;
+            border-radius: 50%;
+            opacity: 0;
+            z-index: -1;
+            animation-name: animation-timeline-current;
+            animation-duration: 2s;
+            animation-iteration-count: infinite;
+            animation-timing-function: ease-out;
+        }
+
+        .horizontal.timeline .steps .step.current span {
+            opacity: .8;
+        }
+
+        @keyframes animation-timeline-current {
+            from {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0;
+            }
+        }
+    </style>
     <div class="container">
         <div class="header">
             <p>Tracking My Order</p>
@@ -49,18 +152,17 @@
     <script>
         const orderDetails = localStorage.getItem('myorder')
 
-        // console.log(orderDetails)
         if (orderDetails) {
             const order = JSON.parse(orderDetails)
             let currentStatus = order.status
 
             order.items.forEach((product, index) => {
                 const row = document.querySelector('#orders-history')
-
                 const { product: productID } = product
+
                 $.ajax({
                     type: "GET",
-                    url: `api/v1/admin/product/${productID}`,
+                    url: `/api/v1/admin/product/${productID}`,
                     success: function (productResponse) {
                         const { products } = productResponse.data;
 
@@ -75,36 +177,60 @@
                                     console.log("no address found")
                                 }
 
-                                const orderedDetailsCard = `<div class="row">
-              <div class="product_details">
-                <div class="product_image">
-                  ${products.image.map((path, index) => {
+                                const orderedDetailsCard = `
+              <div class="details-row">
+                <div class="orders_container">
+                  <div class="product_details">
+                    <div class="product_image">
+                      ${products.image.map((path, index) => {
                                     const newPath = path.replace("public", "");
                                     console.log(newPath)
                                     if (index === 0) {
                                         return `<img src="${newPath}" width="100"/>`
                                     }
                                 })}
-                </div>
-                <div class="product_name">
-                  <p>${products.name}</p>
-                </div>
-                <div class="product_desc">
-                  <p></p>
-                </div>
-                <div class="rating">
+                    </div>
 
-                </div>
-                <div class="product_price">
-                  <p>MRP <span>${order.totalPrice}/-</span></p>
-                </div>
+                    <div class="product_name">
+                      <p>${products.name}</p>
+                    </div>
+                    <div class="product_desc">
+                      <p></p>
+                    </div>
+                    <div class="rating"></div>
+                    <div class="product_price">
+                      <p>MRP <span>${order.totalPrice}/-</span></p>
+                    </div>
+                  </div>
+
+                  <div class="tracking_status">
+        <div class="horizontal timeline" id="timelineProgress">
+          <div class="steps">
+                        <div class="step ${currentStatus === 'pending' ? 'current' : ''}">
+                          <span>To be prepared</span>
+                        </div>
+                        <div class="step ${currentStatus === 'confirmed' ? 'current' : ''}">
+                          <span>Confirmed</span>
+                        </div>
+                        <div class="step ${currentStatus === 'shipped' ? 'current' : ''}">
+                          <span>Shipped</span>
+                        </div>
+                        <div class="step ${currentStatus === 'delivered' ? 'current' : ''}">
+                          <span>Delivered</span>
+                        </div>
+                        <div class="step" style="display:none;">
+                          <span>Cancelled</span>
+                        </div>
+                      </div>
+                      <div class="line"></div>
+                    </div>
+                  </div>
+
+              
+
               </div>
 
-              <div class="tracking_status">
-                ${order.status}
-              </div>
-
-              <div class="delivery_address">
+              <div class="delivery_address address_details">
                 <div class="header">
                   <p>Delivery Address</p>
                 </div>
@@ -132,15 +258,49 @@
             </div>`
 
                                 const tempElement = document.createElement('div');
-                                tempElement.setAttribute("id", "order_item");
+                                tempElement.setAttribute("class", "order_details");
                                 tempElement.innerHTML = orderedDetailsCard;
                                 row.append(tempElement);
+
+                                const statusOrder = ['pending', 'confirmed', 'shipped', 'delivered'];
+                                const status = statusOrder.find((item) => item == currentStatus)
+
+                                let progressPercentage;
+                                let lineColor;
+
+                                if (status === 'pending') {
+                                    progressPercentage = 10;
+                                    lineColor = 'hsl(152, 51%, 52%)'; 
+                                } else if (status === 'confirmed') {
+                                    progressPercentage = 30;
+                                    lineColor = 'hsl(152, 51%, 52%)';
+                                } else if (status === 'shipped') {
+                                    progressPercentage = 60;
+                                    lineColor = 'hsl(152, 51%, 52%)'; 
+                                } else if (status === 'delivered') {
+                                    progressPercentage = 90;
+                                    lineColor = 'hsl(152, 51%, 52%)'; 
+                                } else if (status === 'cancelled'){
+                                    progressPercentage = 90;
+                                    lineColor = 'red'; 
+                                }
+
+
+                                const timelineProgressElement = document.getElementById('timelineProgress');
+
+                                const styleElement = document.querySelector('style');
+                                const cssRule = `.horizontal.timeline:before { width: ${progressPercentage}%  }`;
+
+                                styleElement.textContent += cssRule;
+
+
                             }
                         });
                     }
                 });
             });
         }
+
 
 
 

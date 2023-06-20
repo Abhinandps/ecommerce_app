@@ -5,6 +5,8 @@ const logout = async () => {
   }
 };
 
+
+
 const bestSellers = () => {
   const row = document.getElementById("showcase-container");
   if (row) {
@@ -44,7 +46,7 @@ const bestSellers = () => {
                       </div>
 
                       <div class="price-box">
-                          <del>₹${product.price + 299}</del>
+                          <del>₹ ${product.originalPrice ? product.originalPrice : product.price + 299}</del>
                           <p class="price">₹${product.price}</p>
                       </div>
 
@@ -73,6 +75,7 @@ const bestSellers = () => {
 };
 
 bestSellers();
+
 
 const getCategories = () => {
   $.ajax({
@@ -192,7 +195,7 @@ const getProducts = () => {
 
         <div class="price-box">
             <p class="price">₹${product.price}</p>
-            <del>₹${product.price * 2}</del>
+            <del>₹ ${product.originalPrice ? product.originalPrice : product.price * 2}</del>
         </div>
 
     </div>

@@ -137,11 +137,11 @@ Features
 
 User side :
 [✔]Invoice download
-[]Offer module(product offer, category offer,Referral offer).
+[✗]Offer module(product offer, category offer,Referral offer).
 
 Admin side :
 [✔]Admin Dashboard - Chart with filter(yearly,monthly etc.)
-[]Sales Report - Pdf and excel download(with order summary)
+[✔]Sales Report - Pdf and excel download(with order summary)
 
 Score-
 Theory-5.5

@@ -128,9 +128,9 @@
                                             </p>
 
                                             <div class="price-box">
-                                                <p id="product_price" class="price">$150.00</p>
+                                                <p class="price">₹<span id="product_price" ></span></p>
 
-                                                <del id="product_del_price">$200.00</del>
+                                                <span>₹<del id="product_del_price"></del></span>
                                             </div>
 
                                             <button class="add-cart-btn">add to cart</button>
@@ -353,7 +353,7 @@
             document.querySelector("#product_title").textContent = product.name
             document.querySelector("#product_price").textContent = product.price
             document.querySelector("#product_desc").textContent = product.description
-            document.querySelector("#product_del_price").textContent = product.price + 399
+            document.querySelector("#product_del_price").textContent =  product.originalPrice ? product.originalPrice : product.price * 2
 
             const images = product.image
 

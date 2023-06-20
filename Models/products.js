@@ -7,6 +7,18 @@ const productSchema = new mongoose.Schema(
       required: true,
       unique:true
     },
+    productOffer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ProductOffer",
+    },
+    categoryOffer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CategoryOffer",
+    },
+    originalPrice: {
+      type: Number,
+      default:undefined
+    },
     price: {
       type: Number,
       required: true,

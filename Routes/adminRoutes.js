@@ -37,6 +37,21 @@ const {
   getMetricsData,
   generateStockReport,
   generateCancellationReport,
+  getAllCategoryOffers,
+  createNewCategoryOffer,
+  getOneCategoryOffer,
+  updateOneCategoryOffer,
+  deleteOneCategoryOffer,
+  getAllProductOffers,
+  createNewProductOffer,
+  getOneProductOffer,
+  updateOneProductOffer,
+  deleteOneProductOffer,
+  getAllReferralOffers,
+  createNewReferralOffer,
+  getOneReferralOffer,
+  updateOneReferralOffer,
+  deleteOneReferralOffer,
 
 } = require("../Controllers/adminController");
 
@@ -168,6 +183,48 @@ router.route("/banners/:id")
   .delete(isAdmin, deleteBanner)
 
 
+
+// OFFER MANAGEMENT START
+
+/* Category*/
+
+router.route("/category-offers")
+  .get(isAdmin, getAllCategoryOffers)
+  .post(isAdmin,createNewCategoryOffer)
+  
+
+router.route("/category-offers/:id")
+  .get(isAdmin,getOneCategoryOffer)
+  .put(isAdmin,updateOneCategoryOffer)
+  .delete(isAdmin, deleteOneCategoryOffer)
+
+
+/* Product*/
+
+router.route("/product-offers")
+  .get(isAdmin, getAllProductOffers)
+  .post(isAdmin,createNewProductOffer)
+  
+
+router.route("/product-offers/:id")
+  .get(isAdmin,getOneProductOffer)
+  .put(isAdmin,updateOneProductOffer)
+  .delete(isAdmin, deleteOneProductOffer)
+
+
+/* Referral*/
+
+router.route("referral-offers")
+  .get(isAdmin, getAllReferralOffers)
+  .post(isAdmin,createNewReferralOffer)
+  
+
+router.route("referral-offers/:id")
+  .get(isAdmin,getOneReferralOffer)
+  .put(isAdmin,updateOneReferralOffer)
+  .delete(isAdmin, deleteOneReferralOffer)
+
+// OFFER MANAGEMENT END
 
 
 

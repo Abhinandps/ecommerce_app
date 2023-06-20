@@ -11,6 +11,8 @@ const Order = require("../Models/orders");
 const Coupon = require("../Models/coupen");
 const Banner = require("../Models/banner");
 const { generatePDF, generateCSV } = require("../utils/generateReport");
+const CategoryOffer = require("../Models/categoryOffer");
+const ProductOffer = require("../Models/productOffer");
 
 exports.getAllUsers = catchAsync(async (req, res) => {
   const users = await User.find();
@@ -100,26 +102,6 @@ exports.updateCategory = catchAsync(async (req, res, next) => {
   }
 });
 
-// exports.deleteCategory = catchAsync(async (req, res, next) => {
-//   const category = await Category.findById(req.params.id);
-
-//   if (!category) {
-//     return next(new AppError("Category not found", 404));
-//   }
-
-//   // Remove the category from the database
-//   await Category.findByIdAndDelete(req.params.id);
-
-//   // Delete the icon file from storage
-//   if (category.image) {
-//     fs.unlink(category.image, (err) => {
-//       if (err) console.log(err);
-//     });
-//   }
-
-//   res.status(204).json({ message: "Category deleted" });
-// });
-
 exports.deleteCategory = catchAsync(async (req, res, next) => {
   const category = await Category.findById(req.params.id);
 
@@ -140,7 +122,6 @@ exports.deleteCategory = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllProducts = catchAsync(async (req, res) => {
-  // const products = await Product.find({ deleted: false });
   res.status(200).json({
     status: "success",
     data: res.paginatedResults,
@@ -901,14 +882,10 @@ exports.getMetricsData = catchAsync(async (req, res, next) => {
   });
 });
 
-
-
-
 /*
 REPORTS
 ========
 */
-
 
 // Generate Sales Report Data
 exports.getSalesReportData = catchAsync(async (req, res, next) => {
@@ -1366,3 +1343,336 @@ exports.generateReturnRefundReport = catchAsync(async (req, res) => {
   });
 });
 
+// OFFER MANAGEMENT START
+
+/* Category*/
+
+exports.getAllCategoryOffers = catchAsync(async (req, res) => {
+  // Retrieve all category offers
+  const categoryOffers = await CategoryOffer.find();
+
+  res.status(200).json({ categoryOffers });
+});
+
+exports.createNewCategoryOffer = catchAsync(async (req, res) => {
+  const { categoryId, discount, description } = req.body;
+
+  const products = await Product.find({ category: { $in: categoryId } });
+
+  // Validate the request body
+  if (!categoryId || !description || !discount) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  if (products.length === 0) {
+    return res
+      .status(404)
+      .json({ error: "No products found in the specified category" });
+  }
+
+  // Check if a category offer already exists for the category ID
+  const existingCategoryOffer = await CategoryOffer.findOne({
+    category: categoryId,
+  });
+  if (existingCategoryOffer) {
+    return res.status(409).json({
+      error: "Category offer already exists for the specified category",
+    });
+  }
+
+  // Create a new category offer
+  const newCategoryOffer = await CategoryOffer.create({
+    category: categoryId,
+    description: `${description} ${discount}% off`,
+    discount,
+  });
+
+  // Apply the discount to each product
+  for (const product of products) {
+    if (product.originalPrice) {
+      product.categoryOffer = newCategoryOffer._id;
+      product.price -= Math.round((product.price * discount) / 100);
+      await product.save();
+    } else {
+      product.categoryOffer = newCategoryOffer._id;
+      product.originalPrice = product.price;
+      product.price -= Math.round((product.price * discount) / 100);
+      await product.save();
+    }
+  }
+
+  res.status(201).json(products);
+});
+
+// < pending ... >
+exports.getOneCategoryOffer = catchAsync(async (req, res) => {});
+
+exports.updateOneCategoryOffer = catchAsync(async (req, res) => {
+  const categoryId = req.params.id;
+  const { discount, description } = req.body;
+
+  // Find the category offer by category ID
+  const categoryOffer = await CategoryOffer.findOne({ category: categoryId });
+
+  if (!categoryOffer) {
+    return res.status(404).json({ error: "Category offer not found" });
+  }
+
+  const products = await Product.find({ category: categoryId });
+
+  if (products.length === 0) {
+    return res
+      .status(404)
+      .json({ error: "No products found in the specified category" });
+  }
+
+  // Revert the prices of the products to their original prices
+  for (const product of products) {
+    const productOffer = await ProductOffer.findById(product.productOffer);
+    // console.log(productOffer);
+    if (!productOffer) {
+      // If the product offer is not found, clear the original price
+      product.price = product.originalPrice;
+      product.originalPrice = undefined;
+      product.originalPrice = product.price;
+      product.price -= Math.round((product.price * discount) / 100);
+      await product.save();
+    } else {
+      // find product offer price
+      const productOfferPrice = Math.round(
+        (product.originalPrice * productOffer.discount) / 100
+      );
+      product.price = product.originalPrice - productOfferPrice;
+
+      let storeOriginalPriceAsTemp = product.originalPrice; // store as temp
+
+      product.originalPrice = product.price;
+
+      product.price -= Math.round((product.price * discount) / 100);
+      product.originalPrice = storeOriginalPriceAsTemp; // assign after discount updated
+      await product.save();
+    }
+  }
+
+  // Update the category offer fields
+  categoryOffer.discount = discount;
+  categoryOffer.description = description;
+
+  // Save the updated category offer
+  await categoryOffer.save();
+
+  res
+    .status(200)
+    .json({ message: "Category offer updated successfully", categoryOffer });
+});
+
+exports.deleteOneCategoryOffer = catchAsync(async (req, res) => {
+  const categoryId = req.params.id;
+
+  const products = await Product.find({ category: { $in: categoryId } });
+
+  const categoryOffer = await CategoryOffer.findOne({ category: categoryId });
+
+  if (!categoryOffer) {
+    return res.status(404).json({ error: "Category offer not found" });
+  }
+
+  // Revert the prices of the products to their original prices
+  for (const product of products) {
+    const productOffer = await ProductOffer.findById(product.productOffer);
+    if (!productOffer) {
+      product.price = product.originalPrice;
+      product.originalPrice = undefined;
+      product.categoryOffer = undefined;
+      await product.save();
+    } else {
+      product.price =  product.originalPrice - Math.round(
+        (product.originalPrice * productOffer.discount) / 100
+      );
+      product.categoryOffer = undefined;
+      await product.save();
+    }
+  }
+
+  await categoryOffer.deleteOne();
+
+  res.status(200).json({ status: "deleted" });
+});
+
+/* Product*/
+
+exports.getAllProductOffers = catchAsync(async (req, res) => {});
+
+exports.createNewProductOffer = catchAsync(async (req, res) => {
+  const { productId, categoryId, discount } = req.body;
+  // Validate the request body
+  if (!productId || !categoryId || !discount) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  // Retrieve the product by ID and category
+  const product = await Product.findOne({
+    _id: productId,
+    category: categoryId,
+  });
+
+  if (!product) {
+    return res.status(404).json({ error: "Product not found" });
+  }
+
+  // Check if a product offer already exists for the productID
+  const existingProductOffer = await ProductOffer.findOne({product: productId});
+
+  if (existingProductOffer) {
+    return res.status(409).json({
+      error: "Product offer already exists for the specified product",
+    });
+  }
+
+  // Create a new product offer
+  const newProductOffer = await ProductOffer.create({
+    product: productId,
+    category: categoryId,
+    description: `${discount}%`,
+    discount,
+  });
+
+  // Apply the discount to product
+  if (product.originalPrice) {
+    product.productOffer = newProductOffer._id;
+    product.price -= Math.round((product.price * discount) / 100);
+  } else {
+    product.productOffer = newProductOffer._id;
+    product.originalPrice = product.price;
+    product.price -= Math.round((product.price * discount) / 100);
+  }
+
+  await product.save();
+
+  res.status(201).json({
+    message: "Product offer created successfully",
+    productOffer: newProductOffer,
+  });
+});
+
+
+exports.getOneProductOffer = catchAsync(async (req, res) => {});
+
+
+exports.updateOneProductOffer = catchAsync(async (req, res) => {
+  const productId = req.params.id;
+
+  const { discount, description } = req.body;
+
+  
+  const product = await Product.findOne({ _id: productId });
+
+  if (!product) {
+    return res
+      .status(404)
+      .json({ error: "No product found in the specified product offer" });
+  }
+
+  // Find the product offer by product ID
+  const productOffer = await ProductOffer.findById(product.productOffer);
+
+  if (!productOffer) {
+    return res.status(404).json({ error: "product offer not found" });
+  }
+
+
+  const categoryOffer = await CategoryOffer.findById(product.categoryOffer);
+  // console.log(categoryOffer);
+  
+  if (!categoryOffer) {
+    // If the product offer is not found, clear the original price
+    product.price = product.originalPrice;
+    product.originalPrice = undefined;
+    product.originalPrice = product.price;
+    product.price -= Math.round((product.price * discount) / 100);
+    await product.save();
+  } else {
+    // find product offer price
+    const categoryOfferPrice = Math.round(
+      (product.originalPrice * categoryOffer.discount) / 100
+    );
+    product.price = product.originalPrice - categoryOfferPrice;
+
+    let storeOriginalPriceAsTemp = product.originalPrice; // store as temp
+
+    product.originalPrice = product.price;
+
+    product.price -= Math.round((product.price * discount) / 100);
+    product.originalPrice = storeOriginalPriceAsTemp; // assign after discount updated
+    await product.save();
+  }
+
+  console.log(product)
+
+  // Update the category offer fields
+  productOffer.discount = discount;
+  productOffer.description = description;
+
+  // Save the updated category offer
+  // await productOffer.save();
+
+  res
+    .status(200)
+    .json({ message: "product offer updated successfully", productOffer });
+});
+
+
+
+
+exports.deleteOneProductOffer = catchAsync(async (req, res) => {
+
+  const productId = req.params.id;
+  
+
+  const product = await Product.findOne({ _id: productId });
+  const productOffer = await ProductOffer.findById(product.productOffer);
+
+
+
+  if (!productOffer) {
+    return res.status(404).json({ error: "Product offer not found" });
+  }
+
+  
+
+
+  // Revert the prices of the products to their original prices
+  const categoryOffer = await CategoryOffer.findById(product.categoryOffer);
+
+  if (!categoryOffer) {
+    product.price = product.originalPrice;
+    product.originalPrice = undefined;
+    product.productOffer = undefined;
+    await product.save();
+  } else { 
+    product.price = product.originalPrice - Math.round((product.originalPrice * categoryOffer.discount) / 100);
+    product.productOffer = undefined;
+    await product.save();
+  }
+
+
+  await productOffer.deleteOne();
+
+  res.status(200).json({ status: "deleted" });
+});
+
+
+
+/* Referral*/
+
+exports.getAllReferralOffers = catchAsync(async (req, res) => {});
+
+exports.createNewReferralOffer = catchAsync(async (req, res) => {});
+
+exports.getOneReferralOffer = catchAsync(async (req, res) => {});
+
+exports.updateOneReferralOffer = catchAsync(async (req, res) => {});
+
+exports.deleteOneReferralOffer = catchAsync(async (req, res) => {});
+
+// OFFER MANAGEMENT END

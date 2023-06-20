@@ -1,4 +1,4 @@
-const easyinvoice = require("easyinvoice");
+const easyinvoice = require('easyinvoice');
 const Cart = require("../Models/Cart");
 const Order = require("../Models/orders");
 const fs = require("fs");
