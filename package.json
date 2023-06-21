@@ -30,6 +30,7 @@
     "otp-generator": "^4.0.1",
     "pdfkit": "^0.13.0",
     "razorpay": "^2.8.6",
-    "twilio": "^4.11.1"
+    "twilio": "^4.11.1",
+    "uuid": "^9.0.0"
   }
 }

@@ -344,7 +344,7 @@
                 </div>
 
                 <div class="header-user-actions">
-                    <% if (locals.user) { %>
+                    <% if (locals.user && locals.user.role === 'user') { %>
 
                         <button class="action-btn" data-menu-user-action>
                             <img class="mobile-user-avatar" src="<%= locals.user.avatar.replace('public\\', '') %>"
@@ -363,7 +363,7 @@
                         </div>
 
 
-                        <% } else { %>
+                        <% } else if (locals.user && locals.user.role === 'guest') { %>
                             <button class="action-btn" data-user-action>
                                 <ion-icon name="person-outline"></ion-icon>
                             </button>
@@ -866,7 +866,6 @@
                         email: emailValue, password: passwordValue
                     },
                 });
-
                 if (res.data.status == "success") {
                     location.assign('/')
                 } else {

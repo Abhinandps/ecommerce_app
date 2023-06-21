@@ -13,8 +13,8 @@ const Order = require("../Models/orders");
 const Coupon = require("../Models/coupen");
 const Banner = require("../Models/banner");
 
-
 const { generateInvoice } = require("../utils/generateInvoice");
+const GuestUser = require("../Models/guestUser");
 
 const generateOrderID = () => {
   const date = new Date();
@@ -48,7 +48,6 @@ exports.toprated = catchAsync(async (req, res) => {
   res.json(topRatedProducts);
 });
 
-
 exports.bestSellers = catchAsync(async (req, res) => {
   const orders = await Order.find({ status: "delivered" })
     .populate("items.product")
@@ -59,11 +58,11 @@ exports.bestSellers = catchAsync(async (req, res) => {
   orders.forEach((order) => {
     order.items.forEach((item) => {
       const { product, quantity } = item;
-      const { _id, name, price, image ,description} = product;
+      const { _id, name, price, image, description } = product;
       if (productSales[_id]) {
         productSales[_id].quantity += quantity;
       } else {
-        productSales[_id] = { _id, name, quantity, price, image , description };
+        productSales[_id] = { _id, name, quantity, price, image, description };
       }
     });
   });
@@ -83,16 +82,31 @@ exports.bestSellers = catchAsync(async (req, res) => {
   });
 });
 
-
 exports.getAllProducts = catchAsync(async (req, res) => {
   const products = await Product.find({ deleted: false }).populate("category"); // Populate category field with full category document
 
   res.json({ status: "success", data: products });
 });
 
+
 // cart management
 
 exports.getCart = catchAsync(async (req, res) => {
+  if (req.user.role === "guest") {
+    let cart = await GuestUser.findOne({
+      guestUserID: req.user.guestUserID,
+    });
+    const { productSum, totalPrice } = await cart.calculatePrices();
+
+    return res.status(200).json({
+      status: "success",
+      cart,
+      productSum,
+      totalPrice,
+    });
+  }
+
+  // normal user
   const cart = await Cart.findOne({ user: req.user._id });
   const { productSum, totalPrice } = await cart.calculatePrices();
 
@@ -106,6 +120,36 @@ exports.getCart = catchAsync(async (req, res) => {
 
 exports.addToCart = catchAsync(async (req, res) => {
   const { productId, quantity } = req.body;
+  console.log(productId, quantity);
+
+  if (req.user.role === "guest") {
+    let cart = await GuestUser.findOne({
+      guestUserID: req.user.guestUserID,
+    });
+
+    // Check if the product already exists in the cart
+    const existingItem = cart.items.find(
+      (item) => item.product.toString() === productId
+    );
+
+    if (existingItem) {
+      existingItem.quantity += Number(quantity);
+    } else {
+      cart.items.push({ product: productId, quantity });
+    }
+
+    await cart.save();
+
+    const { productSum, totalPrice } = await cart.calculatePrices();
+
+    return res.status(201).json({
+      status: "success",
+      message: "Item added to cart successfully",
+      cart,
+      productSum,
+      totalPrice,
+    });
+  }
 
   let cart = await Cart.findOne({ user: req.user._id });
 
@@ -140,6 +184,28 @@ exports.addToCart = catchAsync(async (req, res) => {
 exports.updateCartItem = catchAsync(async (req, res) => {
   const { productId } = req.params;
   const { quantity } = req.body;
+
+  if (req.user.role === "guest") {
+    let guestUser = await GuestUser.findOne({
+      guestUserID: req.user.guestUserID,
+    });
+
+    const cartItem = guestUser.items.find(
+      (item) => item.product.toString() === productId
+    );
+    cartItem.quantity = quantity;
+    await guestUser.save();
+    const { productSum } = await cart.calculatePrices();
+
+    return res.status(201).json({
+      status: "success",
+      message: "Cart item updated successfully.",
+      cart,
+      productSum,
+      totalPrice,
+    });
+  }
+
   const cart = await Cart.findOne({ user: req.user._id });
 
   // Update the quantity of the specified product in the cart
@@ -164,7 +230,20 @@ exports.updateCartItem = catchAsync(async (req, res) => {
 
 exports.updateCartTotal = catchAsync(async (req, res) => {
   const { totalPrice } = req.body;
-  console.log(totalPrice);
+
+  if (req.user.role === "guest") {
+    const cart = await GuestUser.findOneAndUpdate(
+      { guestUserID: req.user.guestUserID },
+      { totalPrice: totalPrice },
+      { new: true }
+    );
+    return res.status(200).json({
+      status: "success",
+      message: "Cart total price updated successfully.",
+      cart,
+    });
+  }
+
   const userId = req.user._id;
   const cart = await Cart.findOneAndUpdate(
     { user: userId },
@@ -180,6 +259,30 @@ exports.updateCartTotal = catchAsync(async (req, res) => {
 
 exports.removeCartItem = catchAsync(async (req, res) => {
   const { productId } = req.params;
+
+  if (req.user.role === "guest") {
+    let cart = await GuestUser.findOne({
+      guestUserID: req.user.guestUserID,
+    });
+
+    // Update the quantity of the specified product in the cart
+    cart.items = cart.items.filter(
+      (item) => item.product.toString() !== productId
+    );
+
+    await cart.save();
+
+    const { productSum, totalPrice } = await cart.calculatePrices();
+
+    return res.status(204).json({
+      status: "success",
+      message: "Cart item removed successfully.",
+      cart,
+      productSum,
+      totalPrice,
+    });
+  }
+
   const cart = await Cart.findOne({ user: req.user._id });
 
   // Update the quantity of the specified product in the cart
@@ -201,12 +304,22 @@ exports.removeCartItem = catchAsync(async (req, res) => {
 });
 
 exports.getCartItemsCount = catchAsync(async (req, res, next) => {
+  if (req.user.role === "guest") {
+    let cart = await GuestUser.findOne({
+      guestUserID: req.user.guestUserID,
+    });
+    const cartItemsCount = cart.items.length;
+
+    return res.json({ count: cartItemsCount });
+  }
   const cart = await Cart.findOne({ user: req.user._id });
 
   const cartItemsCount = cart.items.length;
 
   res.json({ count: cartItemsCount });
 });
+
+
 
 exports.saveShippingAddress = catchAsync(async (req, res) => {
   const cart = await Cart.findOne({ user: req.user._id });

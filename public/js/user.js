@@ -638,6 +638,7 @@ const getCoupons = () => {
 
 getCoupons();
 
+
 const updateCartTotal = (totalPrice) => {
   $.ajax({
     type: "PATCH",
@@ -655,6 +656,7 @@ const updateCartTotal = (totalPrice) => {
 };
 
 getCheckOut();
+
 
 const getPaymentDetails = () => {
   const shippingHandlingFee = 98;

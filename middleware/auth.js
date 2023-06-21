@@ -2,6 +2,8 @@ const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
 const Admin = require("../Models/adminModel");
 const User = require("../Models/userModel");
+const { generateGuestID } = require("../utils/guestUtils");
+const GuestUser = require("../Models/guestUser");
 
 // User auth
 // exports.isAuthenticate = async (req, res, next) => {
@@ -42,8 +44,9 @@ const User = require("../Models/userModel");
 //   next();
 // };
 
-
 // User auth
+
+
 exports.isAuthenticate = async (req, res, next) => {
   let token;
   if (
@@ -79,6 +82,44 @@ exports.isAuthenticate = async (req, res, next) => {
       return next();
     } catch (err) {
       return next();
+    }
+  } else {
+    // Guest user
+    const guestUserID = req.cookies.guestUserID; // Retrieve the guest user ID from the cookie
+
+    if (guestUserID) {
+      // Guest user exists, retrieve guest user's information from the database based on the guestUserID
+      const guestUser = await GuestUser.findOne({ guestUserID });
+      if (guestUser) {
+        req.user = guestUser; // Attach the guest user object to the request object
+        res.locals.user = guestUser;
+      } else {
+        // Handle case when guest user ID is not found in the database
+        // You can create a new guest user entry in the database if needed
+      }
+    } else {
+      const newGuestUserID = generateGuestID();
+      const maxAgeInMinutes = 60 * 24; // 24 hours
+      const maxAgeInMilliseconds = maxAgeInMinutes * 60 * 1000;
+
+      res.cookie("guestUserID", newGuestUserID, {
+        maxAge: maxAgeInMilliseconds,
+        httpOnly: true,
+      });
+
+      const guestUser = new GuestUser({
+        guestUserID: newGuestUserID,
+        items: [],
+        role:"guest"
+      });
+
+      try {
+        await guestUser.save();
+        req.user = guestUser;
+        res.locals.user = guestUser;
+      } catch (err) {
+        console.error(err);
+      }
     }
   }
   next();

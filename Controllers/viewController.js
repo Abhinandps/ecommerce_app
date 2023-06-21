@@ -4,76 +4,73 @@ exports.getAdminLogin = (req, res) => {
   if (req.admin) {
     res.redirect("/dashboard");
   } else {
-    res.render('admin/login')
+    res.render("admin/login");
   }
 };
 
 exports.getDashboard = (req, res) => {
-  if(req.admin){
-    res.render('admin/pages/dashboard')
-  }else{
-    res.redirect('/admin/login')
+  if (req.admin) {
+    res.render("admin/pages/dashboard");
+  } else {
+    res.redirect("/admin/login");
   }
 };
 
 exports.getUsers = (req, res) => {
-  if(req.admin){
+  if (req.admin) {
     res.render("admin/pages/users");
-  }else{
-    res.redirect('/admin/login')
+  } else {
+    res.redirect("/admin/login");
   }
 };
 
 exports.getAllCategories = (req, res) => {
-  if(req.admin){
+  if (req.admin) {
     res.render("admin/pages/categories");
-  }else{
-    res.redirect('/admin/login')
+  } else {
+    res.redirect("/admin/login");
   }
 };
 
 exports.getAllProducts = (req, res) => {
-  if(req.admin){
+  if (req.admin) {
     res.render("admin/pages/products");
-  }else{
-    res.redirect('/admin/login')
+  } else {
+    res.redirect("/admin/login");
   }
 };
 
-
-exports.getAllCoupones = (req,res)=>{
-  if(req.admin){
+exports.getAllCoupones = (req, res) => {
+  if (req.admin) {
     res.render("admin/pages/coupons");
-  }else{
-    res.redirect('/admin/login')
+  } else {
+    res.redirect("/admin/login");
   }
-}
+};
 
-exports.getAllOrders = (req,res)=>{
-  if(req.admin){
+exports.getAllOrders = (req, res) => {
+  if (req.admin) {
     res.render("admin/pages/orders");
-  }else{
-    res.redirect('/admin/login')
+  } else {
+    res.redirect("/admin/login");
   }
-}
+};
 
-
-exports.getOrderPage = (req,res)=>{
-  if(req.admin){
-    res.render("admin/pages/orderDetails.ejs")
-    }else{
-      res.redirect('/admin/login')
-    }
-}
-
-
-exports.getAllBanners = (req,res)=>{
-  if(req.admin){
-    res.render("admin/pages/banner.ejs")
-  }else{
-    res.redirect('/admin/login')
+exports.getOrderPage = (req, res) => {
+  if (req.admin) {
+    res.render("admin/pages/orderDetails.ejs");
+  } else {
+    res.redirect("/admin/login");
   }
-}
+};
+
+exports.getAllBanners = (req, res) => {
+  if (req.admin) {
+    res.render("admin/pages/banner.ejs");
+  } else {
+    res.redirect("/admin/login");
+  }
+};
 
 // USER
 
@@ -85,6 +82,7 @@ exports.getUserLogin = (req, res) => {
   }
 };
 
+
 exports.getSignIn = (req, res) => {
   if (req.user) {
     res.redirect("/");
@@ -93,6 +91,7 @@ exports.getSignIn = (req, res) => {
   }
 };
 
+
 exports.getUserSignup = (req, res) => {
   if (req.user) {
     res.redirect("/");
@@ -100,6 +99,7 @@ exports.getUserSignup = (req, res) => {
     res.render("user/signup.ejs");
   }
 };
+
 
 exports.getOtpForm = (req, res) => {
   if (req.user) {
@@ -110,77 +110,85 @@ exports.getOtpForm = (req, res) => {
   }
 };
 
+
 exports.getHome = (req, res) => {
-  if (req.user) {
+  if (req.user && req.user.role === "guest") {
     res.render("user/home.ejs");
   } else {
-    res.render("user/demo/home.ejs");
+    res.render("user/home.ejs");
   }
 };
 
-exports.getProfile = (req,res)=>{
-  if(req.user){
-    res.render("user/profile.ejs")
+
+exports.getProfile = (req, res) => {
+  if (req.user & req.user.role === "user") {
+    res.render("user/profile.ejs");
   }
-}
+};
+
 
 exports.getShoppingPage = (req, res) => {
-  if (req.user) {
+  if (req.user && req.user.role === "guest") {
     res.render("user/shop.ejs");
   } else {
-    res.render("user/demo/shop.ejs");
+    res.render("user/shop.ejs");
   }
 };
 
 
-exports.getProductDetails = (req,res)=>{
-  if(req.user){
-    res.render("user/shopDetails")
-  }else {
-    res.render("user/demo/shopDetails.ejs");
+exports.getProductDetails = (req, res) => {
+  if (req.user && req.user.role === "guest") {
+    res.render("user/shopDetails");
+  } else {
+    res.render("user/shopDetails");
   }
-}
+};
 
-exports.getCartPage = (req,res)=>{
-  if(req.user){
-    res.render("user/cart")
+
+exports.getCartPage = (req, res) => {
+  if (req.user && req.user.role === "guest") {
+    res.render("user/cart");
+  } else {
+    res.render("user/cart");
+  }
+};
+
+
+
+exports.getCheckoutPage = (req, res) => {
+  if (req.user && req.user.role === "user") {
+    res.render("user/checkout.ejs");
   }else{
-    res.render("user/demo/cart.ejs")
+    res.redirect("/");
   }
-}
+};
 
-exports.getCheckoutPage = (req,res)=>{
-  if(req.user){
-    res.render("user/checkout.ejs")
+
+exports.getOrdersPage = (req, res) => {
+  if (req.user && req.user.role === "user") {
+    res.render("user/order.ejs");
+  }else{
+    res.redirect("/shop");
   }
-}
+};
 
 
-exports.getOrdersPage = (req,res)=>{
-  if(req.user){
-    res.render("user/order.ejs")
+exports.getOneOrder = (req, res) => {
+  if (req.user && req.user.role === "user") {
+    res.render("user/orderDetails.ejs");
+  }else{
+    res.redirect("/shop");
   }
-}
+};
 
-
-exports.getOneOrder = (req,res)=>{
-  if(req.user){
-    res.render("user/orderDetails.ejs")
+exports.getPaymentPage = (req, res) => {
+  if (req.user && req.user.role === "user") {
+    res.render("user/payment.ejs");
+  }else{
+    res.redirect("/shop");
   }
-}
+};
 
-
-
-exports.getPaymentPage = (req,res)=>{
-  if(req.user){
-    res.render("user/payment.ejs")
-  }
-}
-
-
-
-exports.getErrorPage = (req,res)=>{
-  res.render("404.ejs")
-}
-
-
+exports.getErrorPage = (req, res) => {
+  res.render("404.ejs");
+};

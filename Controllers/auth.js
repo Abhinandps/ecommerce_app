@@ -9,6 +9,8 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const ErrorHandler = require("../Controllers/errorController");
 const twilio = require("twilio");
+const Cart = require("../Models/Cart");
+const GuestUser = require("../Models/guestUser");
 
 function generateNumericOTP(length) {
   const digits = "0123456789";
@@ -34,6 +36,7 @@ const sendOTP = (otp, user) => {
       pass: process.env.EMAIL_PASSWORD,
     },
   });
+  
   const mailOptions = {
     from: process.env.EMAIL_USERNAME,
     to: user.email,
@@ -63,7 +66,7 @@ const sendMobileOTP = async (otp, mobileNumber) => {
   });
 };
 
-const createSendToken = (user, statusCode, res) => {
+const createSendToken = async (user, statusCode, res, req) => {
   // Generate a JWT containing the user's ID
   const token = signToken(user._id);
 
@@ -81,13 +84,53 @@ const createSendToken = (user, statusCode, res) => {
   // Remove password from response
   user.password = undefined;
 
+  // handle guest user
+
+
+  const guestUserID = req.cookies.guestUserID;
+  if (guestUserID) {
+    const guestUser = await GuestUser.findOne({ guestUserID });
+    res.clearCookie("guestUserID");
+    (async () => {
+      const user = await findUserFromToken(token);
+      // console.log(user);
+      const cart = await Cart.findOne({ user: user._id });
+      if (cart) {
+        cart.items = guestUser.items;
+        cart.totalPrice = guestUser.totalPrice;
+        await cart.save();
+      } else {
+        cart.items = [];
+        await cart.save();
+      }
+    })();
+  }
+
+
   res.status(statusCode).json({
     status: "success",
     token,
     data: {
-      data: user,
+      data: user
     },
   });
+};
+
+const findUserFromToken = async (token) => {
+  try {
+    // Decode the token to extract the user ID
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+
+    // Find the user based on the user ID
+    const user = await User.findById(userId);
+
+    return user;
+  } catch (error) {
+    // Handle error if the token is invalid or user is not found
+    console.log("Error finding user from token:", error);
+    return null;
+  }
 };
 
 // User signup
@@ -110,15 +153,15 @@ exports.signup = catchAsync(async (req, res, next) => {
   newUser.otp = otp;
   await newUser.save();
 
-
-   // Send the OTP to the user's mobile number
-   sendMobileOTP(otp, newUser.mobile);
+  // Send the OTP to the user's mobile number
+  sendMobileOTP(otp, newUser.mobile);
 
   // Send the OTP to the user's email address
   // sendOTP(otp, newUser);
 
   res.json({ status: "success" });
 }, ErrorHandler);
+
 
 // Verify the OTP
 exports.verifyOTP = async (req, res, next) => {
@@ -145,8 +188,9 @@ exports.verifyOTP = async (req, res, next) => {
   await user.save();
 
   // Send Token To Client
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, res,req);
 };
+
 
 // validate
 
@@ -165,6 +209,7 @@ exports.validate = catchAsync(async (req, res, next) => {
 
   res.status(200).json({ status: "success" });
 }, ErrorHandler);
+
 
 // User Login
 exports.login = catchAsync(async (req, res, next) => {
@@ -193,10 +238,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 3) if everything ok, send token to client
-  createSendToken(user, 200, res);
-
-  // Create a new session for the user
-  req.session.userId = 1;
+  createSendToken(user, 200, res, req);
 }, ErrorHandler);
 
 // User generateOTP

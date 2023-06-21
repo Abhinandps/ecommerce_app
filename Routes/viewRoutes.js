@@ -30,6 +30,12 @@ const { isAuthenticate ,isAdmin} = require("../middleware/auth");
 
 
 
+
+
+// GUEST VIEW ACTIONS
+
+
+
 // ADMIN VIEW
 router.get("/admin/login",isAdmin, getAdminLogin);
 

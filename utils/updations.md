@@ -90,7 +90,7 @@ Week 3 Project Updations
 [✔] - order details - admin
 [✔] - add product UI
 [] - Home page
-[✗] - guest user experience
+[✔] - guest user experience
 [✔] - order success and order details page 
 [✔] - profile 
 [✔] - $ and ₹
@@ -106,7 +106,7 @@ Week 3 Project Updations
 [] Image Zooming, Image Cropping
 [✔] Admin dashboard
 [✔] Chart & Graph reports in Admin Side
-[] User profile
+[✗] User profile
 
 Theory:6
 Workout:6
