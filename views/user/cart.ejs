@@ -1,188 +1,275 @@
 <%- include ('../layouts/header.ejs') %>
 
 
-    <div class="container wrapper">
+    <% if (locals.modal) { %>
+        <script>
 
-        <div class="carts">
-            <div class="cart-head">
-                <h2 class="cart-title">Your Cart</h2>
-                <button class="cart-button">
-                    <i></i>
-                    <!-- ( 3 items ) -->
-                </button>
-            </div>
+            // modal variables
+            const modal = document.querySelector("[data-modal]");
+            const modalCloseBtn = document.querySelector("[data-modal-close]");
+            const modalCloseOverlay = document.querySelector("[data-modal-overlay]");
 
-            <div class="cart-items">
-                <div class="empty-cart">
-                    <h3>Missing Cart items ?</h3>
-                    <p>Your Cart is Empty now this time to shop</p>
-                    <a href="/shop" class="button">Shop</a>
-                    </div>
-            </div>
-        </div>
+            // modal function
+            const modalCloseFunc = function () {
+                modal.classList.remove("modal-active");
+                modal.classList.remove("closed");
+            };
 
-        <div class="proceedSidebar">
-            <div id="couponEditCard" class="couponEditCard">
+            const modalDisplayFunc = function () {
+                document.getElementById("signup-form").style.display = "none";
+                document.getElementById("login").style.display = "none";
+                modal.classList.remove("closed");
+                modal.classList.add("modal-active");
+            };
 
-            </div>
-
-            <div class="desc">
-                <p>how are shipping costs calculated? shipping have been applied to your order</p>
-            </div>
-            <div class="sidebar-heading">
-                <h2>Order Summary</h2>
-            </div>
-            <div class="sidebar-details">
-                <div class="group-data">
-                    <div class="data-title">Items( <span item-count> </span> ):</div>
-                    <div id="totalPrice" class="title-value">₹<span></span></div>
-                </div>
-                <div class="group-data">
-                    <div class="data-title"> shipping & handling:</div>
-                    <div class="title-value">₹98.00</div>
-                </div>
-                <div class="group-data">
-                    <div class="data-title">Coupon Discount:</div>
-                    <div class="title-value" style="cursor:pointer;" id="coupon-list"> Apply Coupon </div>
-                </div>
-                <div class="group-data">
-                    <div class="data-title">Delivery Charges:</div>
-                    <div class="title-value">₹0.00</div>
-                </div>
-                <div class="group-data">
-                    <div class="data-total">total Payable:</div>
-                    <div class="title-value">₹<span id="totalPayable"></span></div>
-                </div>
-                <button class="btn-proceed" onclick="goToChekOut()">Checkout</button>
+            modalDisplayFunc()
 
 
-            </div>
-        </div>
+            // modal eventListener
+            modalCloseOverlay.addEventListener("click", modalCloseFunc);
+            modalCloseBtn.addEventListener("click", modalCloseFunc);
+
+        </script>
+        <script>
+            // multi form handle 
 
 
 
+            // Multi Page Handle
 
-        <div class="form-popup-bg">
-            <div class="form-container">
-                <button id="btnCloseForm" class="modal-close-btn">
-                    <ion-icon id="btnCloseForm" name="close-outline"></ion-icon>
-                </button>
-                <h1>Apply Coupon</h1>
-                <!-- <p>For more information. Please complete this form.</p> -->
+            const signup = document.querySelector("[data-user-action]");
+            const mobileSignup = document.querySelector("[data-mobile-user-action]");
 
-                <form id="applyCoupon" method="post">
+            signup.addEventListener("click", modalDisplayFunc);
+            mobileSignup.addEventListener("click", modalDisplayFunc);
 
-                    <div class="form-group">
-                        <input id="code" type="text" placeholder="Enter coupon code" name="code" class="form-control"
-                            required />
-                        <span class="invalid error" id="error-coupon"></span>
-                    </div>
+            function showOTPForm() {
+                setTimeout(() => {
+                    document.getElementById("otp-login-form").style.display = "none";
+                    document.getElementById("otp-form").style.display = "block";
+                    document.getElementById("signup-form").style.display = "none";
+                    document.getElementById("login").style.display = "none";
+                }, 500);
+            }
 
-                    <div class="form-group" id="coupon-codes-container">
+            function showSignUpForm() {
+                document.getElementById("login").style.display = "none";
+                document.getElementById("otp-login-form").style.display = "none";
+                document.getElementById("otp-form").style.display = "none";
+                document.getElementById("signup-form").style.display = "block";
+            }
 
-                        <div class="coupon-code-selection">
-                            <p>ANON500</p>
+            function showLoginForm() {
+                document.getElementById("otp-login-form").style.display = "none";
+                document.getElementById("otp-form").style.display = "none";
+                document.getElementById("signup-form").style.display = "none";
+                document.getElementById("login").style.display = "block";
+            }
 
-                            <div class="coupon-details">
-                                <p class="highlight_text">Save ₹501</p>
-                                <p class="more-details">
-                                    Rs.400 off on minimum purchase of Rs. 2599.
-                                    <br>
-                                    Expires On: 09th June 2023 | 12:00 AM
-                                </p>
-                            </div>
-                        </div>
+            // otp form
 
-                    </div>
+            let digitValidate = function (ele) {
+                console.log(ele.value);
+                ele.value = ele.value.replace(/[^0-9]/g, "");
+            };
 
-
-                    <div class="bottom-fixed-bar">
-                        <p id="savings">Maximum Savings : ₹0 </p>
-                        <button type="submit">APPLY</button>
-                    </div>
-                </form>
-
-            </div>
-        </div>
-
-
-
-
-    </div>
-    </div>
-
-    <script>
-        window.onload = function () {
-            getCart();
-        };
-    </script>
-
-    <script>
-        const form = document.querySelector('#applyCoupon')
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault()
-            const input = document.getElementById("code").value
-            $.ajax({
-                type: "GET",
-                url: "/api/v1/user/cart",
-                success: (data) => {
-                    try {
-                        const orderTotal = data.cart.totalPrice
-                        $.ajax({
-                            type: "POST",
-                            url: "/api/v1/user/apply-coupon",
-                            data: {
-                                code: input,
-                                orderTotal
-                            },
-                            success: function (response) {
-                                updateCartTotal(response.finalTotal)
-                                getCart()
-                                window.location.href = '/cart'
-                            },
-                            error: function (error) {
-                                document.getElementById("error-coupon").textContent =error.responseJSON.message 
-                            }
-                        })
-                    } catch (err) {
-                        console.log(err.response)
+            let tabChange = function (val) {
+                let ele = document.querySelectorAll(".otp");
+                for (let i = 0; i < ele.length; i++) {
+                    if (ele[i].value === "") {
+                        ele[i].focus();
+                        break;
                     }
                 }
-            })
-        })
+            };
+        </script>
+        <% } %>
 
-    </script>
+
+            <div class="container wrapper">
+
+                <div class="carts">
+                    <div class="cart-head">
+                        <h2 class="cart-title">Your Cart</h2>
+                        <button class="cart-button">
+                            <i></i>
+                            <!-- ( 3 items ) -->
+                        </button>
+                    </div>
+
+                    <div class="cart-items">
+                        <div class="empty-cart">
+                            <h3>Missing Cart items ?</h3>
+                            <p>Your Cart is Empty now this time to shop</p>
+                            <a href="/shop" class="button">Shop</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="proceedSidebar">
+                    <div id="couponEditCard" class="couponEditCard">
+
+                    </div>
+
+                    <div class="desc">
+                        <p>how are shipping costs calculated? shipping have been applied to your order</p>
+                    </div>
+                    <div class="sidebar-heading">
+                        <h2>Order Summary</h2>
+                    </div>
+                    <div class="sidebar-details">
+                        <div class="group-data">
+                            <div class="data-title">Items( <span item-count> </span> ):</div>
+                            <div id="totalPrice" class="title-value">₹<span></span></div>
+                        </div>
+                        <div class="group-data">
+                            <div class="data-title"> shipping & handling:</div>
+                            <div class="title-value">₹98.00</div>
+                        </div>
+                        <div class="group-data">
+                            <div class="data-title">Coupon Discount:</div>
+                            <div class="title-value" style="cursor:pointer;" id="coupon-list"> Apply Coupon </div>
+                        </div>
+                        <div class="group-data">
+                            <div class="data-title">Delivery Charges:</div>
+                            <div class="title-value">₹0.00</div>
+                        </div>
+                        <div class="group-data">
+                            <div class="data-total">total Payable:</div>
+                            <div class="title-value">₹<span id="totalPayable"></span></div>
+                        </div>
+                        <button class="btn-proceed" onclick="goToChekOut()">Checkout</button>
 
 
-    <script>
-        function closeForm() {
-            document.querySelector('.form-popup-bg').classList.remove('is-visible');
-        }
+                    </div>
+                </div>
 
-        document.addEventListener('DOMContentLoaded', function () {
-            var btnOpenForm = document.getElementById('coupon-list');
-            var formPopupBg = document.querySelector('.form-popup-bg');
-            var btnCloseForm = document.getElementById('btnCloseForm');
 
-            /* Contact Form Interactions */
-            btnOpenForm.addEventListener('click', function (event) {
-                event.preventDefault();
-                formPopupBg.classList.add('is-visible');
-            });
 
-            // close popup when clicking x or off popup
-            formPopupBg.addEventListener('click', function (event) {
-                if (event.target.classList.contains('form-popup-bg') || event.target.id === 'btnCloseForm') {
-                    event.preventDefault();
-                    formPopupBg.classList.remove('is-visible');
+
+                <div class="form-popup-bg">
+                    <div class="form-container">
+                        <button id="btnCloseForm" class="modal-close-btn">
+                            <ion-icon id="btnCloseForm" name="close-outline"></ion-icon>
+                        </button>
+                        <h1>Apply Coupon</h1>
+                        <!-- <p>For more information. Please complete this form.</p> -->
+
+                        <form id="applyCoupon" method="post">
+
+                            <div class="form-group">
+                                <input id="code" type="text" placeholder="Enter coupon code" name="code"
+                                    class="form-control" required />
+                                <span class="invalid error" id="error-coupon"></span>
+                            </div>
+
+                            <div class="form-group" id="coupon-codes-container">
+
+                                <div class="coupon-code-selection">
+                                    <p>ANON500</p>
+
+                                    <div class="coupon-details">
+                                        <p class="highlight_text">Save ₹501</p>
+                                        <p class="more-details">
+                                            Rs.400 off on minimum purchase of Rs. 2599.
+                                            <br>
+                                            Expires On: 09th June 2023 | 12:00 AM
+                                        </p>
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+                            <div class="bottom-fixed-bar">
+                                <p id="savings">Maximum Savings : ₹0 </p>
+                                <button type="submit">APPLY</button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+
+
+
+
+            </div>
+            </div>
+
+            <script>
+                window.onload = function () {
+                    getCart();
+                };
+            </script>
+
+            <script>
+                const form = document.querySelector('#applyCoupon')
+
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault()
+                    const input = document.getElementById("code").value
+                    $.ajax({
+                        type: "GET",
+                        url: "/api/v1/user/cart",
+                        success: (data) => {
+                            try {
+                                const orderTotal = data.cart.totalPrice
+                                $.ajax({
+                                    type: "POST",
+                                    url: "/api/v1/user/apply-coupon",
+                                    data: {
+                                        code: input,
+                                        orderTotal
+                                    },
+                                    success: function (response) {
+                                        updateCartTotal(response.finalTotal)
+                                        getCart()
+                                        window.location.href = '/cart'
+                                    },
+                                    error: function (error) {
+                                        document.getElementById("error-coupon").textContent = error.responseJSON.message
+                                    }
+                                })
+                            } catch (err) {
+                                console.log(err.response)
+                            }
+                        }
+                    })
+                })
+
+            </script>
+
+
+            <script>
+                function closeForm() {
+                    document.querySelector('.form-popup-bg').classList.remove('is-visible');
                 }
-            });
-        });
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    var btnOpenForm = document.getElementById('coupon-list');
+                    var formPopupBg = document.querySelector('.form-popup-bg');
+                    var btnCloseForm = document.getElementById('btnCloseForm');
+
+                    /* Contact Form Interactions */
+                    btnOpenForm.addEventListener('click', function (event) {
+                        event.preventDefault();
+                        formPopupBg.classList.add('is-visible');
+                    });
+
+                    // close popup when clicking x or off popup
+                    formPopupBg.addEventListener('click', function (event) {
+                        if (event.target.classList.contains('form-popup-bg') || event.target.id === 'btnCloseForm') {
+                            event.preventDefault();
+                            formPopupBg.classList.remove('is-visible');
+                        }
+                    });
+                });
 
 
-    </script>
+            </script>
 
 
+            <!-- Login -->
 
-    <%- include ('../layouts/footer.ejs') %>
+
+            <%- include ('../layouts/footer.ejs') %>

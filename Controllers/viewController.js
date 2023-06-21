@@ -159,7 +159,7 @@ exports.getCheckoutPage = (req, res) => {
   if (req.user && req.user.role === "user") {
     res.render("user/checkout.ejs");
   }else{
-    res.redirect("/");
+    res.render("user/cart",{modal:true});
   }
 };
 

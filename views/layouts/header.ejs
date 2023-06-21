@@ -344,7 +344,8 @@
                 </div>
 
                 <div class="header-user-actions">
-                    <% if (locals.user && locals.user.role === 'user') { %>
+
+                    <% if (locals.user && locals.user.role === 'user' ) { %>
 
                         <button class="action-btn" data-menu-user-action>
                             <img class="mobile-user-avatar" src="<%= locals.user.avatar.replace('public\\', '') %>"
@@ -442,7 +443,7 @@
                 <span class="count">0</span>
             </button>
 
-            <% if (locals.user) { %>
+            <% if (locals.user && locals.user.role === 'user' ) { %>
                 <button class="action-btn" data-mobile-user-action>
                     <img class="mobile-user-avatar" src="src/images/testimonial-1.jpg" alt="testimonial">
                 </button>
@@ -457,7 +458,7 @@
                         <li> <a href="#" class="logout">Logout</a></li>
                     </ul>
                 </div>
-                <% } else { %>
+                <% } else if (locals.user && locals.user.role === 'guest') { %>
                     <button class="action-btn" data-mobile-user-action>
                         <ion-icon name="person-outline"></ion-icon>
                     </button>
@@ -1017,6 +1018,8 @@
 
         var toggleButtons = document.querySelectorAll('.dropdown-toggle');
 
+        
+        
         // toggleButtons.forEach(function (button) {
         //     button.addEventListener('click', function () {
         //         var dropdown = this.closest('.dropdown');
@@ -1030,6 +1033,4 @@
         //         }
         //     });
         // });
-
-
     </script>

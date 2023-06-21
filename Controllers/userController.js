@@ -319,8 +319,6 @@ exports.getCartItemsCount = catchAsync(async (req, res, next) => {
   res.json({ count: cartItemsCount });
 });
 
-
-
 exports.saveShippingAddress = catchAsync(async (req, res) => {
   const cart = await Cart.findOne({ user: req.user._id });
   cart.shippingAddress.push(req.body);
@@ -331,6 +329,7 @@ exports.saveShippingAddress = catchAsync(async (req, res) => {
     cart,
   });
 });
+
 
 // Coupon
 
