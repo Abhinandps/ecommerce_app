@@ -20,7 +20,7 @@ const bestSellers = () => {
             (image) => image.split("public")[1]
           )[0];
           const item = `
-                <div class="showcase" data-product='${JSON.stringify(product)}'>
+                <div class="showcase fade-in-animation" data-product='${JSON.stringify(product)}'>
 
                   <a href="#" class="showcase-img-box">
                       <img src="${firstImage}" alt="baby fabric shoes" width="75"
@@ -98,6 +98,10 @@ const getCategories = () => {
           navlink.href = "#";
           navlink.innerHTML = category.name;
 
+          navlink.addEventListener("click", function () {
+            getProducts(category._id);
+          });
+
           const listItem = document.createElement("li");
           listItem.classList.add("panel-list-item");
           const link = document.createElement("a");
@@ -107,6 +111,9 @@ const getCategories = () => {
           img.alt = "";
           img.width = 250;
           img.height = 119;
+          img.addEventListener("click", function () {
+            getProducts(category._id);
+          });
 
           link.appendChild(img);
           listTitle.appendChild(navlink);
@@ -121,12 +128,22 @@ const getCategories = () => {
   });
 };
 
-const getProducts = () => {
+const getProducts = (categoryId) => {
   const row = $(".product-grid");
+  const filter = {};
+
+
+  row.empty()
+
+  if (categoryId) {
+    filter.category = categoryId;
+  }
+
+  const queryString = $.param(filter);
 
   $.ajax({
     type: "GET",
-    url: "http://127.0.0.1:3000/api/v1/user/products",
+    url: `/api/v1/user/products${queryString ? `?${queryString}` : ""}`,
     success: function (products) {
       const { data } = products;
       console.log(data);
@@ -137,7 +154,7 @@ const getProducts = () => {
         // console.log(newPath)
 
         const card = `
-        <div class="showcase">
+        <div class="showcase fade-in-animation">
 
         <div class="showcase-banner">
 
@@ -202,6 +219,7 @@ const getProducts = () => {
     </div>
     </div>
         `;
+        // card.classList.add("fade-in-animation");
         row.append(card);
       });
     },
@@ -317,7 +335,7 @@ const getCart = () => {
             console.log(product);
 
             const singleItem = `
-              <div class="cart-product">
+              <div class="cart-product fade-in-animation">
               <button class="exit-btn" onClick="handleRemoveCartItem('${
                 product._id
               }')">
@@ -348,7 +366,11 @@ const getCart = () => {
                     }
               </div>
 
-              ${ product.stock == 1 ? `<p class="noti"> <span>Hurry Up!  One product left</p>` : ''}
+              ${
+                product.stock == 1
+                  ? `<p class="noti"> <span>Hurry Up!  One product left</p>`
+                  : ""
+              }
 
               <div class="exit-btn">
                   <i></i>

@@ -84,25 +84,55 @@ exports.bestSellers = catchAsync(async (req, res) => {
 });
 
 
-exports.getAllProducts = catchAsync(async (req, res) => {
-  const products = await Product.find({ deleted: false }).populate("category"); 
+// exports.getAllProducts = catchAsync(async (req, res) => {
+//   const products = await Product.find({ deleted: false }).populate("category"); 
 
-   // Retrieve the productOffer values and attach them to the products
-   const productIds = products.map((product) => product._id);
-   const productOffers = await ProductOffer.find({ product: { $in: productIds } });
+//    // Retrieve the productOffer values and attach them to the products
+//    const productIds = products.map((product) => product._id);
+//    const productOffers = await ProductOffer.find({ product: { $in: productIds } });
  
-   const productsWithOffers = products.map((product) => {
-     const offer = productOffers.find((offer) => offer.product.toString() === product._id.toString());
-     return {
-       ...product._doc,
-       offer: offer ? offer.description : null,
-     };
-   });
+//    const productsWithOffers = products.map((product) => {
+//      const offer = productOffers.find((offer) => offer.product.toString() === product._id.toString());
+//      return {
+//        ...product._doc,
+//        offer: offer ? offer.description : null,
+//      };
+//    });
 
 
+
+//   res.json({ status: "success", data: productsWithOffers });
+// });
+
+
+exports.getAllProducts = catchAsync(async (req, res) => {
+  const filters = req.query; 
+
+
+  const filterOptions = { deleted: false };
+
+  if (filters.category) {
+    filterOptions.category = filters.category; 
+  }
+
+
+  const products = await Product.find(filterOptions).populate("category");
+
+  // Retrieve the productOffer values and attach them to the products
+  const productIds = products.map((product) => product._id);
+  const productOffers = await ProductOffer.find({ product: { $in: productIds } });
+
+  const productsWithOffers = products.map((product) => {
+    const offer = productOffers.find((offer) => offer.product.toString() === product._id.toString());
+    return {
+      ...product._doc,
+      offer: offer ? offer.description : null,
+    };
+  });
 
   res.json({ status: "success", data: productsWithOffers });
 });
+
 
 
 // cart management
@@ -199,7 +229,6 @@ exports.addToCart = catchAsync(async (req, res) => {
 });
 
 
-
 exports.updateCartItem = catchAsync(async (req, res) => {
   const { productId } = req.params;
   const { quantity } = req.body;
@@ -249,7 +278,6 @@ exports.updateCartItem = catchAsync(async (req, res) => {
     totalPrice,
   });
 });
-
 
 
 exports.updateCartTotal = catchAsync(async (req, res) => {
@@ -666,6 +694,7 @@ exports.orderHistory = catchAsync(async (req, res, next) => {
   });
 });
 
+
 exports.getOrderDetails = catchAsync(async (req, res, next) => {
   const { orderID } = req.params;
   const order = await Order.findOne({ orderID, user: req.user._id });
@@ -677,6 +706,7 @@ exports.getOrderDetails = catchAsync(async (req, res, next) => {
     data: order,
   });
 });
+
 
 exports.orderCancel = catchAsync(async (req, res, next) => {
   const { orderID } = req.params;
@@ -838,3 +868,6 @@ exports.updateAvatar = catchAsync(async (req, res, next) => {
 
   res.status(200).json({ status: "success", data: updatedUser });
 });
+
+
+

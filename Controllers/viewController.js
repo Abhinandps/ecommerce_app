@@ -141,7 +141,7 @@ exports.getHome = (req, res) => {
 
 
 exports.getProfile = (req, res) => {
-  if (req.user & req.user.role === "user") {
+  if (req.user) {
     res.render("user/profile.ejs");
   }
 };

@@ -117,11 +117,11 @@ Week 4 Updations
 
 Updations:
 
--[]Transaction id needed
+-[✔]Transaction id needed
 -[]Order list ui updates
--[]Order history
+-[✔]Order history
 -[]Product saving not showing any message
--[]Toaster message missing
+-[✔]Toaster message missing
 -[✔]Inform stock is out or not
 -[]Add new address ui
 -[]Dialog message needed for success
@@ -129,7 +129,7 @@ Updations:
 -[]Redirection after payment failure not working
 -[✔]Keep transaction id
 -[]Dependency injection
--[]Coupon code -ve discount amount
+-[✔]Coupon code -ve discount amount
 
 
 Features

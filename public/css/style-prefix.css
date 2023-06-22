@@ -2494,6 +2494,8 @@ footer {
     width: 100%;
   }
 
+ 
+
   /* profile  */
 
   .grid-container .grid-item.top-left {
@@ -2608,7 +2610,7 @@ footer {
     width: 100%;
     height: 100%;
     background: var(--white);
-    border-radius: var(--border-radius-md);
+    border-radius: none;
   }
 
   .bottom-fixed-bar #savings {
@@ -2732,6 +2734,20 @@ footer {
     width: 100%;
     justify-content: space-between;
   }
+
+  /* COupon  */
+
+  .form-popup-bg.is-visible .form-container .coupon-code-selection {
+    padding: 10px 20px;
+}
+
+.form-popup-bg.is-visible .form-container {
+  position: relative;
+  margin: 0 auto;
+  padding: 20px 30px;
+  background: var(--white);
+  border-radius: var(--border-radius-md);
+}
 
   /**
    * #BANNER
@@ -4091,6 +4107,7 @@ footer {
   padding: 0px;
 }
 
+
 .address-details {
   display: flex;
   align-items: center;
@@ -4540,14 +4557,23 @@ img {
   opacity: 0.9;
 }
 
+
+
+
 /* Add Shipping Address  */
 
 #btnOpenForm {
-  /* background: var(--sandy-brown);
   padding: 10px 20px;
-  border-radius: var(--border-radius-sm);
-  margin: 10px 0; */
+    background: var(--ocean-green);
+    border-radius: var(--border-radius-sm);
+    margin: 10px 0px;
+    color: var(--white);
+    font-size: var(--fs-7);
+    font-weight: var(--weight-500);
 }
+
+
+
 
 .form-popup-bg {
   position: absolute;
@@ -4590,9 +4616,9 @@ img {
   position: relative;
   margin: 0 auto;
   padding: 20px 30px;
-  max-width: 30em;
+  /* max-width: 30em; */
   background: var(--white);
-  border-radius: var(--border-radius-md);
+  border-radius: none;
 }
 
 .form-popup-bg.is-visible .form-container > h1 {
@@ -4602,7 +4628,8 @@ img {
   color: var(--onyx);
 }
 
-.form-popup-bg.is-visible .form-container .form-group input {
+.form-popup-bg.is-visible .form-container #applyCoupon  .form-group input {
+  font-size: var(--fs-8);
   width: 100%;
   padding: 10px 20px;
   border-radius: 5px;
@@ -4610,13 +4637,22 @@ img {
 }
 
 .form-popup-bg.is-visible .form-container .coupon-code-selection {
-  padding: 10px 20px;
+  padding: 5px;
 }
 .form-popup-bg.is-visible .form-container .coupon-code-selection > p {
-  font-size: var(--fs-4);
+  font-size: var(--fs-6);
   font-weight: var(--weight-500);
   color: var(--onyx);
   margin: 5px 0;
+}
+
+
+.form-popup-bg.is-visible .form-container {
+  position: relative;
+  margin: 0 auto;
+  padding: 10px 20px;
+  background: var(--white);
+  border-radius: none;
 }
 
 .bottom-fixed-bar {
@@ -4631,8 +4667,8 @@ img {
   color: var(--white);
   background: var(--sandy-brown);
   font-weight: var(--weight-500);
-  width: 60%;
-  height: 80%;
+  width: 100%;
+  padding: 10px 20px;
   letter-spacing: 1px;
   border-radius: var(--border-radius-md);
 }
@@ -4659,7 +4695,7 @@ img {
 }
 
 .coupon-code-selection .more-details {
-  font-size: var(--fs-9);
+  font-size: var(--fs-10);
   color: var(--eerie-black);
 }
 
@@ -5053,15 +5089,33 @@ img {
   display: flex;
   gap: 30px;
 }
-
+/* 
 .form-popup-bg.is-visible
   .form-container
   #add-new-address
   .field-group
   .form-group:last-child {
   border: 1px solid red;
-}
+} */
 
+.form-popup-bg.is-visible .form-container #add-new-address .field-group .form-group #state{
+  padding: 13px 0px;
+  border-radius: var(--border-radius-sm);
+  border-color: var(--eerie-black);
+  outline: none;
+}
+.form-popup-bg.is-visible .form-container #add-new-address{
+  width: 100%;
+}
+.form-popup-bg.is-visible .form-container #add-new-address button{
+  background: var(--sandy-brown);
+  padding: 5px 15px;
+  border-radius: var(--border-radius-sm);
+  color: var(--white);
+  width: 150px;
+  margin: 10px auto;
+
+}
 .grid-item.top-left {
   grid-column: 1/2;
   grid-row: 1/2;
@@ -5287,5 +5341,24 @@ img {
   }
   100% {
     opacity: 1;
+  }
+}
+
+
+/* animations 
+ */
+
+ .fade-in-animation {
+  animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
