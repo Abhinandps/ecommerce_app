@@ -23,7 +23,8 @@ const {
   getAllOrders,
   getPaymentPage,
   getAllCoupones,
-  getAllBanners
+  getAllBanners,
+  getAllCategoryOffer
 } = require("../Controllers/viewController");
 
 const { isAuthenticate ,isAdmin} = require("../middleware/auth");
@@ -55,6 +56,8 @@ router.get("/order",isAdmin , getOrderPage);
 router.get("/coupons",isAdmin , getAllCoupones);
 
 router.get("/banners", isAdmin, getAllBanners)
+
+router.get("/category/offer", isAdmin, getAllCategoryOffer)
 
 
 // USER VIEW

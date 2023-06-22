@@ -1348,15 +1348,26 @@ exports.generateReturnRefundReport = catchAsync(async (req, res) => {
 /* Category*/
 
 exports.getAllCategoryOffers = catchAsync(async (req, res) => {
-  // Retrieve all category offers
   const categoryOffers = await CategoryOffer.find();
 
-  res.status(200).json({ categoryOffers });
+  const categoryOff = await Promise.all(
+    categoryOffers.map(async (offer) => {
+      const category = await Category.findById(offer.category);
+      return {
+        id: offer._id,
+        categoryName: category.name,
+        categoryId: category._id,
+        offer: offer.description,
+      };
+    })
+  );
+
+  res.status(200).json({ categoryOffers: categoryOff });
 });
 
 exports.createNewCategoryOffer = catchAsync(async (req, res) => {
   const { categoryId, discount, description } = req.body;
-
+  console.log(categoryId, discount, description);
   const products = await Product.find({ category: { $in: categoryId } });
 
   // Validate the request body
@@ -1376,8 +1387,17 @@ exports.createNewCategoryOffer = catchAsync(async (req, res) => {
   });
   if (existingCategoryOffer) {
     return res.status(409).json({
-      error: "Category offer already exists for the specified category",
+      error: "Offer already exists",
     });
+  }
+
+  // Calculate the minimum product price for the discount
+  const minProductPrice = Math.min(...products.map((product) => product.price));
+
+  if (minProductPrice < discount) {
+    return res
+      .status(400)
+      .json({ message: "Discount exceeds the minimum product price" });
   }
 
   // Create a new category offer
@@ -1404,12 +1424,35 @@ exports.createNewCategoryOffer = catchAsync(async (req, res) => {
   res.status(201).json(products);
 });
 
-// < pending ... >
-exports.getOneCategoryOffer = catchAsync(async (req, res) => {});
+exports.getOneCategoryOffer = catchAsync(async (req, res) => {
+  const offerId = req.params.id;
+  const categoryOffer = await CategoryOffer.findOne({ _id: offerId });
+
+  if (!categoryOffer) {
+    return res.status(404).json({ message: "Category offer not found" });
+  }
+
+  const category = await Category.findById(categoryOffer.category);
+  if (!category) {
+    return res.status(404).json({ message: "Category not found" });
+  }
+
+  const categoryOff = {
+    id: categoryOffer._id,
+    categoryId: categoryOffer.category,
+    categoryName: category.name,
+    offer: categoryOffer.description,
+    discount: categoryOffer.discount,
+  };
+  res.status(200).json({ categoryOffer: categoryOff });
+});
 
 exports.updateOneCategoryOffer = catchAsync(async (req, res) => {
   const categoryId = req.params.id;
+
   const { discount, description } = req.body;
+
+  console.log(categoryId, discount, description);
 
   // Find the category offer by category ID
   const categoryOffer = await CategoryOffer.findOne({ category: categoryId });
@@ -1424,6 +1467,16 @@ exports.updateOneCategoryOffer = catchAsync(async (req, res) => {
     return res
       .status(404)
       .json({ error: "No products found in the specified category" });
+  }
+
+  
+  // Calculate the minimum product price for the discount
+  const minProductPrice = Math.min(...products.map((product) => product.price));
+
+  if (minProductPrice < discount) {
+    return res
+      .status(400)
+      .json({ message: "Discount exceeds the minimum product price" });
   }
 
   // Revert the prices of the products to their original prices
@@ -1469,9 +1522,11 @@ exports.updateOneCategoryOffer = catchAsync(async (req, res) => {
 exports.deleteOneCategoryOffer = catchAsync(async (req, res) => {
   const categoryId = req.params.id;
 
-  const products = await Product.find({ category: { $in: categoryId } });
+  const products = await Product.find({ category: categoryId });
 
   const categoryOffer = await CategoryOffer.findOne({ category: categoryId });
+
+  console.log(categoryOffer);
 
   if (!categoryOffer) {
     return res.status(404).json({ error: "Category offer not found" });
@@ -1486,9 +1541,9 @@ exports.deleteOneCategoryOffer = catchAsync(async (req, res) => {
       product.categoryOffer = undefined;
       await product.save();
     } else {
-      product.price =  product.originalPrice - Math.round(
-        (product.originalPrice * productOffer.discount) / 100
-      );
+      product.price =
+        product.originalPrice -
+        Math.round((product.originalPrice * productOffer.discount) / 100);
       product.categoryOffer = undefined;
       await product.save();
     }
@@ -1521,7 +1576,9 @@ exports.createNewProductOffer = catchAsync(async (req, res) => {
   }
 
   // Check if a product offer already exists for the productID
-  const existingProductOffer = await ProductOffer.findOne({product: productId});
+  const existingProductOffer = await ProductOffer.findOne({
+    product: productId,
+  });
 
   if (existingProductOffer) {
     return res.status(409).json({
@@ -1555,16 +1612,13 @@ exports.createNewProductOffer = catchAsync(async (req, res) => {
   });
 });
 
-
 exports.getOneProductOffer = catchAsync(async (req, res) => {});
-
 
 exports.updateOneProductOffer = catchAsync(async (req, res) => {
   const productId = req.params.id;
 
   const { discount, description } = req.body;
 
-  
   const product = await Product.findOne({ _id: productId });
 
   if (!product) {
@@ -1580,10 +1634,9 @@ exports.updateOneProductOffer = catchAsync(async (req, res) => {
     return res.status(404).json({ error: "product offer not found" });
   }
 
-
   const categoryOffer = await CategoryOffer.findById(product.categoryOffer);
   // console.log(categoryOffer);
-  
+
   if (!categoryOffer) {
     // If the product offer is not found, clear the original price
     product.price = product.originalPrice;
@@ -1607,7 +1660,7 @@ exports.updateOneProductOffer = catchAsync(async (req, res) => {
     await product.save();
   }
 
-  console.log(product)
+  console.log(product);
 
   // Update the category offer fields
   productOffer.discount = discount;
@@ -1621,25 +1674,15 @@ exports.updateOneProductOffer = catchAsync(async (req, res) => {
     .json({ message: "product offer updated successfully", productOffer });
 });
 
-
-
-
 exports.deleteOneProductOffer = catchAsync(async (req, res) => {
-
   const productId = req.params.id;
-  
 
   const product = await Product.findOne({ _id: productId });
   const productOffer = await ProductOffer.findById(product.productOffer);
 
-
-
   if (!productOffer) {
     return res.status(404).json({ error: "Product offer not found" });
   }
-
-  
-
 
   // Revert the prices of the products to their original prices
   const categoryOffer = await CategoryOffer.findById(product.categoryOffer);
@@ -1649,19 +1692,18 @@ exports.deleteOneProductOffer = catchAsync(async (req, res) => {
     product.originalPrice = undefined;
     product.productOffer = undefined;
     await product.save();
-  } else { 
-    product.price = product.originalPrice - Math.round((product.originalPrice * categoryOffer.discount) / 100);
+  } else {
+    product.price =
+      product.originalPrice -
+      Math.round((product.originalPrice * categoryOffer.discount) / 100);
     product.productOffer = undefined;
     await product.save();
   }
-
 
   await productOffer.deleteOne();
 
   res.status(200).json({ status: "deleted" });
 });
-
-
 
 /* Referral*/
 

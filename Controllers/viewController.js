@@ -72,6 +72,18 @@ exports.getAllBanners = (req, res) => {
   }
 };
 
+
+exports.getAllCategoryOffer = (req, res) => {
+  if (req.admin) {
+    res.render("admin/pages/categoryOff.ejs");
+  } else {
+    res.redirect("/admin/login");
+  }
+};
+
+
+
+
 // USER
 
 exports.getUserLogin = (req, res) => {

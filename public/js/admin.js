@@ -1068,6 +1068,224 @@ if (window.location.pathname.includes("/banners")) {
 
 // --- HANDLE PAGINATION END
 
+// ----OFFERS START----
+
+// Category Offers
+
+const getAllCategoryOffers = async () => {
+  try {
+    const res = await axios.get("/api/v1/admin/category-offers");
+    const categoriesOff = res.data.categoryOffers;
+
+    const tableBody = document.querySelector("#user-table tbody");
+
+    tableBody.innerHTML = "";
+
+    categoriesOff.forEach((category) => {
+      const row = document.createElement("tr");
+
+      const editBtn = `<label type="button"  class="badge badge-primary" data-user-id="${category.id}" onclick="handleCategoryOfferFormEdit(event)"> <i class="mdi mdi-grease-pencil"></i></label>`;
+
+      const dltBtn = `<label type="button"  class="badge badge-danger" data-user-id="${category.categoryId}" onclick="handleCategoryOfferDelete(event)"> <i class="mdi mdi-delete"></i> </label>`;
+
+      row.innerHTML = `
+              <td>${category.categoryName}</td>
+              <td style="white-space: pre-wrap">${category.offer}</td>
+              <td>${editBtn}</td>
+              <td>${dltBtn}</td>
+            `;
+      tableBody.appendChild(row);
+    });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const addCategoryOffer = () => {
+  const cardBody = document.getElementById("card-body");
+
+  const form = document.getElementById("category-form");
+
+  const categoryError = document.getElementsByClassName("category-error")[0];
+  
+
+  const category = form.querySelector("#category-dropdown");
+  const discount = form.querySelector("#value");
+  const description = form.querySelector("#category-desc");
+
+  console.log(category, discount, description);
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    try {
+      const formData = {
+        categoryId: category.value,
+        discount: discount.value,
+        description: description.value,
+      };
+
+      $.ajax({
+        url: "/api/v1/admin/category-offers",
+        type: "POST",
+        data: formData,
+        success: function(response) {
+          showToast("OFFER Added Successfully", "success");
+          getAllCategoryOffers();
+          console.log(response);
+        },
+        error: function(error) {
+          showToast(error.responseJSON.message, "danger");
+          const name = error.responseJSON.error;
+          if (name) {
+            categoryError.innerHTML = name;
+          } else {
+            categoryError.innerHTML = "";
+          }
+        }
+      });
+      
+    } catch (error) {
+      const name = error.response.data.message.name;
+      if (name) {
+        nameError.innerHTML = name;
+      } else {
+        nameError.innerHTML = "";
+      }
+    }
+  });
+};
+
+
+
+const handleCategoryOfferFormEdit = (event) => {
+  const form = document.getElementById("category-form");
+
+  const categoryID = event.target.dataset.userId;
+  const editForm = document.getElementById("edit-category-form");
+
+  $.ajax({
+    type: "GET",
+    url: `/api/v1/admin/category-offers/${categoryID}`,
+    success: function (response) {
+      const categoryOff = response.categoryOffer;
+
+      // Fetch the category name using the category ID
+      $.ajax({
+        type: "GET",
+        url: `/api/v1/admin/categories`,
+        success: function (response) {
+          console.log(response);
+          console.log(response);
+          const { categories } = response.data;
+
+          // Populate the category dropdown options
+          const categoryDropdown = editForm.querySelector("#categoryId");
+          categoryDropdown.innerHTML = "";
+
+          categories.forEach((category) => {
+            const option = document.createElement("option");
+            option.value = category._id;
+            option.textContent = category.name;
+            categoryDropdown.appendChild(option);
+          });
+
+          // Set the selected category
+          const selectedCategory = categories.find(
+            (category) => category._id === categoryOff.categoryId
+          );
+
+          if (selectedCategory) {
+            console.log(selectedCategory._id);
+            categoryDropdown.value = selectedCategory._id;
+            showToast(`You can Edit Now`, "info");
+          }
+        },
+        error: function (err) {
+          console.log(err);
+
+        },
+      });
+
+      editForm.querySelector("#category-desc").value = categoryOff.offer;
+      editForm.querySelector("#discount").value = categoryOff.discount;
+
+      const form = document.getElementById("category-form");
+      form.style.display = "none";
+      editForm.style.display = "block";
+    },
+    error: function (err) {
+      console.error(err);
+
+    },
+  });
+  // Listen for the edit form submission
+  editForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const category = editForm.querySelector("#categoryId").value;
+    const discount = editForm.querySelector("#discount").value;
+    const description = editForm.querySelector("#category-desc").value;
+
+    const formData = {
+      category,
+      discount,
+      description,
+    };
+
+    $.ajax({
+      type: "PUT",
+      url: `/api/v1/admin/category-offers/${category}`,
+      data: JSON.stringify(formData),
+      processData: true,
+      contentType: "application/json",
+      success: function (response) {
+        // Hide the edit form and show the add form
+        form.style.display = "block";
+        editForm.style.display = "none";
+
+        // Reload the categories table
+        showToast(`Category Updated Successfully`, "success");
+        getAllCategoryOffers();
+      },
+      error: function (err) {
+        // console.error(err);
+      showToast(err.responseJSON.message, "danger");
+
+      },
+    });
+  });
+};
+
+const handleCategoryOfferDelete = (event) => {
+  const categoryID = event.target.dataset.userId;
+  console.log(categoryID);
+
+  showCustomConfirmation(
+    "Are you sure you want to delete the Category Offer?",
+    function (result) {
+      if (result) {
+        $.ajax({
+          type: "DELETE",
+          url: `/api/v1/admin/category-offers/${categoryID}`,
+          success: async function (response) {
+            console.log(response);
+            showToast(`OFFER Deleted Successfully`, "danger");
+            // window.location.href = "/category/offers";
+            getAllCategoryOffers();
+          },
+          error: function (err) {
+            console.error(err);
+          },
+        });
+      } else {
+        console.log("Deletion canceled");
+      }
+    }
+  );
+};
+
+// ----OFFERS END----
+
 const handleOrders = (event) => {
   const orderID = event.target.dataset.orderId;
   $.ajax({
@@ -1300,8 +1518,8 @@ function showCustomPopup(message, callback) {
     }
 
     if (!startDate && !endDate && downloadType) {
-      console.log("Values : " + startDate, endDate, downloadType)
-      downloadReport(null,null,downloadType);
+      console.log("Values : " + startDate, endDate, downloadType);
+      downloadReport(null, null, downloadType);
     } else {
       downloadReport(startDate, endDate, downloadType);
     }
@@ -1316,7 +1534,6 @@ function showCustomPopup(message, callback) {
 
 // Function to download the report
 function downloadReport(startDate, endDate, downloadType) {
-  
   // Validate the selected filter option
   var selectedOption = $("#filterOptions").val();
   if (!selectedOption) {
@@ -1332,11 +1549,10 @@ function downloadReport(startDate, endDate, downloadType) {
       downloadType
     );
     getReport(startDate, endDate, downloadType, selectedOption);
-
   } else if (selectedOption === "stock") {
     console.log("Downloading stocks report...");
-   
-    getReport(null,null,downloadType, selectedOption);
+
+    getReport(null, null, downloadType, selectedOption);
   } else if (selectedOption === "cancelled") {
     console.log(
       "Downloading cancelled report..." + startDate,
@@ -1386,7 +1602,6 @@ $(document).on("click", "#exportButton", function () {
 // }
 
 async function getReport(startDate, endDate, downloadType, selectedOption) {
-
   try {
     const response = await axios.get(`/api/v1/admin/${selectedOption}/report`, {
       responseType: "blob",
