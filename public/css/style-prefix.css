@@ -2654,7 +2654,6 @@ footer {
     margin-top: 5px;
   }
 
-
   #orders-history .order_details .details-row .tracking_status {
     /* width: 100%;
     min-height: 10vh;
@@ -2664,9 +2663,7 @@ footer {
     padding: 10px 20px;
     text-align: left; */
     transform: rotate(90deg) translateX(25em) translateY(15em);
-}
-
-
+  }
 }
 
 @media (min-width: 570px) {
@@ -2842,12 +2839,12 @@ footer {
     justify-content: space-between;
     align-items: center;
     flex-direction: column;
-}
+  }
 
-#orders-history .order_details .details-row .address_details {
-  width: 100%;
-  padding: 10px 0px;
-}
+  #orders-history .order_details .details-row .address_details {
+    width: 100%;
+    padding: 10px 0px;
+  }
 
   .row > .tracking_status {
     display: none;
@@ -3858,20 +3855,23 @@ footer {
 
 /* message toast  */
 
+
 .toast {
-  position: absolute;
+  position: fixed;
   top: 25px;
   right: 30px;
+  width: 20em;
   border-radius: 12px;
-  background: #fff;
+  background: var(--color-green);
   padding: 10px 30px 20px 10px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-  border-left: 6px solid var(--sandy-brown);
+  border-left: 6px solid var(--eerie-black);
   overflow: hidden;
   z-index: 777;
   transform: translateX(calc(100% + 30px));
   transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.35);
 }
+
 
 .toast.active {
   transform: translateX(0%);
@@ -3889,7 +3889,7 @@ footer {
   justify-content: center;
   height: 35px;
   width: 35px;
-  background-color: var(--sandy-brown);
+  background-color:  var(--eerie-black);
   color: #fff;
   font-size: 20px;
   border-radius: 50%;
@@ -3904,14 +3904,15 @@ footer {
 .message .text {
   font-size: 20px;
   font-weight: 400;
-  color: #666666;
-  font-size: var(--fs-8);
+  color: #fff;
+  font-size: var(--fs-9);
+  font-weight: var(--weight-400);
 }
 
 .message .text.text-1 {
   font-weight: 600;
-  color: #333;
-  font-size: var(--fs-6);
+  color: #fff;
+  font-size: var(--fs-7);
 }
 
 .toast .close {
@@ -3933,7 +3934,7 @@ footer {
   left: 0;
   height: 3px;
   width: 100%;
-  background: #ddd;
+  background: var(--eerie-black);
 }
 
 .toast .progress:before {
@@ -3943,7 +3944,7 @@ footer {
   right: 0;
   height: 100%;
   width: 100%;
-  background-color: var(--sandy-brown);
+  /* background-color: var(--sandy-brown); */
 }
 
 .progress.active:before {
@@ -3990,7 +3991,7 @@ footer {
 
 .product_title {
   font-size: var(--fs-7);
-  font-weight: var(--weight-600);
+  font-weight: var(--weight-500);
 }
 
 .product_qty {
@@ -5243,4 +5244,48 @@ img {
   font-size: var(--fs-11);
   color: var(--cultured);
   margin: 10px 0px;
+}
+
+/* Out of Stock  */
+
+.outOfStock {
+  color: var(--bittersweet);
+  font-weight: var(--weight-500);
+  font-size: var(--fs-8);
+  margin: 5px 0px;
+  opacity: 0.9;
+}
+
+.saveForLater {
+  font-size: var(--fs-7);
+  font-weight: var(--weight-700);
+  color: var(--eerie-black);
+  margin: 10px 0;
+}
+
+
+.noti{
+  margin-bottom: 10px;
+  font-size: var(--fs-9);
+  font-weight: var(--weight-400);
+}
+
+.noti > span {
+  background: var(--sandy-brown);
+  border-radius: var(--border-radius-md);
+  color: #fff;
+  padding: 2px 10px;
+  animation: flicker 1s infinite ;
+}
+
+@keyframes flicker {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
 }

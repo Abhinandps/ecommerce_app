@@ -5,8 +5,6 @@ const logout = async () => {
   }
 };
 
-
-
 const bestSellers = () => {
   const row = document.getElementById("showcase-container");
   if (row) {
@@ -22,9 +20,7 @@ const bestSellers = () => {
             (image) => image.split("public")[1]
           )[0];
           const item = `
-                <div class="showcase" data-product='${JSON.stringify(
-                  product
-                )}'>
+                <div class="showcase" data-product='${JSON.stringify(product)}'>
 
                   <a href="#" class="showcase-img-box">
                       <img src="${firstImage}" alt="baby fabric shoes" width="75"
@@ -46,7 +42,11 @@ const bestSellers = () => {
                       </div>
 
                       <div class="price-box">
-                          <del>₹ ${product.originalPrice ? product.originalPrice : product.price + 299}</del>
+                          <del>₹ ${
+                            product.originalPrice
+                              ? product.originalPrice
+                              : product.price + 299
+                          }</del>
                           <p class="price">₹${product.price}</p>
                       </div>
 
@@ -70,12 +70,11 @@ const bestSellers = () => {
         : event.target.closest(".showcase");
       const product = JSON.parse(button.dataset.product);
       handleViewDetails(product);
-    }})
-
+    }
+  });
 };
 
 bestSellers();
-
 
 const getCategories = () => {
   $.ajax({
@@ -154,7 +153,7 @@ const getProducts = () => {
         })}
 
         
-        <p class="showcase-badge">${product.offer ?  product.offer : '' }</p>
+        <p class="showcase-badge">${product.offer ? product.offer : ""}</p>
 
         <div class="showcase-actions">
 
@@ -195,7 +194,9 @@ const getProducts = () => {
 
         <div class="price-box">
             <p class="price">₹${product.price}</p>
-            <del>₹ ${product.originalPrice ? product.originalPrice : product.price * 2}</del>
+            <del>₹ ${
+              product.originalPrice ? product.originalPrice : product.price * 2
+            }</del>
         </div>
 
     </div>
@@ -322,7 +323,8 @@ const getCart = () => {
               }')">
               <ion-icon name="close-outline" role="img" class="md hydrated" aria-label="close outline"></ion-icon>
           </button>
-                <div class="product_image">
+          
+              <div class="product_image">
                 ${product.image.map((path, index) => {
                   const newPath = path.replace("public", "");
                   if (index === 0) {
@@ -334,28 +336,43 @@ const getCart = () => {
                       <p>${product.name}</p>
                     </div>
                    
-                    <div class="product_qty">
-                      <p>${product.price} * ${item.quantity} <span>  ${
-              product.price * item.quantity
-            }</span></p>
-                    </div>
-                  </div>
-                </div>
+                    ${
+                      product.stock > 0
+                        ? `<div class="product_qty">
+                            <p>${product.price} * ${item.quantity} <span> ${
+                            product.price * item.quantity
+                          }</span></p>
+                          </div>
+                        </div>`
+                        : ""
+                    }
+              </div>
 
-                <div class="exit-btn">
+              ${ product.stock == 1 ? `<p class="noti"> <span>Hurry Up!  One product left</p>` : ''}
+
+              <div class="exit-btn">
                   <i></i>
-                </div>
+              </div>
+
+              ${
+                product.stock > 0
+                  ? `
                 <form class="counter">
-                  <button class="inc-btn" data-product-id="${
-                    product._id
-                  }">+</button>
-                  <input  class="qty-input" name="quantity" type="text" minlength="1" value=${
-                    item.quantity
-                  } readonly />
-                  <button class="dec-btn" data-product-id="${
-                    product._id
-                  }">-</button>
+                  <button class="inc-btn" data-product-id="${product._id}">+</button>
+                  <input  class="qty-input" name="quantity" type="text" minlength="1" value=${item.quantity} readonly />
+                  <button class="dec-btn" data-product-id="${product._id}">-</button>
                 </form>
+                `
+                  : `
+                <div class="outOfStock">
+                <span> Currently Out Of Stock </span>
+                </div>
+                <button class="saveForLater">Save for Later</button>
+                `
+              }
+                
+
+
               </div>`;
 
             row.append(singleItem);
@@ -392,6 +409,9 @@ const getCart = () => {
                     console.error(error);
                   }
                 }, 600);
+              } else {
+                showToast();
+                setToastMessage("warning", `Insufficient stock `);
               }
             }
 
@@ -638,7 +658,6 @@ const getCoupons = () => {
 
 getCoupons();
 
-
 const updateCartTotal = (totalPrice) => {
   $.ajax({
     type: "PATCH",
@@ -656,7 +675,6 @@ const updateCartTotal = (totalPrice) => {
 };
 
 getCheckOut();
-
 
 const getPaymentDetails = () => {
   const shippingHandlingFee = 98;
@@ -757,30 +775,29 @@ const getPaymentDetails = () => {
                 }
               );
               // console.log(axiosResponse);
-               const popUp = document.querySelector(".order-success-popup");
-            const container = document.querySelector(".container.wrapper");
-            popUp.style.display = "block";
+              const popUp = document.querySelector(".order-success-popup");
+              const container = document.querySelector(".container.wrapper");
+              popUp.style.display = "block";
 
-            container.classList.add("bg-blur");
+              container.classList.add("bg-blur");
 
-            const overlay = document.querySelector(".overlay")
-            overlay.style.opacity = "1"
-            setTimeout(function () {
-              container.classList.remove("overlay");
-              container.classList.remove("bg-blur");
-              window.location.href = "/myorders";
-              overlay.style.opacity = "0"
-            }, 4000);
-            } 
-           
+              const overlay = document.querySelector(".overlay");
+              overlay.style.opacity = "1";
+              setTimeout(function () {
+                container.classList.remove("overlay");
+                container.classList.remove("bg-blur");
+                window.location.href = "/myorders";
+                overlay.style.opacity = "0";
+              }, 4000);
+            }
           },
           prefill: {
             email: "user@example.com",
             contact: "9876543210",
           },
           notes: {
-            webhookUrl: "/api/v1/user/cart/razorpayWebhook" 
-          }
+            webhookUrl: "/api/v1/user/cart/razorpayWebhook",
+          },
         };
 
         const razorpayInstance = new Razorpay(options);

@@ -122,7 +122,7 @@ Updations:
 -[]Order history
 -[]Product saving not showing any message
 -[]Toaster message missing
--[]Inform stock is out or not
+-[✔]Inform stock is out or not
 -[]Add new address ui
 -[]Dialog message needed for success
 -[✔]Address not adding properly
@@ -137,7 +137,7 @@ Features
 
 User side :
 [✔]Invoice download
-[✗]Offer module(product offer, category offer,Referral offer).
+[✔]Offer module(product offer, category offer,Referral offer[✗]).
 
 Admin side :
 [✔]Admin Dashboard - Chart with filter(yearly,monthly etc.)

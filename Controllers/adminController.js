@@ -168,7 +168,8 @@ exports.addProduct = catchAsync(async (req, res, next) => {
 });
 
 exports.updateProduct = catchAsync(async (req, res, next) => {
-  const { name, price, category, description } = req.body;
+  const { name, price, category, stock, description } = req.body;
+
   const files = req.files;
 
   if (!files || files.length === 0) {
@@ -190,6 +191,7 @@ exports.updateProduct = catchAsync(async (req, res, next) => {
     product.price = price || product.price;
     product.description = description || product.description;
     product.category = category || product.category;
+    product.stock = stock || product.stock;
 
     // Remove the old image file if a new file is uploaded
     if (files.length > 0) {
@@ -197,7 +199,7 @@ exports.updateProduct = catchAsync(async (req, res, next) => {
         // Remove all existing images
         product.image.forEach((filePath) => {
           fs.unlink(filePath, (err) => {
-            if (err) console.log(err);
+            // if (err) console.log(err);
           });
         });
       }
@@ -316,8 +318,30 @@ exports.orderCancel = catchAsync(async (req, res, next) => {
 
 // Coupon management
 
-exports.addCoupons = catchAsync(async (req, res) => {
+exports.addCoupons = catchAsync(async (req, res, next) => {
   const couponData = req.body;
+  const value = Number(couponData.value);
+  const minValue = couponData.minimumOrderValue;
+
+  const currentDate = new Date();
+  const expiryDate = new Date(couponData.expiryDate);
+
+  if (minValue < value) {
+    return next(new AppError("Discount exceeds the minimum Order Value", 400));
+  }
+
+  if (currentDate >= expiryDate) {
+    return next(
+      new AppError("Coupon code is Expired", 400)
+    );
+  }
+
+  if (value < 0) {
+    return next(
+      new AppError("Ensure discount value entered correctly.", 400)
+    );
+  }
+
   const newCoupon = await Coupon.create(couponData);
   res.status(201).json(newCoupon);
 });
@@ -335,8 +359,31 @@ exports.getOneCoupon = catchAsync(async (req, res) => {
   res.json(coupon);
 });
 
-exports.updateCoupon = catchAsync(async (req, res) => {
-  console.log(req.body);
+exports.updateCoupon = catchAsync(async (req, res,next) => {
+  const couponData = req.body;
+  const value = Number(couponData.value);
+  const minValue = couponData.minimumOrderValue;
+
+  const currentDate = new Date();
+  const expiryDate = new Date(couponData.expiryDate);
+
+  if (minValue < value) {
+    return next(new AppError("Discount exceeds the minimum Order Value", 400));
+  }
+
+  if (currentDate >= expiryDate) {
+    return next(
+      new AppError("Coupon code is Expired", 400)
+    );
+  }
+
+  if (value < 0) {
+    return next(
+      new AppError("Ensure discount value entered correctly.", 400)
+    );
+  }
+
+
   const coupon = await Coupon.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
@@ -1569,13 +1616,13 @@ exports.getAllProductOffers = catchAsync(async (req, res) => {
   const ProductOff = await Promise.all(
     ProductOffers.map(async (offer) => {
       const product = await Product.findById(offer.product);
-      const category = await Category.findById(product.category)
+      const category = await Category.findById(product.category);
       const categoryOff = await CategoryOffer.findById(product.categoryOffer);
       return {
         id: offer._id,
         productId: product._id,
         product: product.name,
-        categoryName:category.name,
+        categoryName: category.name,
         offer: offer.description,
         productPrice: product.price,
         categoryOff: categoryOff ? categoryOff.description : "No Offer",
@@ -1649,9 +1696,7 @@ exports.createNewProductOffer = catchAsync(async (req, res) => {
   });
 });
 
-
 exports.getOneProductOffer = catchAsync(async (req, res) => {
-
   const offerId = req.params.id;
   const productOffer = await ProductOffer.findOne({ _id: offerId });
 
@@ -1670,7 +1715,7 @@ exports.getOneProductOffer = catchAsync(async (req, res) => {
     productId: productOffer.product,
     productName: product.name,
     CategoryId: product.category,
-    CategoryName:category.name,
+    CategoryName: category.name,
     offer: productOffer.description,
     discount: productOffer.discount,
   };
@@ -1681,8 +1726,7 @@ exports.getOneProductOffer = catchAsync(async (req, res) => {
 exports.updateOneProductOffer = catchAsync(async (req, res) => {
   const productId = req.params.id;
 
-  const { discount,description } = req.body;
-
+  const { discount, description } = req.body;
 
   const product = await Product.findOne({ _id: productId });
 
@@ -1695,7 +1739,6 @@ exports.updateOneProductOffer = catchAsync(async (req, res) => {
   // Find the product offer by product ID
   const productOffer = await ProductOffer.findById(product.productOffer);
 
-
   if (!productOffer) {
     return res.status(404).json({ error: "product offer not found" });
   }
@@ -1707,7 +1750,6 @@ exports.updateOneProductOffer = catchAsync(async (req, res) => {
       .status(400)
       .json({ message: "Discount exceeds the minimum product price" });
   }
-
 
   const categoryOffer = await CategoryOffer.findById(product.categoryOffer);
   console.log(categoryOffer);
@@ -1735,18 +1777,15 @@ exports.updateOneProductOffer = catchAsync(async (req, res) => {
     await product.save();
   }
 
-
   // Update the category offer fields
   productOffer.discount = discount;
   productOffer.description = `${discount}%`;
 
-  console.log(productOffer)
+  console.log(productOffer);
   // Save the updated category offer
   await productOffer.save();
 
-  res
-    .status(200)
-    .json({ message: "product offer updated successfully"});
+  res.status(200).json({ message: "product offer updated successfully" });
 });
 
 exports.deleteOneProductOffer = catchAsync(async (req, res) => {

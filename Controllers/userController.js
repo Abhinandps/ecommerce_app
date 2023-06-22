@@ -135,7 +135,6 @@ exports.getCart = catchAsync(async (req, res) => {
 });
 
 
-
 exports.addToCart = catchAsync(async (req, res) => {
   const { productId, quantity } = req.body;
   console.log(productId, quantity);
@@ -205,6 +204,7 @@ exports.updateCartItem = catchAsync(async (req, res) => {
   const { productId } = req.params;
   const { quantity } = req.body;
 
+
   if (req.user.role === "guest") {
     let guestUser = await GuestUser.findOne({
       guestUserID: req.user.guestUserID,
@@ -213,6 +213,8 @@ exports.updateCartItem = catchAsync(async (req, res) => {
     const cartItem = guestUser.items.find(
       (item) => item.product.toString() === productId
     );
+
+
     cartItem.quantity = quantity;
     await guestUser.save();
     const { productSum } = await cart.calculatePrices();

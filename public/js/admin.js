@@ -312,6 +312,7 @@ const handleProductFormEdit = (event) => {
 
       productName.value = products.name;
       // category.value= products.category;
+
       price.value = products.price;
       stock.value = products.stock;
       description.value = products.description;
@@ -386,6 +387,7 @@ const handleProductFormEdit = (event) => {
     try {
       if (isValid) {
         const formData = new FormData(editForm);
+        console.log(formData);
         $.ajax({
           type: "PUT",
           url: `http://127.0.0.1:3000/api/v1/admin/product/${productID}`,
@@ -681,8 +683,9 @@ const handleCouponFormEdit = (event) => {
         getAllCoupons();
         showToast(`Coupon Updated Successfully`, "success");
       },
-      error: function (err) {
-        console.error(err);
+      error: function (error) {
+        const err = error.responseJSON;
+        showToast(err.message.code ? err.message.code : err.message, "danger");
       },
     });
   });
@@ -1436,7 +1439,6 @@ const handleProductOfferFormEdit = (event) => {
             option.value = category._id;
             option.textContent = category.name;
             categoryDropdown.appendChild(option);
-            
           });
 
           // Set the selected category
@@ -1450,15 +1452,13 @@ const handleProductOfferFormEdit = (event) => {
             showToast(`You can Edit Now`, "info");
           }
 
-          
-
           $.ajax({
             type: "GET",
             url: `/api/v1/admin/categories/${selectedCategory._id}/products`,
             success: function (res) {
               const data = res.products;
 
-              console.log(data)
+              console.log(data);
 
               const select = document.querySelector("[product-dropdown]");
 
@@ -1475,7 +1475,7 @@ const handleProductOfferFormEdit = (event) => {
               const selectedCategory = data.find(
                 (product) => product._id === productOff.productId
               );
-    
+
               if (selectedCategory) {
                 select.value = selectedCategory._id;
                 select.disabled = true;
@@ -1509,16 +1509,16 @@ const handleProductOfferFormEdit = (event) => {
     const category = editForm.querySelector("#category-dropdown").value;
     const product = editForm.querySelector("#product-dropdown").value;
     const discount = editForm.querySelector("#discount").value;
-    const description = ""
+    const description = "";
 
     const formData = {
       category,
       product,
       discount,
-      description
+      description,
     };
 
-    console.log(formData)
+    console.log(formData);
 
     $.ajax({
       type: "PUT",

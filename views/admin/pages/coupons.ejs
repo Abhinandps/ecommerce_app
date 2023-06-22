@@ -147,16 +147,12 @@
                     const response = await axios.post('/api/v1/admin/coupons', formData)
 
                     // nameError.innerHTML = ''
+                    showToast("Coupon Added Successfully", "success");
                     await getAllCoupons();
                     // console.log(response)
                 } catch (error) {
-                    // const name = error.response.data.message.name
-                    // if (name) {
-                    //     nameError.innerHTML = name
-                    // } else {
-                    //     nameError.innerHTML = ''
-                    // }
-                    console.error(error)
+                    const err = error.response.data
+                    showToast(err.message.code ? err.message.code  : err.message, "danger");
                 }
             });
 
