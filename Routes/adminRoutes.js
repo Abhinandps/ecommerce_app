@@ -52,6 +52,7 @@ const {
   getOneReferralOffer,
   updateOneReferralOffer,
   deleteOneReferralOffer,
+  getFilterProducts,
 
 } = require("../Controllers/adminController");
 
@@ -185,6 +186,9 @@ router.route("/banners/:id")
 
 
 // OFFER MANAGEMENT START
+
+// retrieve product based on category id
+router.get("/categories/:categoryId/products", isAdmin, getFilterProducts)
 
 /* Category*/
 

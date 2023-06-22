@@ -153,8 +153,8 @@ const getProducts = () => {
           return `<img src="${newPath}" alt="Mens Winter Leathers Jackets" width="300" class="${className}">`;
         })}
 
-      
-        <p class="showcase-badge">15%</p>
+        
+        <p class="showcase-badge">${product.offer ?  product.offer : '' }</p>
 
         <div class="showcase-actions">
 

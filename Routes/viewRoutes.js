@@ -24,10 +24,12 @@ const {
   getPaymentPage,
   getAllCoupones,
   getAllBanners,
-  getAllCategoryOffer
+  getAllCategoryOffer,
+  getAllProductOffer
 } = require("../Controllers/viewController");
 
 const { isAuthenticate ,isAdmin} = require("../middleware/auth");
+const { getAllProductOffers } = require("../Controllers/adminController");
 
 
 
@@ -50,7 +52,6 @@ router.get("/products",isAdmin, getAllProducts);
 
 router.get("/orders", isAdmin, getAllOrders)
 
-
 router.get("/order",isAdmin , getOrderPage);
 
 router.get("/coupons",isAdmin , getAllCoupones);
@@ -58,6 +59,9 @@ router.get("/coupons",isAdmin , getAllCoupones);
 router.get("/banners", isAdmin, getAllBanners)
 
 router.get("/category/offer", isAdmin, getAllCategoryOffer)
+
+router.get("/product/offer", isAdmin, getAllProductOffer)
+
 
 
 // USER VIEW

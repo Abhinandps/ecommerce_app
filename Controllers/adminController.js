@@ -1469,7 +1469,6 @@ exports.updateOneCategoryOffer = catchAsync(async (req, res) => {
       .json({ error: "No products found in the specified category" });
   }
 
-  
   // Calculate the minimum product price for the discount
   const minProductPrice = Math.min(...products.map((product) => product.price));
 
@@ -1556,7 +1555,37 @@ exports.deleteOneCategoryOffer = catchAsync(async (req, res) => {
 
 /* Product*/
 
-exports.getAllProductOffers = catchAsync(async (req, res) => {});
+// product retrieve by category id
+
+exports.getFilterProducts = catchAsync(async (req, res) => {
+  const categoryId = req.params.categoryId;
+  const products = await Product.find({ category: categoryId });
+  res.json({ products: products });
+});
+
+exports.getAllProductOffers = catchAsync(async (req, res) => {
+  const ProductOffers = await ProductOffer.find();
+
+  const ProductOff = await Promise.all(
+    ProductOffers.map(async (offer) => {
+      const product = await Product.findById(offer.product);
+      const category = await Category.findById(product.category)
+      const categoryOff = await CategoryOffer.findById(product.categoryOffer);
+      return {
+        id: offer._id,
+        productId: product._id,
+        product: product.name,
+        categoryName:category.name,
+        offer: offer.description,
+        productPrice: product.price,
+        categoryOff: categoryOff ? categoryOff.description : "No Offer",
+        originalPrice: product.originalPrice,
+      };
+    })
+  );
+
+  res.status(200).json({ ProductOffers: ProductOff });
+});
 
 exports.createNewProductOffer = catchAsync(async (req, res) => {
   const { productId, categoryId, discount } = req.body;
@@ -1586,6 +1615,14 @@ exports.createNewProductOffer = catchAsync(async (req, res) => {
     });
   }
 
+  // Calculate the  product price for the discount
+
+  if (product.price < discount) {
+    return res
+      .status(400)
+      .json({ message: "Discount exceeds the minimum product price" });
+  }
+
   // Create a new product offer
   const newProductOffer = await ProductOffer.create({
     product: productId,
@@ -1612,12 +1649,40 @@ exports.createNewProductOffer = catchAsync(async (req, res) => {
   });
 });
 
-exports.getOneProductOffer = catchAsync(async (req, res) => {});
+
+exports.getOneProductOffer = catchAsync(async (req, res) => {
+
+  const offerId = req.params.id;
+  const productOffer = await ProductOffer.findOne({ _id: offerId });
+
+  if (!productOffer) {
+    return res.status(404).json({ message: "Product offer not found" });
+  }
+
+  const product = await Product.findById(productOffer.product);
+  const category = await Category.findById(productOffer.category);
+  if (!product || !category) {
+    return res.status(404).json({ message: "Product or Category not found" });
+  }
+
+  const productOff = {
+    id: productOffer._id,
+    productId: productOffer.product,
+    productName: product.name,
+    CategoryId: product.category,
+    CategoryName:category.name,
+    offer: productOffer.description,
+    discount: productOffer.discount,
+  };
+
+  res.status(200).json({ productOffer: productOff });
+});
 
 exports.updateOneProductOffer = catchAsync(async (req, res) => {
   const productId = req.params.id;
 
-  const { discount, description } = req.body;
+  const { discount,description } = req.body;
+
 
   const product = await Product.findOne({ _id: productId });
 
@@ -1630,12 +1695,22 @@ exports.updateOneProductOffer = catchAsync(async (req, res) => {
   // Find the product offer by product ID
   const productOffer = await ProductOffer.findById(product.productOffer);
 
+
   if (!productOffer) {
     return res.status(404).json({ error: "product offer not found" });
   }
 
+  // Calculate the  product price for the discount
+
+  if (product.price < discount || discount < 0) {
+    return res
+      .status(400)
+      .json({ message: "Discount exceeds the minimum product price" });
+  }
+
+
   const categoryOffer = await CategoryOffer.findById(product.categoryOffer);
-  // console.log(categoryOffer);
+  console.log(categoryOffer);
 
   if (!categoryOffer) {
     // If the product offer is not found, clear the original price
@@ -1660,18 +1735,18 @@ exports.updateOneProductOffer = catchAsync(async (req, res) => {
     await product.save();
   }
 
-  console.log(product);
 
   // Update the category offer fields
   productOffer.discount = discount;
-  productOffer.description = description;
+  productOffer.description = `${discount}%`;
 
+  console.log(productOffer)
   // Save the updated category offer
-  // await productOffer.save();
+  await productOffer.save();
 
   res
     .status(200)
-    .json({ message: "product offer updated successfully", productOffer });
+    .json({ message: "product offer updated successfully"});
 });
 
 exports.deleteOneProductOffer = catchAsync(async (req, res) => {

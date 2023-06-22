@@ -15,6 +15,7 @@ const Banner = require("../Models/banner");
 
 const { generateInvoice } = require("../utils/generateInvoice");
 const GuestUser = require("../Models/guestUser");
+const ProductOffer = require("../Models/productOffer");
 
 const generateOrderID = () => {
   const date = new Date();
@@ -82,10 +83,25 @@ exports.bestSellers = catchAsync(async (req, res) => {
   });
 });
 
-exports.getAllProducts = catchAsync(async (req, res) => {
-  const products = await Product.find({ deleted: false }).populate("category"); // Populate category field with full category document
 
-  res.json({ status: "success", data: products });
+exports.getAllProducts = catchAsync(async (req, res) => {
+  const products = await Product.find({ deleted: false }).populate("category"); 
+
+   // Retrieve the productOffer values and attach them to the products
+   const productIds = products.map((product) => product._id);
+   const productOffers = await ProductOffer.find({ product: { $in: productIds } });
+ 
+   const productsWithOffers = products.map((product) => {
+     const offer = productOffers.find((offer) => offer.product.toString() === product._id.toString());
+     return {
+       ...product._doc,
+       offer: offer ? offer.description : null,
+     };
+   });
+
+
+
+  res.json({ status: "success", data: productsWithOffers });
 });
 
 
@@ -117,6 +133,8 @@ exports.getCart = catchAsync(async (req, res) => {
     totalPrice,
   });
 });
+
+
 
 exports.addToCart = catchAsync(async (req, res) => {
   const { productId, quantity } = req.body;
@@ -181,6 +199,8 @@ exports.addToCart = catchAsync(async (req, res) => {
   });
 });
 
+
+
 exports.updateCartItem = catchAsync(async (req, res) => {
   const { productId } = req.params;
   const { quantity } = req.body;
@@ -228,6 +248,8 @@ exports.updateCartItem = catchAsync(async (req, res) => {
   });
 });
 
+
+
 exports.updateCartTotal = catchAsync(async (req, res) => {
   const { totalPrice } = req.body;
 
@@ -256,6 +278,7 @@ exports.updateCartTotal = catchAsync(async (req, res) => {
     cart,
   });
 });
+
 
 exports.removeCartItem = catchAsync(async (req, res) => {
   const { productId } = req.params;
@@ -303,6 +326,7 @@ exports.removeCartItem = catchAsync(async (req, res) => {
   });
 });
 
+
 exports.getCartItemsCount = catchAsync(async (req, res, next) => {
   if (req.user.role === "guest") {
     let cart = await GuestUser.findOne({
@@ -318,6 +342,7 @@ exports.getCartItemsCount = catchAsync(async (req, res, next) => {
 
   res.json({ count: cartItemsCount });
 });
+
 
 exports.saveShippingAddress = catchAsync(async (req, res) => {
   const cart = await Cart.findOne({ user: req.user._id });

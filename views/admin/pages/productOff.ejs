@@ -1,0 +1,129 @@
+<%- include ('../../layouts/adminHeader.ejs') %>
+
+
+    <div class="main-panel">
+        <div class="content-wrapper">
+            <div class="page-header">
+                <h3 class="page-title">All Product Offers</h3>
+                <nav aria-label="breadcrumb">
+
+                </nav>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body" id="card-body">
+
+                            <form class="forms-sample" id="category-form">
+                                <h4 class="card-title">Add Product Offer</h4>
+
+                                <div class="form-group">
+                                    <label for="exampleSelectGender">Category</label>
+                                    <select class="form-control" category id="category-dropdown" name="categoryId">
+                                        <option></option>
+                                    </select>
+                                    <p class="text-danger my-2 category-error error"></p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exampleSelectGender">Product</label>
+                                    <select class="form-control" category id="product-dropdown" name="productId">
+                                        <option></option>
+                                    </select>
+                                    <p class="text-danger my-2 product-error error"></p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exampleInputName1">Discount</label>
+                                    <input type="number" class="form-control" name="discount" id="value" placeholder=""
+                                        required>
+                                    <p id="value-error" class="text-danger my-2"></p>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                                <button type="reset" class="btn btn-dark">Cancel</button>
+                            </form>
+
+                            <form class="forms-sample" id="edit-category-form" style="display: none;"
+                                enctype="multipart/form-data">
+
+                                <h4 class="card-title">Update Product Offer</h4>
+
+                                <div class="form-group">
+                                    <label for="exampleSelectGender">Category</label>
+                                    <select class="form-control" category id="category-dropdown" name="categoryId">
+                                        <option></option>
+                                    </select>
+                                    <p class="text-danger my-2 category-error error"></p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exampleSelectGender">Product</label>
+                                    <select class="form-control" product-dropdown id="product-dropdown" name="productId">
+                                        <option></option>
+                                    </select>
+                                    <p class="text-danger my-2 product-error error"></p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="exampleInputName1">Discount</label>
+                                    <input type="number" class="form-control" name="discount" id="discount" placeholder=""
+                                        required>
+                                    <p id="value-error" class="text-danger my-2"></p>
+                                </div>
+
+                                <button type="submit" class="btn btn-success mr-2">Save</button>
+                                <button type="reset" class="btn btn-dark" onclick="window.location.reload()">Cancel</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-8 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">List Categories Offers</h4>
+                            <p class="card-description"> You can <code class="text-primary">edit</code> and
+                                <code>delete</code> Category Offers
+                            </p>
+                            <div class="table-responsive">
+                                <table class="table" id="user-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Offer</th>
+                                            <th>Category Off</th>
+                                            <th>Current Price</th>
+                                            <th>Original Price</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <script>
+
+
+        </script>
+
+        <script>
+            window.onload = async function () {
+                await getAllProductOffers();
+                await getDropdownCategories();
+                addProductOffer()
+            };
+            
+
+        </script>
+
+        <%- include ('../../layouts/adminFooter.ejs') %>

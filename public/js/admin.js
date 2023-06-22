@@ -188,9 +188,7 @@ const getAllCategories = async () => {
 
 const getDropdownCategories = async () => {
   try {
-    const res = await axios.get(
-      "http://127.0.0.1:3000/api/v1/admin/categories"
-    );
+    const res = await axios.get("/api/v1/admin/categories");
     const { data } = res.data;
     const categories = data.categories;
 
@@ -205,6 +203,48 @@ const getDropdownCategories = async () => {
     console.log(err);
   }
 };
+
+// get product dropdown
+
+const getProductDropdown = async (categoryId) => {
+  try {
+    const res = await axios.get(
+      `/api/v1/admin/categories/${categoryId}/products`
+    );
+    const data = res.data;
+    const products = data.products;
+
+    const select =
+      document.querySelector("#product-dropdown") ||
+      document.querySelector("[product-dropdown]");
+
+    console.log(select);
+    // Clear existing options
+    select.innerHTML = "";
+
+    products.forEach((product) => {
+      const option = document.createElement("option");
+      option.setAttribute("value", product._id);
+      option.textContent = product.name;
+      select.appendChild(option);
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const categoryDropdown = document.querySelector("#category-dropdown");
+
+if (window.location.pathname === "/product/offer") {
+  // Event listener for category dropdown change
+  categoryDropdown.addEventListener("change", async (event) => {
+    const categoryId = event.target.value;
+    await getProductDropdown(categoryId);
+  });
+}
+
+// Initial call to populate category dropdown
+// getDropdownCategories();
 
 // Products
 
@@ -1107,7 +1147,6 @@ const addCategoryOffer = () => {
   const form = document.getElementById("category-form");
 
   const categoryError = document.getElementsByClassName("category-error")[0];
-  
 
   const category = form.querySelector("#category-dropdown");
   const discount = form.querySelector("#value");
@@ -1128,12 +1167,12 @@ const addCategoryOffer = () => {
         url: "/api/v1/admin/category-offers",
         type: "POST",
         data: formData,
-        success: function(response) {
+        success: function (response) {
           showToast("OFFER Added Successfully", "success");
           getAllCategoryOffers();
           console.log(response);
         },
-        error: function(error) {
+        error: function (error) {
           showToast(error.responseJSON.message, "danger");
           const name = error.responseJSON.error;
           if (name) {
@@ -1141,9 +1180,8 @@ const addCategoryOffer = () => {
           } else {
             categoryError.innerHTML = "";
           }
-        }
+        },
       });
-      
     } catch (error) {
       const name = error.response.data.message.name;
       if (name) {
@@ -1154,8 +1192,6 @@ const addCategoryOffer = () => {
     }
   });
 };
-
-
 
 const handleCategoryOfferFormEdit = (event) => {
   const form = document.getElementById("category-form");
@@ -1202,7 +1238,6 @@ const handleCategoryOfferFormEdit = (event) => {
         },
         error: function (err) {
           console.log(err);
-
         },
       });
 
@@ -1215,7 +1250,6 @@ const handleCategoryOfferFormEdit = (event) => {
     },
     error: function (err) {
       console.error(err);
-
     },
   });
   // Listen for the edit form submission
@@ -1249,8 +1283,7 @@ const handleCategoryOfferFormEdit = (event) => {
       },
       error: function (err) {
         // console.error(err);
-      showToast(err.responseJSON.message, "danger");
-
+        showToast(err.responseJSON.message, "danger");
       },
     });
   });
@@ -1272,6 +1305,258 @@ const handleCategoryOfferDelete = (event) => {
             showToast(`OFFER Deleted Successfully`, "danger");
             // window.location.href = "/category/offers";
             getAllCategoryOffers();
+          },
+          error: function (err) {
+            console.error(err);
+          },
+        });
+      } else {
+        console.log("Deletion canceled");
+      }
+    }
+  );
+};
+
+// Product Off
+
+const getAllProductOffers = async () => {
+  try {
+    const res = await axios.get("/api/v1/admin/product-offers");
+    const productOff = res.data.ProductOffers;
+    console.log(productOff);
+
+    const tableBody = document.querySelector("#user-table tbody");
+
+    tableBody.innerHTML = "";
+
+    console.log(productOff);
+
+    productOff.forEach((offer) => {
+      const row = document.createElement("tr");
+
+      const editBtn = `<label type="button"  class="badge badge-primary" data-user-id="${offer.id}" onclick="handleProductOfferFormEdit(event)"> <i class="mdi mdi-grease-pencil"></i></label>`;
+
+      const dltBtn = `<label type="button"  class="badge badge-danger" data-user-id="${offer.productId}" onclick="handleProductOfferDelete(event)"> <i class="mdi mdi-delete"></i> </label>`;
+
+      // <td>${offer.product}</td>
+      row.innerHTML = `
+              <td style="white-space: pre-wrap">${offer.product}</td>
+              <td>${offer.offer}</td>
+              <td>${offer.categoryOff} <br> <small class="text-warning">${offer.categoryName}</small> </td>
+              <td class="text-info">₹${offer.productPrice}</td>
+              <td>₹<del class="text-primary">${offer.originalPrice}</del></td>
+              <td>${editBtn}   ${dltBtn}</td>
+            `;
+
+      tableBody.appendChild(row);
+    });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const addProductOffer = () => {
+  const cardBody = document.getElementById("card-body");
+
+  const form = document.getElementById("category-form");
+
+  const categoryError = document.getElementsByClassName("category-error")[0];
+
+  const category = form.querySelector("#category-dropdown");
+  const product = form.querySelector("#product-dropdown");
+  const discount = form.querySelector("#value");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    try {
+      const formData = {
+        productId: product.value,
+        categoryId: category.value,
+        discount: discount.value,
+      };
+
+      console.log(formData);
+
+      $.ajax({
+        url: "/api/v1/admin/product-offers",
+        type: "POST",
+        data: formData,
+        success: function (response) {
+          showToast("OFFER Added Successfully", "success");
+          getAllProductOffers();
+          console.log(response);
+        },
+        error: function (error) {
+          showToast(error.responseJSON.message, "danger");
+          const name = error.responseJSON.error;
+          if (name) {
+            categoryError.innerHTML = name;
+          } else {
+            categoryError.innerHTML = "";
+          }
+        },
+      });
+    } catch (error) {
+      const name = error.response.data.message.name;
+      if (name) {
+        nameError.innerHTML = name;
+      } else {
+        nameError.innerHTML = "";
+      }
+    }
+  });
+};
+
+const handleProductOfferFormEdit = (event) => {
+  const form = document.getElementById("category-form");
+
+  const productID = event.target.dataset.userId;
+  const editForm = document.getElementById("edit-category-form");
+
+  $.ajax({
+    type: "GET",
+    url: `/api/v1/admin/product-offers/${productID}`,
+    success: function (response) {
+      const productOff = response.productOffer;
+
+      // Fetch the category name using the category ID
+      $.ajax({
+        type: "GET",
+        url: `/api/v1/admin/categories`,
+        success: function (response) {
+          const { categories } = response.data;
+
+          // Populate the category dropdown options
+          const categoryDropdown = editForm.querySelector("#category-dropdown");
+
+          categoryDropdown.innerHTML = "";
+
+          categories.forEach(async (category) => {
+            const option = document.createElement("option");
+            option.value = category._id;
+            option.textContent = category.name;
+            categoryDropdown.appendChild(option);
+            
+          });
+
+          // Set the selected category
+          const selectedCategory = categories.find(
+            (category) => category._id === productOff.CategoryId
+          );
+
+          if (selectedCategory) {
+            categoryDropdown.value = selectedCategory._id;
+            categoryDropdown.disabled = true;
+            showToast(`You can Edit Now`, "info");
+          }
+
+          
+
+          $.ajax({
+            type: "GET",
+            url: `/api/v1/admin/categories/${selectedCategory._id}/products`,
+            success: function (res) {
+              const data = res.products;
+
+              console.log(data)
+
+              const select = document.querySelector("[product-dropdown]");
+
+              // // Clear existing options
+              select.innerHTML = "";
+
+              data.forEach((product) => {
+                const option = document.createElement("option");
+                option.setAttribute("value", product._id);
+                option.textContent = product.name;
+                select.appendChild(option);
+              });
+
+              const selectedCategory = data.find(
+                (product) => product._id === productOff.productId
+              );
+    
+              if (selectedCategory) {
+                select.value = selectedCategory._id;
+                select.disabled = true;
+              }
+            },
+          });
+        },
+        error: function (err) {
+          console.log(err);
+        },
+      });
+
+      console.log(productOff.offer, productOff.discount);
+
+      // editForm.querySelector("#category-desc").value = productOff.offer;
+      editForm.querySelector("#discount").value = productOff.discount;
+
+      const form = document.getElementById("category-form");
+      form.style.display = "none";
+      editForm.style.display = "block";
+    },
+    error: function (err) {
+      console.error(err);
+    },
+  });
+
+  // Listen for the edit form submission
+  editForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const category = editForm.querySelector("#category-dropdown").value;
+    const product = editForm.querySelector("#product-dropdown").value;
+    const discount = editForm.querySelector("#discount").value;
+    const description = ""
+
+    const formData = {
+      category,
+      product,
+      discount,
+      description
+    };
+
+    console.log(formData)
+
+    $.ajax({
+      type: "PUT",
+      url: `/api/v1/admin/product-offers/${product}`,
+      data: JSON.stringify(formData),
+      processData: true,
+      contentType: "application/json",
+      success: function (response) {
+        // Hide the edit form and show the add form
+        form.style.display = "block";
+        editForm.style.display = "none";
+
+        // Reload the categories table
+        showToast(`Category Updated Successfully`, "success");
+        getAllProductOffers();
+      },
+      error: function (err) {
+        // console.error(err);
+        showToast(err.responseJSON.message, "danger");
+      },
+    });
+  });
+};
+
+const handleProductOfferDelete = (event) => {
+  const productID = event.target.dataset.userId;
+
+  showCustomConfirmation(
+    "Are you sure you want to delete the Product Offer?",
+    function (result) {
+      if (result) {
+        $.ajax({
+          type: "DELETE",
+          url: `/api/v1/admin/product-offers/${productID}`,
+          success: async function (response) {
+            showToast(`OFFER Deleted Successfully`, "danger");
+            // window.location.href = "/category/offers";
+            getAllProductOffers();
           },
           error: function (err) {
             console.error(err);

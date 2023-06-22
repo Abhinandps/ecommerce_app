@@ -81,6 +81,14 @@ exports.getAllCategoryOffer = (req, res) => {
   }
 };
 
+exports.getAllProductOffer = (req, res) => {
+  if (req.admin) {
+    res.render("admin/pages/productOff.ejs");
+  } else {
+    res.redirect("/admin/login");
+  }
+};
+
 
 
 
