@@ -215,6 +215,49 @@ exports.updateProduct = catchAsync(async (req, res, next) => {
   }
 });
 
+
+exports.updateImageCrop = catchAsync(async(req,res,next) =>{
+
+
+  try {
+    // console.log(req.body)
+    const {cropWidth,cropHeight,cropX,cropY,imageUrl} = req.body;
+ 
+    console.log(imageUrl)
+    // const baseDirectory = process.cwd();
+    // const filePath = path.join(baseDirectory,'public',imgPath)
+    // console.log(filePath)
+    // const image = await Jimp.read(filePath);
+    // console.log(image)
+    // image.crop(x,y,width,height);
+    // console.log(image)
+
+    // if(fs.existsSync(filePath)){
+    //     fs.unlink(filePath,(error)=>{
+    //         if(error){
+    //             console.log(error)
+    //         }else{
+    //             console.log("Image deleted")
+    //         }
+    //     })
+    // }else{
+    //     console.log('Image not found')
+    // }
+
+    // await image.writeAsync(filePath);
+
+    // res.status(200).json({msg:"Image cropped successfully"})
+
+    res.json({message:"image cropped successfully"})
+} catch (error) {
+    console.error('Error cropping image:', error);
+    res.status(500).json({ msg: 'Error occurred while cropping the image.' });
+        }
+
+
+})
+
+
 exports.deleteProduct = catchAsync(async (req, res, next) => {
   const product = await Product.findById(req.params.id);
 

@@ -25,7 +25,8 @@ const {
   getAllCoupones,
   getAllBanners,
   getAllCategoryOffer,
-  getAllProductOffer
+  getAllProductOffer,
+  getImageCropPage
 } = require("../Controllers/viewController");
 
 const { isAuthenticate ,isAdmin} = require("../middleware/auth");
@@ -61,6 +62,8 @@ router.get("/banners", isAdmin, getAllBanners)
 router.get("/category/offer", isAdmin, getAllCategoryOffer)
 
 router.get("/product/offer", isAdmin, getAllProductOffer)
+
+router.get("/product-images", isAdmin, getImageCropPage)
 
 
 

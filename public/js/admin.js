@@ -317,6 +317,9 @@ const handleProductFormEdit = (event) => {
       stock.value = products.stock;
       description.value = products.description;
 
+      const cropNavigateBtn = document.getElementById("cropPageNavigate");
+      console.log(cropNavigateBtn);
+
       const form = document.getElementById("product-form");
       form.style.display = "none";
       editForm.style.display = "block";
@@ -847,6 +850,7 @@ const handleProductPaginationClick = async (pageNumber, searchQuery) => {
     data.results.forEach((product) => {
       const row = document.createElement("tr");
       const editBtn = `<label type="button"  class="badge badge-primary" data-product-id="${product._id}" onclick="handleProductFormEdit(event)"> <i class="mdi mdi-grease-pencil"></i></label>`;
+      const cropBtn = `<label type="button"  class="badge badge-info" data-product-id="${product._id}" onclick="handleProductCrop(event)"> <i class="mdi mdi-crop"></i></label>`;
 
       const dltBtn = `<label type="button"  class="badge badge-danger" data-product-id="${product._id}" onclick="handleProductDelete(event)"> <i class="mdi mdi-delete"></i> </label>`;
 
@@ -872,6 +876,7 @@ const handleProductPaginationClick = async (pageNumber, searchQuery) => {
             <td>${product.stock}</td>
             <td>${product.price}</td>
             <td>${editBtn}</td>
+            <td>${cropBtn}</td>
             <td>${dltBtn}</td>
           `;
           tableBody.innerHTML += row.outerHTML;
@@ -887,6 +892,24 @@ const handleProductPaginationClick = async (pageNumber, searchQuery) => {
     console.error(error);
   }
 };
+
+const handleProductCrop = (event) => {
+  const productId = event.target.getAttribute("data-product-id");
+
+  $.ajax({
+    type: "GET",
+    url: `/api/v1/admin/product/${productId}`,
+    success: (response) => {
+      const paths = response.data.products.image;
+      const manipulatedPaths = paths.map((path) =>
+        path.replace("public\\", "")
+      );
+      window.location.href = `/product-images?imagePath=${manipulatedPaths}`;
+    },
+  });
+};
+
+
 
 function createPaginationButton(pageNumber, label, isActive, paginationType) {
   var button = document.createElement("button");
@@ -997,6 +1020,7 @@ async function fetchDataAndPaginate(url, currentPage, dataType) {
       data.results.forEach((product) => {
         const row = document.createElement("tr");
         const editBtn = `<label type="button"  class="badge badge-primary" data-product-id="${product._id}" onclick="handleProductFormEdit(event)"> <i class="mdi mdi-grease-pencil"></i></label>`;
+        const cropBtn = `<label type="button"  class="badge badge-info" data-product-id="${product._id}" onclick="handleProductCrop(event)"> <i class="mdi mdi-crop"></i></label>`;
 
         const dltBtn = `<label type="button"  class="badge badge-danger" data-product-id="${product._id}" onclick="handleProductDelete(event)"> <i class="mdi mdi-delete"></i> </label>`;
 
@@ -1022,6 +1046,7 @@ async function fetchDataAndPaginate(url, currentPage, dataType) {
           <td>${product.stock}</td>
           <td>${product.price}</td>
           <td>${editBtn}</td>
+          <td>${cropBtn}</td>
           <td>${dltBtn}</td>
         `;
             tableBody.innerHTML += row.outerHTML;
@@ -1749,7 +1774,7 @@ function showCustomPopup(message, callback) {
               <option value="sales">Sales</option>
               <option value="stock">Stocks</option>
               <option value="cancelled">Cancellation</option>
-              <option value="return">Return and Refund</option>
+            
             </select>
             
           </div>

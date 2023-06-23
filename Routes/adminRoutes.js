@@ -53,6 +53,7 @@ const {
   updateOneReferralOffer,
   deleteOneReferralOffer,
   getFilterProducts,
+  updateImageCrop,
 
 } = require("../Controllers/adminController");
 
@@ -139,6 +140,8 @@ router.post("/product", upload.array('image',2), addProduct);
 router.put("/product/:id", upload.array('image',2), updateProduct);
 
 router.delete("/product/:id", deleteProduct);
+
+router.post("/crop-image",isAdmin, updateImageCrop)
 
 
 // cart

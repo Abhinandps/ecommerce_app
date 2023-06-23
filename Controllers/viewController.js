@@ -72,7 +72,6 @@ exports.getAllBanners = (req, res) => {
   }
 };
 
-
 exports.getAllCategoryOffer = (req, res) => {
   if (req.admin) {
     res.render("admin/pages/categoryOff.ejs");
@@ -90,6 +89,13 @@ exports.getAllProductOffer = (req, res) => {
 };
 
 
+exports.getImageCropPage = (req, res) => {
+  if (req.admin) {
+    res.render("admin/pages/imageCrop.ejs");
+  } else {
+    res.redirect("/admin/login");
+  }
+};
 
 
 // USER
@@ -102,7 +108,6 @@ exports.getUserLogin = (req, res) => {
   }
 };
 
-
 exports.getSignIn = (req, res) => {
   if (req.user) {
     res.redirect("/");
@@ -111,7 +116,6 @@ exports.getSignIn = (req, res) => {
   }
 };
 
-
 exports.getUserSignup = (req, res) => {
   if (req.user) {
     res.redirect("/");
@@ -119,7 +123,6 @@ exports.getUserSignup = (req, res) => {
     res.render("user/signup.ejs");
   }
 };
-
 
 exports.getOtpForm = (req, res) => {
   if (req.user) {
@@ -130,7 +133,6 @@ exports.getOtpForm = (req, res) => {
   }
 };
 
-
 exports.getHome = (req, res) => {
   if (req.user && req.user.role === "guest") {
     res.render("user/home.ejs");
@@ -139,13 +141,11 @@ exports.getHome = (req, res) => {
   }
 };
 
-
 exports.getProfile = (req, res) => {
   if (req.user) {
     res.render("user/profile.ejs");
   }
 };
-
 
 exports.getShoppingPage = (req, res) => {
   if (req.user && req.user.role === "guest") {
@@ -155,7 +155,6 @@ exports.getShoppingPage = (req, res) => {
   }
 };
 
-
 exports.getProductDetails = (req, res) => {
   if (req.user && req.user.role === "guest") {
     res.render("user/shopDetails");
@@ -163,7 +162,6 @@ exports.getProductDetails = (req, res) => {
     res.render("user/shopDetails");
   }
 };
-
 
 exports.getCartPage = (req, res) => {
   if (req.user && req.user.role === "guest") {
@@ -173,30 +171,26 @@ exports.getCartPage = (req, res) => {
   }
 };
 
-
-
 exports.getCheckoutPage = (req, res) => {
   if (req.user && req.user.role === "user") {
     res.render("user/checkout.ejs");
-  }else{
-    res.render("user/cart",{modal:true});
+  } else {
+    res.render("user/cart", { modal: true });
   }
 };
-
 
 exports.getOrdersPage = (req, res) => {
   if (req.user && req.user.role === "user") {
     res.render("user/order.ejs");
-  }else{
+  } else {
     res.redirect("/shop");
   }
 };
 
-
 exports.getOneOrder = (req, res) => {
   if (req.user && req.user.role === "user") {
     res.render("user/orderDetails.ejs");
-  }else{
+  } else {
     res.redirect("/shop");
   }
 };
@@ -204,7 +198,7 @@ exports.getOneOrder = (req, res) => {
 exports.getPaymentPage = (req, res) => {
   if (req.user && req.user.role === "user") {
     res.render("user/payment.ejs");
-  }else{
+  } else {
     res.redirect("/shop");
   }
 };

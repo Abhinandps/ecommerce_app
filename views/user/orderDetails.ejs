@@ -106,11 +106,12 @@
         }
     </style>
     <div class="container">
+
         <div class="header">
             <p>Tracking My Order</p>
             <nav>
                 <ul class="menu-category-list">
-                    <li class="meanu-category"><a class="menu-title" href="/orders">Orders</a></li>
+                    <li class="meanu-category"><a class="menu-title" href="#">Orders</a></li>
                     <li><a href="#">Deliverd</a></li>
                     <li><a href="#">Return</a></li>
                 </ul>
@@ -243,6 +244,8 @@
                 </div>
               </div>
 
+              
+              ${currentStatus === 'delivered' ? `
               <div class="payment_details">
                 <p payment-status>Payment Successfull method</p>
                 <p payment-method>UPI ID</p>
@@ -250,11 +253,19 @@
                   Banking ICICI
                 </p>
                 <button onClick="downloadInvoice('${order.orderID}')">Invoice</button>
-              </div>
+              </div>` : ''}
+              
 
-              <div class="cancel_order">
-                <button id="btnOpenForm" onClick="showPopup('${order.orderID}')" >Cancel Order</button>
-              </div>
+            ${currentStatus === 'delivered'  ? 
+            ''
+            : currentStatus === 'cancelled' ? `<div class="cancel_order">
+                <span> Cancelled</span>
+              </div>` : 
+              `<div class="cancel_order">
+                <button id="btnOpen" onClick="showPopup('${order.orderID}')" >Cancel Order</button>
+              </div>` 
+            }
+
             </div>`
 
                                 const tempElement = document.createElement('div');
@@ -307,7 +318,7 @@
 
 
         function showPopup(orderId) {
-            var btnOpenForm = document.getElementById('btnOpenForm');
+            var btnOpenForm = document.getElementById('btnOpen');
             var formPopupBg = document.querySelector('.form-popup-bg')
             var btnCloseForm = document.getElementById('btnCloseForm')
 

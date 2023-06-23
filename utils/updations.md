@@ -118,17 +118,17 @@ Week 4 Updations
 Updations:
 
 -[✔]Transaction id needed
--[]Order list ui updates
--[✔]Order history
--[]Product saving not showing any message
+-[✔]Order list ui updates
+-[x]Order history
+-[x]Product saving not showing any message
 -[✔]Toaster message missing
 -[✔]Inform stock is out or not
--[]Add new address ui
--[]Dialog message needed for success
+-[✔]Add new address ui
+-[✔]Dialog message needed for success
 -[✔]Address not adding properly
--[]Redirection after payment failure not working
+-[x]Redirection after payment failure not working
 -[✔]Keep transaction id
--[]Dependency injection
+-[✔]Dependency injection
 -[✔]Coupon code -ve discount amount
 
 
@@ -143,6 +143,12 @@ Admin side :
 [✔]Admin Dashboard - Chart with filter(yearly,monthly etc.)
 [✔]Sales Report - Pdf and excel download(with order summary)
 
+
+
+
+
+
+
 Score-
 Theory-5.5
 Practical-6
@@ -152,4 +158,8 @@ Practical-6
 
 
 
+
+
+
+  <!-- <option value="return">Return and Refund</option> -->
 

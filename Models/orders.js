@@ -48,7 +48,8 @@ const orderSchema = new mongoose.Schema(
       unique: true,
     },
     cancellationReason:{
-      type:String
+      type:String,
+      default:"product damaged"
     }
   },
   { timestamps: true }
