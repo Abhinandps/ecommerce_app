@@ -910,7 +910,6 @@ const handleProductCrop = (event) => {
 };
 
 
-
 function createPaginationButton(pageNumber, label, isActive, paginationType) {
   var button = document.createElement("button");
   button.innerHTML = label;

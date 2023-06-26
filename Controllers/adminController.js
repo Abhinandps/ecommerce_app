@@ -14,6 +14,7 @@ const { generatePDF, generateCSV } = require("../utils/generateReport");
 const CategoryOffer = require("../Models/categoryOffer");
 const ProductOffer = require("../Models/productOffer");
 
+
 exports.getAllUsers = catchAsync(async (req, res) => {
   const users = await User.find();
   res.status(200).json({
@@ -23,6 +24,7 @@ exports.getAllUsers = catchAsync(async (req, res) => {
   });
 });
 
+
 exports.getOneUsers = catchAsync(async (req, res) => {
   const user = await User.findOne({ _id: req.params.id });
   res.status(200).json({
@@ -30,6 +32,7 @@ exports.getOneUsers = catchAsync(async (req, res) => {
     data: user,
   });
 });
+
 
 exports.getOneCategory = catchAsync(async (req, res) => {
   const categories = await Category.findOne({ _id: req.params.id });
@@ -40,6 +43,7 @@ exports.getOneCategory = catchAsync(async (req, res) => {
   });
 });
 
+
 exports.getAllCategories = catchAsync(async (req, res) => {
   const categories = await Category.find({ isDeleted: false });
   res.status(200).json({
@@ -48,6 +52,7 @@ exports.getAllCategories = catchAsync(async (req, res) => {
     data: { categories },
   });
 });
+
 
 exports.toggleBlock = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.params.id);
@@ -62,6 +67,7 @@ exports.toggleBlock = catchAsync(async (req, res, next) => {
   });
 });
 
+
 exports.addCategory = catchAsync(async (req, res, next) => {
   const { name, description } = req.body;
 
@@ -72,6 +78,7 @@ exports.addCategory = catchAsync(async (req, res, next) => {
   });
   res.json(category);
 }, ErrorHandler);
+
 
 exports.updateCategory = catchAsync(async (req, res, next) => {
   const { name, description } = req.body;
@@ -121,6 +128,7 @@ exports.deleteCategory = catchAsync(async (req, res, next) => {
   res.status(204).json({ message: "Category deleted" });
 });
 
+
 exports.getAllProducts = catchAsync(async (req, res) => {
   res.status(200).json({
     status: "success",
@@ -166,6 +174,7 @@ exports.addProduct = catchAsync(async (req, res, next) => {
   // Send a response to the client
   res.status(201).json({ status: "success", product });
 });
+
 
 exports.updateProduct = catchAsync(async (req, res, next) => {
   const { name, price, category, stock, description } = req.body;

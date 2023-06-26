@@ -1,6 +1,6 @@
-const cron = require('node-cron');
-const Banner = require('../Models/banner');
-
+const cron = require("node-cron");
+const Banner = require("../Models/banner");
+const ProductOffer = require("../Models/productOffer");
 
 const updateBannerStatus = async () => {
   try {
@@ -10,23 +10,21 @@ const updateBannerStatus = async () => {
       if (banner.endDate) {
         const endDate = new Date(banner.endDate);
         if (endDate < new Date()) {
-          banner.status = 'inactive';
+          banner.status = "inactive";
           await banner.save();
         }
       }
     }
-    console.log('Banner status update cron job completed');
+    console.log("Banner status update cron job completed");
   } catch (error) {
-    console.error('Error updating banner statuses:', error);
+    console.error("Error updating banner statuses:", error);
   }
 };
 
-
-
 exports.paginatedResults = (model) => {
   // updated every 00:00
-  cron.schedule('0 0 * * *', updateBannerStatus)
-  
+  cron.schedule("0 0 * * *", updateBannerStatus);
+
   return async (req, res, next) => {
     const page = parseInt(req.query.page);
     const limit = parseInt(req.query.limit);
@@ -120,3 +118,84 @@ exports.paginatedResults = (model) => {
     }
   };
 };
+
+
+exports.paginatedResultsUser = (model) => {
+  return async (req, res, next) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    const filterOptions = { deleted: false };
+
+    if (req.query.category) {
+      filterOptions.category = req.query.category;
+    }
+
+    // Add search functionality
+    if (req.query.search) {
+      const searchQuery = req.query.search;
+      filterOptions.name = { $regex: searchQuery, $options: "i" };
+    }
+
+   
+
+    try {
+      const results = {};
+      results.results = await model
+        .find(filterOptions)
+        .skip(startIndex)
+        .limit(limit)
+        .populate("category");
+
+      if (endIndex < (await model.countDocuments(filterOptions).exec())) {
+        results.next = {
+          page: page + 1,
+          limit: limit,
+        };
+      }
+
+      if (startIndex > 0) {
+        results.previous = {
+          page: page - 1,
+          limit: limit,
+        };
+      }
+
+      // Retrieve the productOffer values and attach them to the products
+      const productIds = results.results.map((product) => product._id);
+      const productOffers = await ProductOffer.find({
+        product: { $in: productIds },
+      });
+
+      results.resultsWithOffers = results.results.map((product) => {
+        const offer = productOffers.find(
+          (offer) => offer.product.toString() === product._id.toString()
+        );
+        return {
+          ...product._doc,
+          offer: offer ? offer.description : null,
+        };
+      });
+
+      const paginatedResults = {
+        results: results.resultsWithOffers,
+        pagination: {
+          total: await model.countDocuments(filterOptions).exec(),
+          totalPages: Math.ceil(
+            (await model.countDocuments(filterOptions).exec()) / limit
+          ),
+          page: page,
+        },
+        next: results.next,
+        previous: results.previous,
+      };
+      res.paginatedUserResults = paginatedResults;
+      next();
+    } catch (e) {
+      res.status(500).json({ message: e.message });
+    }
+  };
+};
+

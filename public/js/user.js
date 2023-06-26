@@ -20,7 +20,9 @@ const bestSellers = () => {
             (image) => image.split("public")[1]
           )[0];
           const item = `
-                <div class="showcase fade-in-animation" data-product='${JSON.stringify(product)}'>
+                <div class="showcase fade-in-animation" data-product='${JSON.stringify(
+                  product
+                )}'>
 
                   <a href="#" class="showcase-img-box">
                       <img src="${firstImage}" alt="baby fabric shoes" width="75"
@@ -99,7 +101,7 @@ const getCategories = () => {
           navlink.innerHTML = category.name;
 
           navlink.addEventListener("click", function () {
-            getProducts(category._id);
+            handleProductPaginationClick(1, null, category._id);
           });
 
           const listItem = document.createElement("li");
@@ -112,7 +114,7 @@ const getCategories = () => {
           img.width = 250;
           img.height = 119;
           img.addEventListener("click", function () {
-            getProducts(category._id);
+            handleProductPaginationClick(1, undefined, category._id);
           });
 
           link.appendChild(img);
@@ -128,103 +130,432 @@ const getCategories = () => {
   });
 };
 
-const getProducts = (categoryId) => {
-  const row = $(".product-grid");
-  const filter = {};
+// category filter based product render
+
+// const getProducts = (categoryId) => {
+//   const row = $(".product-grid");
+//   const filter = {};
+
+//   row.empty();
+
+//   if (categoryId) {
+//     filter.category = categoryId;
+//   }
+
+//   const queryString = $.param(filter);
+
+//   $.ajax({
+//     type: "GET",
+//     url: `/api/v1/user/products${queryString ? `?${queryString}` : ""}`,
+//     success: function (products) {
+//       const { data } = products;
+
+//       data.results.forEach((product) => {
+
+//         const card = `
+//         <div class="showcase fade-in-animation">
+
+//         <div class="showcase-banner">
+
+//         ${product.image.map((path, index) => {
+//           const newPath = path.replace("public", "");
+//           let className = "product-img default";
+
+//           if (index === 1) {
+//             className = " product-img hover";
+//           }
+//           console.log(newPath);
+//           return `<img src="${newPath}" alt="Mens Winter Leathers Jackets" width="300" class="${className}">`;
+//         })}
+
+//         <p class="showcase-badge">${product.offer ? product.offer : ""}</p>
+
+//         <div class="showcase-actions">
+
+//             <button class="btn-action">
+//                 <ion-icon name="heart-outline"></ion-icon>
+//             </button>
+
+//             <button class="btn-action view-details" data-product='${JSON.stringify(
+//               product
+//             )}'>
+//             <ion-icon name="eye-outline"></ion-icon>
+//               </button>
+
+//             <button class="btn-action add-to-cart" data-productId='${
+//               product._id
+//             }'>
+//                 <ion-icon name="bag-add-outline"></ion-icon>
+//             </button>
+
+//         </div>
+
+//     </div>
+
+//     <div class="showcase-content">
+
+//         <a href="#">
+//             <h3 class="showcase-title">${product.name}</h3>
+//         </a>
+
+//         <div class="showcase-rating">
+//             <ion-icon name="star"></ion-icon>
+//             <ion-icon name="star"></ion-icon>
+//             <ion-icon name="star"></ion-icon>
+//             <ion-icon name="star-outline"></ion-icon>
+//             <ion-icon name="star-outline"></ion-icon>
+//         </div>
+
+//         <div class="price-box">
+//             <p class="price">₹${product.price}</p>
+//             <del>₹ ${
+//               product.originalPrice ? product.originalPrice : product.price * 2
+//             }</del>
+//         </div>
+
+//     </div>
+//     </div>
+//         `;
+
+//         row.append(card);
+//       });
+//     },
+//   });
+// };
+
+// PAGINATION START
+
+const fetchData = async (url) => {
+  try {
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+// Products
+
+const handleProductPaginationClick = async (
+  pageNumber,
+  searchQuery,
+  categoryId
+) => {
+  try {
+    // Get filter and sort parameters for products
+
+    // const category = document.getElementById("category").value;
+    // const priceRange = document.getElementById("price-range").value || undefined;
+    // const sortBy = document.getElementById("sort-by").value || undefined;
+    // const sortOrder = document.getElementById("sort-product").value || undefined;
+
+    // Construct the query string with filtering and sorting parameters
+    let queryString = `/api/v1/user/products?page=${pageNumber}&limit=8`;
+
+    if (categoryId) {
+      queryString += `&category=${categoryId}`;
+    }
 
 
-  row.empty()
+    // if (priceRange) {
+    //   queryString += `&priceRange=${priceRange}`;
+    // }
+    // if (sortBy && sortOrder) {
+    //   queryString += `&sortBy=${sortBy}&sortOrder=${sortOrder}`;
+    // }
 
-  if (categoryId) {
-    filter.category = categoryId;
+    if (searchQuery) {
+      queryString += `&search=${searchQuery}`;
+    }
+
+    const response = await fetchData(queryString);
+    // console.log(response)
+
+    const data = response.data;
+    const row = $(".product-grid");
+    // console.log(data);
+
+    row.empty();
+
+    data.results.forEach((product) => {
+
+      // console.log(product)
+
+      const card = `
+            <div class="showcase fade-in-animation">
+
+            <div class="showcase-banner">
+
+            ${product.image.map((path, index) => {
+              const newPath = path.replace("public", "");
+              let className = "product-img default";
+
+              if (index === 1) {
+                className = " product-img hover";
+              }
+              console.log(newPath);
+              return `<img src="${newPath}" alt="Mens Winter Leathers Jackets" width="300" class="${className}">`;
+            })}
+
+            <p class="showcase-badge">${product.offer ? product.offer : ""}</p>
+
+            <div class="showcase-actions">
+
+                <button class="btn-action">
+                    <ion-icon name="heart-outline"></ion-icon>
+                </button>
+
+                <button class="btn-action view-details" data-product='${JSON.stringify(
+                  product
+                )}'>
+                <ion-icon name="eye-outline"></ion-icon>
+                  </button>
+
+                <button class="btn-action add-to-cart" data-productId='${
+                  product._id
+                }'>
+                    <ion-icon name="bag-add-outline"></ion-icon>
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="showcase-content">
+
+            <a href="#">
+                <h3 class="showcase-title">${product.name}</h3>
+            </a>
+
+            <div class="showcase-rating">
+                <ion-icon name="star"></ion-icon>
+                <ion-icon name="star"></ion-icon>
+                <ion-icon name="star"></ion-icon>
+                <ion-icon name="star-outline"></ion-icon>
+                <ion-icon name="star-outline"></ion-icon>
+            </div>
+
+            <div class="price-box">
+                <p class="price">₹${product.price}</p>
+                <del>₹ ${
+                  product.originalPrice
+                    ? product.originalPrice
+                    : product.price * 2
+                }</del>
+            </div>
+
+        </div>
+        </div>
+            `;
+      // card.classList.add("fade-in-animation");
+      row.append(card);
+    });
+
+    updatePaginationNumbers(data.previous, data.next, pageNumber, "shop");
+  
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+function createPaginationButton(pageNumber, label, isActive, paginationType) {
+  // console.log("pageNumber "+)
+  var button = document.createElement("button");
+  button.innerHTML = label;
+  button.classList.add("paginationBtn");
+
+  if (isActive) {
+    button.classList.add("active");
   }
 
-  const queryString = $.param(filter);
+  button.addEventListener("click", function () {
+    if (paginationType === "orders") {
+      handlePaginationClick(pageNumber);
+    } else if (paginationType === "shop") {
+      handleProductPaginationClick(pageNumber);
+    }
+  });
 
-  $.ajax({
-    type: "GET",
-    url: `/api/v1/user/products${queryString ? `?${queryString}` : ""}`,
-    success: function (products) {
-      const { data } = products;
-      console.log(data);
+  return button;
+}
 
-      data.forEach((product) => {
-        // const imagePath =
+const updatePaginationNumbers = (
+  previousPage,
+  nextPage,
+  currentPage,
+  paginationType
+) => {
+  console.log(previousPage, nextPage, currentPage, paginationType);
+  const paginationContainer = document.getElementById("pagination-container");
+  if (paginationContainer) {
+    paginationContainer.innerHTML = "";
 
-        // console.log(newPath)
+    if (previousPage) {
+      const previousButton = createPaginationButton(
+        previousPage.page,
+        "Previous",
+        false,
+        paginationType
+      );
+      paginationContainer.appendChild(previousButton);
+    }
+
+    const currentButton = createPaginationButton(
+      currentPage,
+      currentPage,
+      true,
+      paginationType
+    );
+    paginationContainer.appendChild(currentButton);
+
+    if (nextPage) {
+      const nextButton = createPaginationButton(
+        nextPage.page,
+        "Next",
+        false,
+        paginationType
+      );
+      paginationContainer.appendChild(nextButton);
+    }
+  }
+};
+
+async function fetchDataAndPaginate(url, currentPage, dataType) {
+  try {
+    const row = $(".product-grid");
+
+    row.empty();
+
+    const response = await fetchData(`${url}?page=${currentPage}&limit=8`);
+
+    const data = response.data;
+
+    if (dataType === "orders") {
+      data.results.forEach((order) => {
+        let statusColor;
+        // // Determine the color based on the order status
+        if (order.status === "pending") {
+          statusColor = "warning";
+        } else if (order.status === "delivered") {
+          statusColor = "success";
+        } else if (order.status === "shipped") {
+          statusColor = "primary";
+        } else if (order.status === "confirmed") {
+          statusColor = "info";
+        } else {
+          statusColor = "danger";
+        }
+
+        const dateString = order.updatedAt;
+
+        /// Splitting the string at the 'T' character
+        const datePart = dateString.split("T")[0];
+
+        const row = document.createElement("tr");
+
+        const statusBadge = `<span class="badge badge-${statusColor}">${order.status}</span>`;
+        const editBtn = `<label id="view" type="button"  class="badge badge-primary" data-order-id="${order.orderID}" onclick="handleOrders(event)"> <i class="mdi mdi-eye" muted></i></label>`;
+
+        row.innerHTML = `
+        <td> ${order.orderID} </td>
+        <td> ₹${order.totalPrice} </td>
+        <td> ${order.paymentMethod} </td>
+        <td> ${datePart} </td>
+        <td> ${statusBadge}</td>
+        <td> ${editBtn}</td>
+        `;
+        tableBody.innerHTML += row.outerHTML;
+      });
+      updatePaginationNumbers(data.previous, data.next, currentPage, "orders");
+    } else if (dataType === "shop") {
+      data.results.forEach((product) => {
+        console.log(product);
 
         const card = `
-        <div class="showcase fade-in-animation">
+            <div class="showcase fade-in-animation">
+      
+            <div class="showcase-banner">
+      
+            ${product.image.map((path, index) => {
+              const newPath = path.replace("public", "");
+              let className = "product-img default";
 
-        <div class="showcase-banner">
-
-        ${product.image.map((path, index) => {
-          const newPath = path.replace("public", "");
-          let className = "product-img default";
-
-          if (index === 1) {
-            className = " product-img hover";
-          }
-          console.log(newPath);
-          return `<img src="${newPath}" alt="Mens Winter Leathers Jackets" width="300" class="${className}">`;
-        })}
-
-        
-        <p class="showcase-badge">${product.offer ? product.offer : ""}</p>
-
-        <div class="showcase-actions">
-
-            <button class="btn-action">
-                <ion-icon name="heart-outline"></ion-icon>
-            </button>
-
-            <button class="btn-action view-details" data-product='${JSON.stringify(
-              product
-            )}'>
-            <ion-icon name="eye-outline"></ion-icon>
-              </button>
-
-            <button class="btn-action add-to-cart" data-productId='${
-              product._id
-            }'>
-                <ion-icon name="bag-add-outline"></ion-icon>
-            </button>
-
+              if (index === 1) {
+                className = " product-img hover";
+              }
+              console.log(newPath);
+              return `<img src="${newPath}" alt="Mens Winter Leathers Jackets" width="300" class="${className}">`;
+            })}
+      
+            
+            <p class="showcase-badge">${product.offer ? product.offer : ""}</p>
+      
+            <div class="showcase-actions">
+      
+                <button class="btn-action">
+                    <ion-icon name="heart-outline"></ion-icon>
+                </button>
+      
+                <button class="btn-action view-details" data-product='${JSON.stringify(
+                  product
+                )}'>
+                <ion-icon name="eye-outline"></ion-icon>
+                  </button>
+      
+                <button class="btn-action add-to-cart" data-productId='${
+                  product._id
+                }'>
+                    <ion-icon name="bag-add-outline"></ion-icon>
+                </button>
+      
+            </div>
+      
         </div>
-
-    </div>
-
-    <div class="showcase-content">
-
-
-        <a href="#">
-            <h3 class="showcase-title">${product.name}</h3>
-        </a>
-
-        <div class="showcase-rating">
-            <ion-icon name="star"></ion-icon>
-            <ion-icon name="star"></ion-icon>
-            <ion-icon name="star"></ion-icon>
-            <ion-icon name="star-outline"></ion-icon>
-            <ion-icon name="star-outline"></ion-icon>
+      
+        <div class="showcase-content">
+      
+      
+            <a href="#">
+                <h3 class="showcase-title">${product.name}</h3>
+            </a>
+      
+            <div class="showcase-rating">
+                <ion-icon name="star"></ion-icon>
+                <ion-icon name="star"></ion-icon>
+                <ion-icon name="star"></ion-icon>
+                <ion-icon name="star-outline"></ion-icon>
+                <ion-icon name="star-outline"></ion-icon>
+            </div>
+      
+            <div class="price-box">
+                <p class="price">₹${product.price}</p>
+                <del>₹ ${
+                  product.originalPrice
+                    ? product.originalPrice
+                    : product.price * 2
+                }</del>
+            </div>
+      
         </div>
-
-        <div class="price-box">
-            <p class="price">₹${product.price}</p>
-            <del>₹ ${
-              product.originalPrice ? product.originalPrice : product.price * 2
-            }</del>
         </div>
-
-    </div>
-    </div>
-        `;
+            `;
         // card.classList.add("fade-in-animation");
         row.append(card);
       });
-    },
-  });
-};
+      updatePaginationNumbers(data.previous, data.next, currentPage, "shop");
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Initial render for products
+if (window.location.pathname.includes("/shop")) {
+  fetchDataAndPaginate("/api/v1/user/products", 1, "shop");
+}
+
+
+// PAGINATION END
 
 // Event listener for clicking on "View Details - add to cart - remove from cart" button
 document.addEventListener("click", function (event) {
@@ -258,6 +589,7 @@ document.addEventListener("click", function (event) {
   }
 });
 
+
 // Function to handle the view details functionality
 const handleViewDetails = (product) => {
   localStorage.setItem("product", JSON.stringify(product));
@@ -283,6 +615,7 @@ const getCartCount = () => {
 
 getCartCount();
 
+
 // function to handle the add to cart functionality
 const handleaddToCart = (productId) => {
   $.ajax({
@@ -300,6 +633,7 @@ const handleaddToCart = (productId) => {
   });
   updateButton();
 };
+
 
 const getCart = () => {
   const row = $(".cart-items");
@@ -523,6 +857,7 @@ const getCart = () => {
   });
 };
 
+
 function removeCoupon() {
   $.ajax({
     url: "/api/v1/user/coupons/remove",
@@ -536,6 +871,7 @@ function removeCoupon() {
     },
   });
 }
+
 
 const handleRemoveCartItem = (productId) => {
   // Find the index of the item with matching productId
@@ -579,6 +915,7 @@ const goToChekOut = () => {
     },
   });
 };
+
 
 const getCheckOut = () => {
   const row = $(".address_list");
@@ -643,6 +980,7 @@ const getCheckOut = () => {
   });
 };
 
+
 const getCoupons = () => {
   const row = $("#coupon-codes-container");
 
@@ -680,6 +1018,7 @@ const getCoupons = () => {
 
 getCoupons();
 
+
 const updateCartTotal = (totalPrice) => {
   $.ajax({
     type: "PATCH",
@@ -695,6 +1034,7 @@ const updateCartTotal = (totalPrice) => {
     },
   });
 };
+
 
 getCheckOut();
 
@@ -831,5 +1171,6 @@ const getPaymentDetails = () => {
     }
   }
 };
+
 
 // getOrders function included in order.ejs

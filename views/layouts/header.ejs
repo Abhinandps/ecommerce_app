@@ -327,13 +327,19 @@
 
                 <div class="header-search-container">
 
-                    <input type="search" name="search" class="search-field" placeholder="Enter your product name...">
+                    <input type="search" id="search-input" name="search" class="search-field"
+                        placeholder="Enter your product name...">
 
                     <button class="search-btn">
                         <ion-icon name="search-outline"></ion-icon>
                     </button>
+                    <div id="suggestions"></div>
 
                 </div>
+
+
+
+
 
                 <div class="header-user-actions">
 
@@ -700,7 +706,67 @@
 
     </header>
 
+
+
     <script>
+
+        // Suggestions
+        // function sendData(e){
+        //     fetch('getProductsSuggestions',{
+        //         method:"GET",
+        //         headers:{'Content-Type':"application/json"},
+        //         body:JSON.stringify({payload:e.value})
+        //     }).then(res=> res.json()).then(data=>{
+        //         let payload = data.payload
+        //         console.log(payload)
+        //     })
+        // }
+
+
+        $(document).ready(function () {
+            $('#search-input').on('input', function () {
+                const searchTerm = $(this).val();
+
+                $.ajax({
+                    url: '/api/v1/user/getSuggestions',
+                    method: 'GET',
+                    data: { term: searchTerm },
+                    success: function (data) {
+                        // Update the suggestions on the page
+                        $('#suggestions').empty();
+                        if (searchTerm.trim() !== '') {
+                            data.forEach(function (product, index) {
+                                var listItem = $('<li>' + product + '</li>');
+                                listItem.on('click', function () {
+                                    $('#search-input').val(product);
+                                    $('#suggestions').empty();
+                                });
+                                $('#suggestions').append(listItem);
+                            });
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error(textStatus, errorThrown);
+                    }
+                });
+            });
+        });
+
+
+        // Handle product search 
+
+        $('.search-btn').on('click', function () {
+            var searchTerm = $('#search-input').val();
+
+            handleProductPaginationClick(1, searchTerm, null);
+
+            // Clear the suggestions and input
+            $('#search-input').val('')
+            $('#suggestions').empty();
+        });
+
+
+
         window.onload = async () => {
             await getCategories()
         }

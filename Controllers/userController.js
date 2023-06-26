@@ -83,57 +83,54 @@ exports.bestSellers = catchAsync(async (req, res) => {
   });
 });
 
-
 // exports.getAllProducts = catchAsync(async (req, res) => {
-//   const products = await Product.find({ deleted: false }).populate("category"); 
+//   const products = await Product.find({ deleted: false }).populate("category");
 
-//    // Retrieve the productOffer values and attach them to the products
-//    const productIds = products.map((product) => product._id);
-//    const productOffers = await ProductOffer.find({ product: { $in: productIds } });
- 
-//    const productsWithOffers = products.map((product) => {
-//      const offer = productOffers.find((offer) => offer.product.toString() === product._id.toString());
-//      return {
-//        ...product._doc,
-//        offer: offer ? offer.description : null,
-//      };
-//    });
+//  // Retrieve the productOffer values and attach them to the products
+//  const productIds = products.map((product) => product._id);
+//  const productOffers = await ProductOffer.find({ product: { $in: productIds } });
 
-
+//  const productsWithOffers = products.map((product) => {
+//    const offer = productOffers.find((offer) => offer.product.toString() === product._id.toString());
+//    return {
+//      ...product._doc,
+//      offer: offer ? offer.description : null,
+//    };
+//  });
 
 //   res.json({ status: "success", data: productsWithOffers });
 // });
 
-
 exports.getAllProducts = catchAsync(async (req, res) => {
-  const filters = req.query; 
+  // const filters = req.query;
 
+  // const productsWithOffers = res.paginatedResults.results;
+  // const nextPage = res.paginatedResults.next;
+  // const previousPage = res.paginatedResults.previous;
 
-  const filterOptions = { deleted: false };
+  // const currentPage = {
+  //   page: req.query.page || 1,
+  //   limit: req.query.limit || 10,
+  // };\
 
-  if (filters.category) {
-    filterOptions.category = filters.category; 
-  }
+  // console.log(res.paginatedResults)
 
-
-  const products = await Product.find(filterOptions).populate("category");
-
-  // Retrieve the productOffer values and attach them to the products
-  const productIds = products.map((product) => product._id);
-  const productOffers = await ProductOffer.find({ product: { $in: productIds } });
-
-  const productsWithOffers = products.map((product) => {
-    const offer = productOffers.find((offer) => offer.product.toString() === product._id.toString());
-    return {
-      ...product._doc,
-      offer: offer ? offer.description : null,
-    };
+  res.status(200).json({
+    status: "success",
+    result: res.paginatedUserResults.length,
+    data: res.paginatedUserResults,
   });
-
-  res.json({ status: "success", data: productsWithOffers });
 });
 
+// search bar suggestions
+exports.getSuggestions = catchAsync(async (req, res) => {
+  const searchTerm = req.query.term;
 
+  const products = await Product.find({ name: { $regex: '^' + searchTerm, $options: 'i' } }).limit(5);
+  const productsName =  products.map(item=>item.name)
+
+  res.json(productsName);
+});
 
 // cart management
 
@@ -163,7 +160,6 @@ exports.getCart = catchAsync(async (req, res) => {
     totalPrice,
   });
 });
-
 
 exports.addToCart = catchAsync(async (req, res) => {
   const { productId, quantity } = req.body;
@@ -228,11 +224,9 @@ exports.addToCart = catchAsync(async (req, res) => {
   });
 });
 
-
 exports.updateCartItem = catchAsync(async (req, res) => {
   const { productId } = req.params;
   const { quantity } = req.body;
-
 
   if (req.user.role === "guest") {
     let guestUser = await GuestUser.findOne({
@@ -242,7 +236,6 @@ exports.updateCartItem = catchAsync(async (req, res) => {
     const cartItem = guestUser.items.find(
       (item) => item.product.toString() === productId
     );
-
 
     cartItem.quantity = quantity;
     await guestUser.save();
@@ -279,7 +272,6 @@ exports.updateCartItem = catchAsync(async (req, res) => {
   });
 });
 
-
 exports.updateCartTotal = catchAsync(async (req, res) => {
   const { totalPrice } = req.body;
 
@@ -308,7 +300,6 @@ exports.updateCartTotal = catchAsync(async (req, res) => {
     cart,
   });
 });
-
 
 exports.removeCartItem = catchAsync(async (req, res) => {
   const { productId } = req.params;
@@ -356,7 +347,6 @@ exports.removeCartItem = catchAsync(async (req, res) => {
   });
 });
 
-
 exports.getCartItemsCount = catchAsync(async (req, res, next) => {
   if (req.user.role === "guest") {
     let cart = await GuestUser.findOne({
@@ -373,7 +363,6 @@ exports.getCartItemsCount = catchAsync(async (req, res, next) => {
   res.json({ count: cartItemsCount });
 });
 
-
 exports.saveShippingAddress = catchAsync(async (req, res) => {
   const cart = await Cart.findOne({ user: req.user._id });
   cart.shippingAddress.push(req.body);
@@ -384,7 +373,6 @@ exports.saveShippingAddress = catchAsync(async (req, res) => {
     cart,
   });
 });
-
 
 // Coupon
 
@@ -694,7 +682,6 @@ exports.orderHistory = catchAsync(async (req, res, next) => {
   });
 });
 
-
 exports.getOrderDetails = catchAsync(async (req, res, next) => {
   const { orderID } = req.params;
   const order = await Order.findOne({ orderID, user: req.user._id });
@@ -706,7 +693,6 @@ exports.getOrderDetails = catchAsync(async (req, res, next) => {
     data: order,
   });
 });
-
 
 exports.orderCancel = catchAsync(async (req, res, next) => {
   const { orderID } = req.params;
@@ -868,6 +854,3 @@ exports.updateAvatar = catchAsync(async (req, res, next) => {
 
   res.status(200).json({ status: "success", data: updatedUser });
 });
-
-
-

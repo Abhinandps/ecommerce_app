@@ -119,6 +119,7 @@ function showSignUpForm() {
   document.getElementById("signup-form").style.display = "block";
 }
 
+
 function showLoginForm() {
   document.getElementById("otp-login-form").style.display = "none";
   document.getElementById("otp-form").style.display = "none";
@@ -126,12 +127,14 @@ function showLoginForm() {
   document.getElementById("login").style.display = "block";
 }
 
+
 // otp form
 
 let digitValidate = function (ele) {
   console.log(ele.value);
   ele.value = ele.value.replace(/[^0-9]/g, "");
 };
+
 
 let tabChange = function (val) {
   let ele = document.querySelectorAll(".otp");
@@ -142,3 +145,7 @@ let tabChange = function (val) {
     }
   }
 };
+
+
+
+

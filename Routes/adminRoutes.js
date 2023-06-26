@@ -188,11 +188,13 @@ router.route("/banners/:id")
 
 
 
+  
+  // retrieve product based on category id
+  router.get("/categories/:categoryId/products", isAdmin, getFilterProducts)
+  
+
 // OFFER MANAGEMENT START
-
-// retrieve product based on category id
-router.get("/categories/:categoryId/products", isAdmin, getFilterProducts)
-
+  
 /* Category*/
 
 router.route("/category-offers")
@@ -219,7 +221,7 @@ router.route("/product-offers/:id")
   .delete(isAdmin, deleteOneProductOffer)
 
 
-/* Referral*/
+/* Referral <pending...> */
 
 router.route("referral-offers")
   .get(isAdmin, getAllReferralOffers)

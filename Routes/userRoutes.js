@@ -33,13 +33,16 @@ const {
   toprated,
   bestSellers,
   initialPayment,
-  razorpayWebhook
+  razorpayWebhook,
+  getSuggestions
 } = require("../Controllers/userController");
 
 const upload = require("../utils/multerConfig");
 
 const { getAllCategories } = require("../Controllers/adminController");
 const User = require("../Models/userModel");
+const { paginatedResultsUser } = require("../utils/pagination");
+const Product = require("../Models/products");
 
 router.get("/otp-login", (req, res) => {
   // if(req.session.userId){
@@ -64,7 +67,10 @@ router.get("/logout", auth.logout);
 
 // Product
 
-router.get("/products", isAuthenticate, getAllProducts);
+router.get("/getSuggestions",isAuthenticate, getSuggestions);
+
+
+router.get("/products", isAuthenticate,paginatedResultsUser(Product), getAllProducts);
 
 // Cart Management
 
