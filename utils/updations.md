@@ -147,14 +147,27 @@ Admin side :
 
 
 
-
-
 Score-
 Theory-5.5
 Practical-6
 
 
-"
+
+
+
+Pending:
+
+[✔]Otp recent and timeout
+[]Group order 
+[]Sort order list
+[]Product search
+
+
+
+
+Score:
+Theory:7.5
+Coding:7.5"
 
 
 

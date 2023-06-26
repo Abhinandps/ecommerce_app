@@ -87,6 +87,7 @@
                             <input class="otp" type="text" oninput='digitValidate(this)' onkeyup='tabChange(4)'
                                 maxlength=1>
                         </div>
+                        <div id="resendBtn" class="countdown">Resend OTP</div>
                         <div id="otp-error" class="invalid"></div>
                         <div class="form-group">
                             <button type="submit" class="btn-black">Verify</button>
@@ -232,7 +233,7 @@
         function setToastMessage(text1, text2) {
             const toastText1 = document.querySelectorAll(".text.text-1");
             const toastText2 = document.querySelectorAll(".text.text-2");
-            
+
             toastText1.forEach((text1Span) => {
                 text1Span.textContent = text1;
             });
@@ -336,7 +337,7 @@
 
                 <div class="header-user-actions">
 
-                    <% if (locals.user && locals.user.role === 'user' ) { %>
+                    <% if (locals.user && locals.user.role==='user' ) { %>
 
                         <button class="action-btn" data-menu-user-action>
                             <img class="mobile-user-avatar" src="<%= locals.user.avatar.replace('public\\', '') %>"
@@ -355,7 +356,7 @@
                         </div>
 
 
-                        <% } else if (locals.user && locals.user.role === 'guest') { %>
+                        <% } else if (locals.user && locals.user.role==='guest' ) { %>
                             <button class="action-btn" data-user-action>
                                 <ion-icon name="person-outline"></ion-icon>
                             </button>
@@ -434,7 +435,7 @@
                 <span class="count">0</span>
             </button>
 
-            <% if (locals.user && locals.user.role === 'user' ) { %>
+            <% if (locals.user && locals.user.role==='user' ) { %>
                 <button class="action-btn" data-mobile-user-action>
                     <img class="mobile-user-avatar" src="src/images/testimonial-1.jpg" alt="testimonial">
                 </button>
@@ -449,7 +450,7 @@
                         <li> <a href="#" class="logout">Logout</a></li>
                     </ul>
                 </div>
-                <% } else if (locals.user && locals.user.role === 'guest') { %>
+                <% } else if (locals.user && locals.user.role==='guest' ) { %>
                     <button class="action-btn" data-mobile-user-action>
                         <ion-icon name="person-outline"></ion-icon>
                     </button>
@@ -724,7 +725,6 @@
         const emailFields = document.querySelectorAll('[email-field]');
 
 
-
         // const password = document.querySelector('[password-field]');
         const msgError = document.getElementById('message-error')
         const otpLoginForm = document.getElementById('otp-login-form');
@@ -740,7 +740,6 @@
 
         const otpForm = document.getElementById('otp-form');
         const otpError = document.getElementById('otp-error')
-
 
 
         // OTP LOGIN
@@ -764,7 +763,7 @@
                     return
                 }
 
-                console.log(preferredMethod, contactData)
+                // console.log(preferredMethod, contactData)
 
                 const res = await axios({
                     method: 'POST',
@@ -779,7 +778,13 @@
 
                 if (res.data.status == "success") {
                     globalInputAccess = contactData
-                    showOTPForm()
+                    showToast();
+                    setToastMessage("Success", res.data.message);
+                    startResendTimer()
+                    setTimeout(() => {
+                        showOTPForm()
+                    }, 1000)
+
                 } else {
                     const errorData = response.data;
                     console.error(errorData);
@@ -787,12 +792,17 @@
 
             } catch (err) {
                 if (err.response) {
+                    console.log(err.response.data.message)
                     emailError.textContent = err.response.data.message
+                    commonError.textContent = err.response.data.message;
                 } else {
                     emailError.textContent = ''
+                    commonError.textContent = '';
+
                 }
             }
         });
+
 
         otpForm.addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -947,7 +957,6 @@
         });
 
 
-
         emailFields.forEach((field) => {
             const emailError = field.parentNode.querySelector('[data-email-error]');
 
@@ -970,12 +979,103 @@
                 } catch (err) {
                     if (err.response && err.response.status === 401) {
                         emailError.textContent = err.response.data.message;
+
                     } else {
                         emailError.textContent = '';
                     }
                 }
             });
         });
+
+        // OTP Resend START
+
+        const resendBtn = document.getElementById('resendBtn');
+
+
+        let otpResendCounter = 0;
+        let otpResendTimer;
+
+        async function resendOTP(preferredMethod, contactData) {
+
+            try {
+                otpResendCounter++;
+
+                const res = await axios({
+                    method: 'POST',
+                    url: '/api/v1/user/generate-otp',
+                    data: {
+                        preferredMethod,
+                        contactData
+                    },
+                });
+
+                // console.log(res)
+
+                if (res.data.status == "success") {
+                    globalInputAccess = contactData
+                    otpForm.reset()
+                    otpError.textContent = ""
+
+                    startResendTimer()
+                    setTimeout(() => {
+                        showOTPForm()
+                    }, 1000)
+
+                } else {
+                    const errorData = response.data;
+                    console.error(errorData);
+                }
+
+            } catch (err) {
+                if (err.response) {
+                    console.log(err.response.data.message)
+                    emailError.textContent = err.response.data.message
+                    commonError.textContent = err.response.data.message;
+                } else {
+                    emailError.textContent = ''
+                    commonError.textContent = '';
+
+                }
+            }
+        }
+
+        function startResendTimer() {
+            let timerCount = 30; // Set the countdown time in seconds
+            resendBtn.disabled = true; // Disable the resend button during the countdown
+
+            otpResendTimer = setInterval(() => {
+                if (timerCount > 0) {
+                    resendBtn.innerHTML = `Resend OTP <b>00:${timerCount}</b> 's`;
+                    timerCount--;
+                } else {
+                    clearInterval(otpResendTimer);
+                    resendBtn.textContent = "Resend OTP";
+                    resendBtn.disabled = false; // Enable the resend button after the countdown
+                }
+            }, 1000);
+        }
+
+
+        resendBtn.addEventListener('click', async (event) => {
+            event.preventDefault();
+            const contactValue = document.getElementById('email1').value;
+
+            if (otpResendCounter < 3) { // Allowing maximum 3 resend attempts
+                if (validateEmail(contactValue)) {
+                    resendOTP('email', { email: contactValue });
+                } else if (validatePhoneNumber(contactValue)) {
+                    resendOTP('phone', { phone: contactValue });
+                }
+                startResendTimer();
+            } else {
+                resendBtn.innerHTML = `<span class="invalid">maximum resend attempts exceeded</span>`;
+            }
+        });
+
+
+
+        // OTP Resend End
+
 
         // Contact Values Validation
         function validateEmail(email) {
@@ -1009,8 +1109,8 @@
 
         var toggleButtons = document.querySelectorAll('.dropdown-toggle');
 
-        
-        
+
+
         // toggleButtons.forEach(function (button) {
         //     button.addEventListener('click', function () {
         //         var dropdown = this.closest('.dropdown');

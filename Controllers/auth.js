@@ -36,7 +36,7 @@ const sendOTP = (otp, user) => {
       pass: process.env.EMAIL_PASSWORD,
     },
   });
-  
+
   const mailOptions = {
     from: process.env.EMAIL_USERNAME,
     to: user.email,
@@ -53,17 +53,40 @@ const sendOTP = (otp, user) => {
   });
 };
 
-const sendMobileOTP = async (otp, mobileNumber) => {
-  const client = twilio(
-    process.env.TWILIO_ACCOUNT_SID,
-    process.env.TWILIO_AUTH_TOKEN
-  );
+const sendMobileOTP = async (otp, mobileNumber, res) => {
+  try {
+    const client = twilio(
+      process.env.TWILIO_ACCOUNT_SID,
+      process.env.TWILIO_AUTH_TOKEN
+    );
 
-  await client.messages.create({
-    body: `Your OTP: ${otp}`,
-    from: process.env.TWILIO_PHONE_NUMBER,
-    to: `+91${mobileNumber}`,
-  });
+    const message = await client.messages.create({
+      body: `Your OTP: ${otp}`,
+      from: process.env.TWILIO_PHONE_NUMBER,
+      to: `+91${mobileNumber}`,
+    });
+
+    console.log("OTP sent successfully!", message.sid);
+
+    res.json({
+      status: "success",
+      message: `OTP is sent to your ${mobileNumber} successfully`,
+    });
+  } catch (error) {
+    // Handle specific error cases
+    if (error.code === 21614) {
+      return res
+        .status(401)
+        .json({ status: "fail", message: "Invalid mobile number" });
+    } else if (error.code === 21211) {
+      return res
+        .status(401)
+        .json({ status: "fail", message: "Mobile number is not registered" });
+    } else {
+      console.error("Error sending OTP:", error);
+      return res.status(500).json({ error: "Error sending OTP" });
+    }
+  }
 };
 
 const createSendToken = async (user, statusCode, res, req) => {
@@ -86,7 +109,6 @@ const createSendToken = async (user, statusCode, res, req) => {
 
   // handle guest user
 
-
   const guestUserID = req.cookies.guestUserID;
   if (guestUserID) {
     const guestUser = await GuestUser.findOne({ guestUserID });
@@ -106,12 +128,11 @@ const createSendToken = async (user, statusCode, res, req) => {
     })();
   }
 
-
   res.status(statusCode).json({
     status: "success",
     token,
     data: {
-      data: user
+      data: user,
     },
   });
 };
@@ -154,10 +175,10 @@ exports.signup = catchAsync(async (req, res, next) => {
   await newUser.save();
 
   // Send the OTP to the user's mobile number
-  sendMobileOTP(otp, newUser.mobile);
+  // sendMobileOTP(otp, newUser.mobile);
 
   // Send the OTP to the user's email address
-  // sendOTP(otp, newUser);
+  sendOTP(otp, newUser, res);
 
   res.json({ status: "success" });
 }, ErrorHandler);
@@ -175,6 +196,7 @@ exports.verifyOTP = async (req, res, next) => {
     user = await User.findOne({ mobile: phoneNumber });
   }
 
+
   if (!user) {
     console.log("not found");
     return next(new AppError(`User not found`, 400));
@@ -183,14 +205,22 @@ exports.verifyOTP = async (req, res, next) => {
   if (user.otp !== otp) {
     return next(new AppError(`Invalid OTP`, 400));
   }
+  // Check if OTP is expired
+  if (user.isOTPExpired) {
+    // Clear the expired OTP
+    user.clearOTP();
+    await user.save();
+    return next(new Error(`OTP has expired`));
+  }
+  
 
-  user.otp = null;
+  // Clear the valid OTP
+  user.clearOTP();
   await user.save();
 
   // Send Token To Client
-  createSendToken(user, 200, res,req);
+  createSendToken(user, 200, res, req);
 };
-
 
 // validate
 
@@ -209,7 +239,6 @@ exports.validate = catchAsync(async (req, res, next) => {
 
   res.status(200).json({ status: "success" });
 }, ErrorHandler);
-
 
 // User Login
 exports.login = catchAsync(async (req, res, next) => {
@@ -254,7 +283,7 @@ exports.generateOTP = catchAsync(async (req, res, next) => {
     );
 
     if (!user) {
-      return next(new AppError(`User not found`, 400));
+      return next(new AppError(`Email not registered. Please register.`, 400));
     }
 
     if (user.isBlock) {
@@ -274,6 +303,11 @@ exports.generateOTP = catchAsync(async (req, res, next) => {
 
       // Send the OTP to the user's email address
       sendOTP(otp, user);
+
+      res.json({
+        status: "success",
+        message: `OTP is sent to your email address (${user.email}) successfully`,
+      });
     }
   } else if (preferredMethod === "phone") {
     // 2) Check if user exist
@@ -282,7 +316,7 @@ exports.generateOTP = catchAsync(async (req, res, next) => {
     );
 
     if (!user) {
-      return next(new AppError(`User not found`, 400));
+      return next(new AppError(`Mobile number is not registered`, 400));
     }
 
     if (user.isBlock) {
@@ -300,26 +334,17 @@ exports.generateOTP = catchAsync(async (req, res, next) => {
       user.otp = otp;
       await user.save();
 
-      // const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-
-      // await client.messages.create({
-      //   body: `Your OTP: ${otp}`,
-      //   from: process.env.TWILIO_PHONE_NUMBER,
-      //   // to: contactData.phone,
-      //   to: `+91${contactData.phone}`,
-      // });
-
       // Send the OTP to the user's mobile number
-      sendMobileOTP(otp, contactData.phone);
+      sendMobileOTP(otp, contactData.phone, res);
     }
   } else {
     return next(new AppError(`Invalid preferred contact method`, 400));
   }
 
-  res.json({
-    status: "success",
-    message: `OTP is sent to Your ${preferredMethod} successfully`,
-  });
+  // res.json({
+  //   status: "success",
+  //   message: `OTP is sent to Your ${preferredMethod} successfully`,
+  // });
 });
 
 // User Logout

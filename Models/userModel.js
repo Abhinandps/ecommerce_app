@@ -43,6 +43,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  otpExpiration: {
+    type: Date,
+    default: null,
+  },
   isBlock: {
     type: Boolean,
     default: false,
@@ -69,6 +73,26 @@ userSchema.methods.correctPassword = async function (
   userPassword
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+
+// Virtual field to check if OTP is expired
+userSchema.virtual("isOTPExpired").get(function () {
+  return this.otpExpiration && this.otpExpiration < Date.now();
+});
+
+// Pre-save hook to automatically set OTP to null after 30 seconds
+userSchema.pre("save", function (next) {
+  if (this.isModified("otp") || this.isNew) {
+    this.otpExpiration = Date.now() + 30000; // 30 seconds from now
+  }
+  next();
+});
+
+// Instance method to clear OTP
+userSchema.methods.clearOTP = function () {
+  this.otp = null;
+  this.otpExpiration = null;
 };
 
 const User = mongoose.model("User", userSchema);

@@ -2543,15 +2543,15 @@ footer {
     left: 50%;
     transform: translate(-50%, 5%);
     opacity: 0;
-    height: 8%;
-    width: 300px;
+    min-height: 8%;
+    max-width: 90%;
     border-radius: 12px;
     background: var(--eerie-black);
     padding: 10px 30px 20px 10px;
     border-left: 6px solid var(--color-green);
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    z-index: 4;
+    z-index: 777;
     transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.35);
   }
 
@@ -3855,10 +3855,38 @@ footer {
   font-weight: var(--weight-500);
 }
 
+#otp-form .box-wrapper{
+  display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 #otp-form .box-wrapper .input-box {
   display: flex;
   margin: 20px;
   justify-content: center;
+}
+
+#otp-form .box-wrapper .countdown{
+  font-size: var(--fs-8);
+  color: var(--spanish-gray);
+  font-weight: var(--weight-300);
+  margin-bottom: 10px;
+}
+
+#otp-form .box-wrapper .countdown b{
+  color: var(--eerie-black);
+}
+#otp-form .box-wrapper #resendBtn{
+  cursor: pointer;
+}
+
+
+.countdown > #resend{
+  background: var(--salmon-pink);
+  padding: 5px 10px;
+  color: var(--white);
 }
 
 .otp-container {
@@ -3876,7 +3904,7 @@ footer {
   position: fixed;
   top: 25px;
   right: 30px;
-  width: 20em;
+  min-width: 20em;
   border-radius: 12px;
   background: var(--color-green);
   padding: 10px 30px 20px 10px;
@@ -3915,6 +3943,12 @@ footer {
   display: flex;
   flex-direction: column;
   margin: 0 20px;
+  min-width: 20em;
+}
+
+div#coupon-codes-container {
+  overflow-y: scroll;
+  height: 60vh;
 }
 
 .message .text {
