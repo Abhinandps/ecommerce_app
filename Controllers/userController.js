@@ -668,11 +668,23 @@ exports.placeOrder = catchAsync(async (req, res, next) => {
 });
 
 // Orders
-
 exports.orderHistory = catchAsync(async (req, res, next) => {
-  const orders = await Order.find({ user: req.user._id });
+  let filter = { user: req.user._id };
 
-  if (!orders) {
+  if (req.query.status === 'delivered') {
+    filter.status = 'delivered';
+  } else if (req.query.status === 'returned') {
+    filter.status = 'returned';
+  } else if (req.query.status === 'cancelled') {
+    filter.status = 'cancelled';
+  } else {
+    filter.status = { $nin: ['cancelled', 'returned','delivered'] };
+  }
+
+  const orders = await Order.find(filter).sort({ createdAt: -1 });
+
+
+  if (!orders || orders.length === 0) {
     return next(new AppError("Order not found", 404));
   }
 
@@ -681,6 +693,7 @@ exports.orderHistory = catchAsync(async (req, res, next) => {
     data: orders,
   });
 });
+
 
 exports.getOrderDetails = catchAsync(async (req, res, next) => {
   const { orderID } = req.params;

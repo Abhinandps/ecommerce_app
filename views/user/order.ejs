@@ -6,9 +6,10 @@
             <p>Tracking My Order</p>
             <nav>
                 <ul class="menu-category-list">
-                    <li class="meanu-category"><a class="menu-title" href="/orders">Orders</a></li>
-                    <li><a href="#">Deliverd</a></li>
-                    <li><a href="#">Return</a></li>
+                    <li class="meanu-category"><a class="ajax-link active" href="/orders">Orders</a></li>
+                    <li><a class="ajax-link" href="/delivered">Delivered</a></li>
+                    <li><a class="ajax-link" href="/cancelled">Cancelled</a></li>
+                    <li><a class="ajax-link" href="/return">Return</a></li>
                 </ul>
             </nav>
         </div>
@@ -43,6 +44,138 @@
 
 
     </div>
+
+    <script>
+        // Handle Orders Pagination
+
+        // Assuming you have included the Axios library in your HTML file
+        const ajaxLinks = document.querySelectorAll('.ajax-link');
+
+
+        ajaxLinks.forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+
+                const href = link.getAttribute('href');
+                const url = `/api/v1/user/orders`;
+
+                let queryString = '';
+                if (href === '/delivered') {
+                    queryString += `${url}/?status=delivered`;
+                } else if (href === '/cancelled') {
+                    queryString += `${url}/?status=cancelled`;
+                } else if (href === '/return') {
+                    queryString += `${url}/?status=return`;
+                } else {
+                    queryString += `${url}`;
+                }
+
+                // Remove active class from all links
+                ajaxLinks.forEach(link => {
+                    link.classList.remove('active');
+                });
+
+                // Add active class to the clicked link
+                link.classList.add('active');
+
+
+                axios.get(queryString)
+                    .then(response => {
+                        console.log(response);
+
+                        const row = document.querySelector('[orders-history]');
+                        const { data } = response.data;
+
+                        // Clear existing content from the DOM
+                        while (row.firstChild) {
+                            row.firstChild.remove();
+                        }
+
+                        const promises = data.map(order => {
+                            const { items, shippingAddress } = order;
+                            const productId = items[0].product;
+                            const productRequest = axios.get(`/api/v1/admin/product/${productId}`);
+                            const cartRequest = axios.get('/api/v1/user/cart');
+
+                            return Promise.all([productRequest, cartRequest])
+                                .then(([productResponse, cartResponse]) => {
+                                    const { products } = productResponse.data.data;
+                                    const { cart } = cartResponse.data;
+
+                                    const shippingAddressFound = cart.shippingAddress.find(address => address._id === order.shippingAddress);
+                                    if (!shippingAddressFound) {
+                                        console.log("No address found");
+                                    }
+
+                                    const MAX_DESCRIPTION_LENGTH = 50;
+                                    let truncatedDescription = products.description;
+                                    if (truncatedDescription.length > MAX_DESCRIPTION_LENGTH) {
+                                        truncatedDescription = truncatedDescription.substring(0, MAX_DESCRIPTION_LENGTH) + '...';
+                                    }
+
+                                    const orderedDetailsCard = `
+                <div class="row fade-in-animation" data-order-id="${order.orderID}" onclick="handleOrders(event)">
+                  <div class="product_details" data-order-id="${order.orderID}" onclick="handleOrders(event)">
+                    <div class="product_data_group" data-order-id="${order.orderID}" onclick="handleOrders(event)">
+                      <div class="product_image">
+                        ${products.image.map((path, index) => {
+                                        const newPath = path.replace("public", "");
+                                        console.log(newPath);
+                                        if (index === 0) {
+                                            return `<img src="${newPath}" width="100"/>`;
+                                        }
+                                    })}
+                      </div>
+                      <div class="group_rating">
+                        <div class="product_name">
+                          <p>${products.name}</p>
+                        </div>
+                        <div class="showcase-rating">
+                          <ion-icon name="star" role="img" class="md hydrated" aria-label="star"></ion-icon>
+                          <ion-icon name="star" role="img" class="md hydrated" aria-label="star"></ion-icon>
+                          <ion-icon name="star" role="img" class="md hydrated" aria-label="star"></ion-icon>
+                          <ion-icon name="star-outline" role="img" class="md hydrated" aria-label="star outline"></ion-icon>
+                          <ion-icon name="star-outline" role="img" class="md hydrated" aria-label="star outline"></ion-icon>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="product_price">
+                      <p>₹<span>${order.totalPrice}/-</span></p>
+                    </div>
+                  </div>
+                  <div class="tracking_status" data-order-id="${order.orderID}" onclick="handleOrders(event)">
+                    ${order.status === 'delivered'
+                                            ? '<span class="notification_badge done"></span>'
+                                            : order.status === 'cancelled'
+                                                ? '<span class="notification_badge fail"></span>'
+                                                : ''}
+                    <p>${order.status}</p>
+                    ${order.status === 'delivered' ? '<small>Your item has been delivered</small>' : ''}
+                  </div>
+                </div>`;
+
+                                    const tempElement = document.createElement('div');
+                                    tempElement.setAttribute("id", "order_item");
+                                    tempElement.innerHTML = orderedDetailsCard;
+                                    row.append(tempElement);
+                                });
+                        });
+
+                        Promise.all(promises)
+                            .then(() => {
+                                // All rendering is complete
+                            })
+                            .catch(error => {
+                                console.error(error);
+                            });
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            });
+        });
+
+    </script>
 
 
     <script>
@@ -109,7 +242,7 @@
                                                         </div>
                                                 </div>
                                             </div>
-                                        
+
                                             <div class="product_price">
                                                 <p>₹<span>${order.totalPrice}/-</span></p>
                                             </div>
@@ -236,8 +369,8 @@
 
 
         window.onload = function () {
-            getOrders()
             getCategories()
+            getOrders()
         }
 
 
@@ -245,15 +378,15 @@
         const handleOrders = (event) => {
             const orderID = event.target.dataset.orderId;
 
-              $.ajax({
+            $.ajax({
                 type: "GET",
                 url: `api/v1/user/orders/${orderID}`,
                 success: function (response) {
-                  const { data } = response;
-                  localStorage.setItem("myorder", JSON.stringify(data));
-                  window.location.href = "/myorder";
+                    const { data } = response;
+                    localStorage.setItem("myorder", JSON.stringify(data));
+                    window.location.href = "/myorder";
                 },
-              });
+            });
 
         };
 

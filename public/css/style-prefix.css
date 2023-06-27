@@ -5329,7 +5329,7 @@ img {
   background: var(--ocean-green);
   padding: 5px;
   border-radius: 5px;
-  font-size: var(--fs-11);
+  font-size: var(--fs-8);
   color: var(--cultured);
   margin: 10px 0px;
 }
@@ -5375,7 +5375,7 @@ img {
   position: absolute;
   top: 50px;
   left: 0;
-  z-index: 7777;
+  z-index: 7;
   font-size: var(--fs-7);
   background: var(--white);
   color: var(--sonic-silver);
@@ -5395,6 +5395,14 @@ img {
   background: var(--cultured);
 }
 
+.ajax-link{
+  transition: 0.3s;
+}
+
+.ajax-link.active{
+  font-weight: var(--weight-700);
+  color: var(--sandy-brown);
+}
 
 
 

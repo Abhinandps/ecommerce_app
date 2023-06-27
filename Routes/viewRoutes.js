@@ -36,7 +36,6 @@ const { getAllProductOffers } = require("../Controllers/adminController");
 
 
 
-// GUEST VIEW ACTIONS
 
 
 
@@ -90,9 +89,11 @@ router.get("/cart",isAuthenticate , getCartPage);
 
 router.get("/checkout",isAuthenticate , getCheckoutPage);
 
+
 router.get("/myorders",isAuthenticate , getOrdersPage);
 
 router.get("/myorder",isAuthenticate , getOneOrder);
+
 
 router.get("/payment",isAuthenticate , getPaymentPage);
 

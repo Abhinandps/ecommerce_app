@@ -158,9 +158,9 @@ Practical-6
 Pending:
 
 [✔]Otp recent and timeout
-[]Group order 
-[]Sort order list
-[]Product search
+[✔]Group order 
+[✔]Sort order list
+[✔]Product search
 
 
 
@@ -168,6 +168,48 @@ Pending:
 Score:
 Theory:7.5
 Coding:7.5"
+
+
+my pending..
+
+TuesDay, WednesDay
+
+[]Home Page Completion
+[]product suggestion border issue (optional)
+[]price filter(optional)
+[x]whish list
+[]product Details and offers
+[]image zoom
+[✔]orders (orders , delivered, returned)
+[✔]group order
+[x]pagination for orders
+[]Hot offers
+[x]profile address management
+[]checkout page address remove option needed
+[]payment page design cleanup
+[]cart remove custom alert
+[]rating (optional)
+
+
+Admin
+
+[x]product crop
+[]heading styleCart to Anon Logo and admin Dynamically
+
+
+Common 
+[]Every Page title change 
+[]Verify the document icon 
+
+[]admin filtering etc.. ui clean up (optical)
+
+
+Thursday
+
+[] Return Wallet (optional)
+
+[x] Code formatting  (must to do )
+
 
 
 
