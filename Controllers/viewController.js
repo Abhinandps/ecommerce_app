@@ -171,6 +171,15 @@ exports.getCartPage = (req, res) => {
   }
 };
 
+
+exports.getWishListPage = (req,res)=>{
+  if(req.user && req.user.role === 'user'){
+    res.render("user/wishList.ejs")
+  }else{
+    res.render("user/wishList.ejs", { modal: true });
+  }
+}
+
 exports.getCheckoutPage = (req, res) => {
   if (req.user && req.user.role === "user") {
     res.render("user/checkout.ejs");

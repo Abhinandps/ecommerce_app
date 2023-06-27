@@ -16,6 +16,7 @@ const Banner = require("../Models/banner");
 const { generateInvoice } = require("../utils/generateInvoice");
 const GuestUser = require("../Models/guestUser");
 const ProductOffer = require("../Models/productOffer");
+const Wishlist = require("../Models/wishList");
 
 const generateOrderID = () => {
   const date = new Date();
@@ -126,11 +127,99 @@ exports.getAllProducts = catchAsync(async (req, res) => {
 exports.getSuggestions = catchAsync(async (req, res) => {
   const searchTerm = req.query.term;
 
-  const products = await Product.find({ name: { $regex: '^' + searchTerm, $options: 'i' } }).limit(5);
-  const productsName =  products.map(item=>item.name)
+  const products = await Product.find({
+    name: { $regex: "^" + searchTerm, $options: "i" },
+  }).limit(5);
+  const productsName = products.map((item) => item.name);
 
   res.json(productsName);
 });
+
+// WishList Management
+
+exports.getWishList = catchAsync(async (req, res) => {
+
+  const wishList = await Wishlist.findOne({ user: req.user._id });
+ 
+   res.status(200).json({
+     status: "success",
+     wishList,
+   });
+});
+
+
+exports.addToWishList = catchAsync(async (req, res,next) => {
+  const { productId } = req.body;
+  
+  if(req.user && req.user.role === 'guest'){
+    return res.status(201).json({
+      status: "failed",
+      message: "You need to login to access wishlist",
+    });
+  }
+
+  let wishList = await Wishlist.findOne({ user: req.user._id });
+
+  if (!wishList) {
+    // Create a new wishList if it doesn't exist for the user
+    wishList = new Wishlist({ user: req.user._id, items: [] });
+  }
+
+  // Check if the product already exists in the wishList
+  const existingItem = wishList.items.find(
+    (item) => item.product.toString() === productId
+  );
+  if (existingItem) {
+    return next(new AppError("Product already exist"))
+    // existingItem.quantity += Number(quantity);
+  } else {
+    wishList.items.push({ product: productId });
+  }
+
+  await wishList.save();
+
+
+  res.status(201).json({
+    status: "success",
+    message: "Item added to wishlist successfully",
+    wishList,
+  });
+});
+
+
+exports.removeWishListItem = catchAsync(async(req,res,next)=>{
+  const { productId } = req.params;
+
+  console.log(req.user)
+
+  const wishList = await Wishlist.findOne({ user: req.user._id });
+
+  // Update the quantity of the specified product in the cart
+  wishList.items = wishList.items.filter(
+    (item) => item.product.toString() !== productId
+  );
+
+  await wishList.save();
+
+
+  res.status(204).json({
+    status: "success",
+    message: "wishlist item removed successfully.",
+    wishList,
+  });
+})
+
+
+exports.getWishListItemsCount = catchAsync(async (req, res, next) => {
+
+  const wishList = await Wishlist.findOne({ user: req.user._id });
+
+  const wishListItemsCount = wishList.items.length;
+
+  res.json({ count: wishListItemsCount });
+});
+
+
 
 // cart management
 
@@ -160,6 +249,7 @@ exports.getCart = catchAsync(async (req, res) => {
     totalPrice,
   });
 });
+
 
 exports.addToCart = catchAsync(async (req, res) => {
   const { productId, quantity } = req.body;
@@ -222,7 +312,10 @@ exports.addToCart = catchAsync(async (req, res) => {
     productSum,
     totalPrice,
   });
+
+
 });
+
 
 exports.updateCartItem = catchAsync(async (req, res) => {
   const { productId } = req.params;
@@ -272,6 +365,7 @@ exports.updateCartItem = catchAsync(async (req, res) => {
   });
 });
 
+
 exports.updateCartTotal = catchAsync(async (req, res) => {
   const { totalPrice } = req.body;
 
@@ -300,6 +394,7 @@ exports.updateCartTotal = catchAsync(async (req, res) => {
     cart,
   });
 });
+
 
 exports.removeCartItem = catchAsync(async (req, res) => {
   const { productId } = req.params;
@@ -671,18 +766,17 @@ exports.placeOrder = catchAsync(async (req, res, next) => {
 exports.orderHistory = catchAsync(async (req, res, next) => {
   let filter = { user: req.user._id };
 
-  if (req.query.status === 'delivered') {
-    filter.status = 'delivered';
-  } else if (req.query.status === 'returned') {
-    filter.status = 'returned';
-  } else if (req.query.status === 'cancelled') {
-    filter.status = 'cancelled';
+  if (req.query.status === "delivered") {
+    filter.status = "delivered";
+  } else if (req.query.status === "returned") {
+    filter.status = "returned";
+  } else if (req.query.status === "cancelled") {
+    filter.status = "cancelled";
   } else {
-    filter.status = { $nin: ['cancelled', 'returned','delivered'] };
+    filter.status = { $nin: ["cancelled", "returned", "delivered"] };
   }
 
   const orders = await Order.find(filter).sort({ createdAt: -1 });
-
 
   if (!orders || orders.length === 0) {
     return next(new AppError("Order not found", 404));
@@ -706,6 +800,7 @@ exports.getOrderDetails = catchAsync(async (req, res, next) => {
     data: order,
   });
 });
+
 
 exports.orderCancel = catchAsync(async (req, res, next) => {
   const { orderID } = req.params;

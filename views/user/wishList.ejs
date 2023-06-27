@@ -1,0 +1,152 @@
+<%- include ('../layouts/header.ejs') %>
+
+
+    <% if (locals.modal) { %>
+        <script>
+
+            // modal variables
+            const modal = document.querySelector("[data-modal]");
+            const modalCloseBtn = document.querySelector("[data-modal-close]");
+            const modalCloseOverlay = document.querySelector("[data-modal-overlay]");
+
+            // modal function
+            const modalCloseFunc = function () {
+                modal.classList.remove("modal-active");
+                modal.classList.remove("closed");
+            };
+
+            const modalDisplayFunc = function () {
+                document.getElementById("signup-form").style.display = "none";
+                document.getElementById("login").style.display = "none";
+                modal.classList.remove("closed");
+                modal.classList.add("modal-active");
+            };
+
+            modalDisplayFunc()
+
+
+            // modal eventListener
+            modalCloseOverlay.addEventListener("click", modalCloseFunc);
+            modalCloseBtn.addEventListener("click", modalCloseFunc);
+
+        </script>
+        <script>
+            // multi form handle 
+
+
+
+            // Multi Page Handle
+
+            const signup = document.querySelector("[data-user-action]");
+            const mobileSignup = document.querySelector("[data-mobile-user-action]");
+
+            signup.addEventListener("click", modalDisplayFunc);
+            mobileSignup.addEventListener("click", modalDisplayFunc);
+
+            function showOTPForm() {
+                setTimeout(() => {
+                    document.getElementById("otp-login-form").style.display = "none";
+                    document.getElementById("otp-form").style.display = "block";
+                    document.getElementById("signup-form").style.display = "none";
+                    document.getElementById("login").style.display = "none";
+                }, 500);
+            }
+
+            function showSignUpForm() {
+                document.getElementById("login").style.display = "none";
+                document.getElementById("otp-login-form").style.display = "none";
+                document.getElementById("otp-form").style.display = "none";
+                document.getElementById("signup-form").style.display = "block";
+            }
+
+            function showLoginForm() {
+                document.getElementById("otp-login-form").style.display = "none";
+                document.getElementById("otp-form").style.display = "none";
+                document.getElementById("signup-form").style.display = "none";
+                document.getElementById("login").style.display = "block";
+            }
+
+            // otp form
+
+            let digitValidate = function (ele) {
+                console.log(ele.value);
+                ele.value = ele.value.replace(/[^0-9]/g, "");
+            };
+
+            let tabChange = function (val) {
+                let ele = document.querySelectorAll(".otp");
+                for (let i = 0; i < ele.length; i++) {
+                    if (ele[i].value === "") {
+                        ele[i].focus();
+                        break;
+                    }
+                }
+            };
+        </script>
+        <% } %>
+
+
+            <div class="container wrapper">
+
+                <div class="carts">
+                    <div class="cart-head">
+                        <h2 class="cart-title">Your WishList</h2>
+                        <button class="cart-button">
+                            <i></i>
+                            <!-- ( 3 items ) -->
+                        </button>
+                    </div>
+
+                    <div class="cart-items">
+                        <div class="empty-cart">
+                            <h3>Missing Wishlist items ?</h3>
+                            <p>You have no items in your WishList. Start Adding</p>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            </div>
+
+            <script>
+                window.onload = function () {
+                    getCategories();
+                    getWishList();
+                };
+            </script>
+
+
+            <script>
+                function closeForm() {
+                    document.querySelector('.form-popup-bg').classList.remove('is-visible');
+                }
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    var btnOpenForm = document.getElementById('coupon-list');
+                    var formPopupBg = document.querySelector('.form-popup-bg');
+                    var btnCloseForm = document.getElementById('btnCloseForm');
+
+                    /* Contact Form Interactions */
+                    btnOpenForm.addEventListener('click', function (event) {
+                        event.preventDefault();
+                        formPopupBg.classList.add('is-visible');
+                    });
+
+                    // close popup when clicking x or off popup
+                    formPopupBg.addEventListener('click', function (event) {
+                        if (event.target.classList.contains('form-popup-bg') || event.target.id === 'btnCloseForm') {
+                            event.preventDefault();
+                            formPopupBg.classList.remove('is-visible');
+                        }
+                    });
+                });
+
+
+            </script>
+
+
+            <!-- Login -->
+
+
+            <%- include ('../layouts/footer.ejs') %>

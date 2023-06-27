@@ -34,7 +34,11 @@ const {
   bestSellers,
   initialPayment,
   razorpayWebhook,
-  getSuggestions
+  getSuggestions,
+  addToWishList,
+  getWishList,
+  removeWishListItem,
+  getWishListItemsCount,
 } = require("../Controllers/userController");
 
 const upload = require("../utils/multerConfig");
@@ -67,10 +71,27 @@ router.get("/logout", auth.logout);
 
 // Product
 
-router.get("/getSuggestions",isAuthenticate, getSuggestions);
+router.get("/getSuggestions", isAuthenticate, getSuggestions);
+
+router.get(
+  "/products",
+  isAuthenticate,
+  paginatedResultsUser(Product),
+  getAllProducts
+);
+
+// WishList
+
+router
+  .route("/wishlist")
+  .get(isAuthenticate, getWishList)
+  .post(isAuthenticate, addToWishList);
+
+router.delete("/wishlist/:productId", isAuthenticate, removeWishListItem);
+
+router.get("/wishlist/items/count", isAuthenticate, getWishListItemsCount);
 
 
-router.get("/products", isAuthenticate,paginatedResultsUser(Product), getAllProducts);
 
 // Cart Management
 
@@ -85,6 +106,7 @@ router
   .delete(isAuthenticate, removeCartItem);
 
 router.patch("/cart/total", isAuthenticate, updateCartTotal);
+
 
 router.get("/cart/items/count", isAuthenticate, getCartItemsCount);
 
@@ -108,10 +130,7 @@ router.delete("/coupons/remove", isAuthenticate, removeCoupon);
 
 router.get("/orders", isAuthenticate, orderHistory);
 
-
-
-
-router.get("/orders/:orderId/invoice", isAuthenticate, downloadInvoice)
+router.get("/orders/:orderId/invoice", isAuthenticate, downloadInvoice);
 
 router
   .route("/orders/:orderID")
@@ -120,17 +139,15 @@ router
 
 module.exports = router;
 
+// Home
 
-// Home 
+router.get("/newarrivals", isAuthenticate, newArrivals);
 
-router.get("/newarrivals", isAuthenticate, newArrivals)
+router.get("/trending", isAuthenticate, trending);
 
-router.get("/trending", isAuthenticate, trending)
+router.get("/toprated", isAuthenticate, toprated);
 
-router.get("/toprated", isAuthenticate, toprated)
-
-router.get("/bestsellers", isAuthenticate, bestSellers)
-
+router.get("/bestsellers", isAuthenticate, bestSellers);
 
 // Banners
 

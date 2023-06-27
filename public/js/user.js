@@ -256,7 +256,6 @@ const handleProductPaginationClick = async (
       queryString += `&category=${categoryId}`;
     }
 
-
     // if (priceRange) {
     //   queryString += `&priceRange=${priceRange}`;
     // }
@@ -278,7 +277,6 @@ const handleProductPaginationClick = async (
     row.empty();
 
     data.results.forEach((product) => {
-
       // console.log(product)
 
       const card = `
@@ -352,7 +350,6 @@ const handleProductPaginationClick = async (
     });
 
     updatePaginationNumbers(data.previous, data.next, pageNumber, "shop");
-  
   } catch (error) {
     console.error(error);
   }
@@ -492,8 +489,10 @@ async function fetchDataAndPaginate(url, currentPage, dataType) {
       
             <div class="showcase-actions">
       
-                <button class="btn-action">
-                    <ion-icon name="heart-outline"></ion-icon>
+                <button class="btn-action add-to-wishlist"  data-productId='${
+                  product._id
+                }'>
+                    <ion-icon name="heart-outline" ></ion-icon>
                 </button>
       
                 <button class="btn-action view-details" data-product='${JSON.stringify(
@@ -554,7 +553,6 @@ if (window.location.pathname.includes("/shop")) {
   fetchDataAndPaginate("/api/v1/user/products", 1, "shop");
 }
 
-
 // PAGINATION END
 
 // Event listener for clicking on "View Details - add to cart - remove from cart" button
@@ -586,9 +584,17 @@ document.addEventListener("click", function (event) {
       : event.target.closest(".add-to-cart");
     const productId = button.dataset.productid;
     handleaddToCart(productId);
+  } else if (
+    event.target.classList.contains("add-to-wishlist") ||
+    event.target.closest(".add-to-wishlist")
+  ) {
+    const button = event.target.classList.contains("add-to-wishlist")
+      ? event.target
+      : event.target.closest(".add-to-wishlist");
+    const productId = button.dataset.productid;
+    saveToWishList(productId);
   }
 });
-
 
 // Function to handle the view details functionality
 const handleViewDetails = (product) => {
@@ -615,6 +621,26 @@ const getCartCount = () => {
 
 getCartCount();
 
+// get the count of wishlist items
+const getWishListCount = () => {
+  $.ajax({
+    type: "GET",
+    url: "/api/v1/user/wishlist/items/count",
+    success: function (response) {
+      const wishListCount = document.querySelector("#wishlist_count");
+      const wishListCountMobile = document.querySelector(
+        "#wishlist_count_mobile"
+      );
+      wishListCount.textContent = response.count;
+      wishListCountMobile.textContent = response.count;
+    },
+    error: function (error) {
+      console.error("Error retrieving cart items count", error);
+    },
+  });
+};
+
+getWishListCount();
 
 // function to handle the add to cart functionality
 const handleaddToCart = (productId) => {
@@ -634,6 +660,7 @@ const handleaddToCart = (productId) => {
   updateButton();
 };
 
+// Get Cart
 
 const getCart = () => {
   const row = $(".cart-items");
@@ -718,19 +745,22 @@ const getCart = () => {
                   <input  class="qty-input" name="quantity" type="text" minlength="1" value=${item.quantity} readonly />
                   <button class="dec-btn" data-product-id="${product._id}">-</button>
                 </form>
+
                 `
                   : `
                 <div class="outOfStock">
                 <span> Currently Out Of Stock </span>
                 </div>
-                <button class="saveForLater">Save for Later</button>
+                
                 `
               }
+
+              <button class="saveForLater" data-product-id="${product._id}">Save for Later</button>
+
                 
 
 
               </div>`;
-
             row.append(singleItem);
 
             const counterDiv = row.find(".counter").last();
@@ -814,9 +844,22 @@ const getCart = () => {
                 console.error(error);
               }
             }
+
+            $(".saveForLater").on("click", function (e) {
+              e.preventDefault();
+              const productId = $(this).data("product-id");
+              moveToWishlist(productId);
+            });
           },
+
+          
         });
+
+        
+       
       });
+
+      
 
       const totalPrice = document.querySelector("#totalPrice");
       const totalPayable = document.querySelector("#totalPayable");
@@ -857,6 +900,190 @@ const getCart = () => {
   });
 };
 
+// Whish list
+
+const getWishList = () => {
+  const row = $(".cart-items");
+
+  $.ajax({
+    type: "GET",
+    url: "/api/v1/user/wishlist",
+    success: function (response) {
+      const { wishList } = response;
+      const data = wishList.items;
+
+      row.empty();
+
+      if (data.length < 1) {
+        const cart = `
+        <div class="cart-items">
+                        <div class="empty-cart">
+                            <h3>Missing Wishlist items ?</h3>
+                            <p>You have no items in your WishList. Start Adding</p>
+                        </div>
+                    </div>
+        `;
+        row.append(cart);
+      }
+
+      data.forEach((item) => {
+        $.ajax({
+          type: "GET",
+          url: `/api/v1/admin/product/${item.product}`,
+          success: function (response) {
+            console.log(response);
+            const { data } = response;
+            const product = data.products;
+
+            const singleItem = `
+              <div class="cart-product fade-in-animation">
+              <button class="exit-btn" onClick="handleRemoveWishListItem('${
+                product._id
+              }')">
+              <ion-icon name="close-outline" role="img" class="md hydrated" aria-label="close outline"></ion-icon>
+          </button>
+          
+              <div class="product_image">
+                ${product.image.map((path, index) => {
+                  const newPath = path.replace("public", "");
+                  if (index === 0) {
+                    return `<img src=${newPath} />`;
+                  }
+                })}
+
+                  <div class="product_details">
+                    <div class="product_title">
+                      <p>${product.name}</p>
+                    </div>
+                   
+                   <div class="product_qty">
+                            <p><span>₹
+                            ${product.price}</span></p>
+                          </div>
+                        </div>
+              </div>
+
+             
+              <button class="addToCart" data-product-id="${
+                product._id
+              }">Move To Cart</button>
+
+                <script>
+                </script>
+
+              
+
+              <div class="exit-btn">
+                  <i></i>
+              </div>
+
+              </div>
+              
+              `;
+
+            row.append(singleItem);
+
+            $(".addToCart").on("click", function (e) {
+              e.preventDefault();
+              const productId = $(this).data("product-id");
+              moveToCart(productId);
+            });
+          },
+        });
+      });
+    },
+  });
+};
+
+const moveToCart = (productId) => {
+  $.ajax({
+    type: "POST",
+    url: "/api/v1/user/cart",
+    data: { productId: productId },
+    success: function (response) {
+      getCartCount()
+      removeFromWishlist(productId);
+
+    },
+    error: function (error) {
+      console.log("Error moving the product to the cart:", error);
+      // Handle the error case if the product fails to move to the cart.
+    },
+  });
+};
+
+const moveToWishlist = (productId)=>{
+  $.ajax({
+    type: "POST",
+    url: "/api/v1/user/wishlist",
+    data: { productId: productId },
+    success: function (response) {
+      getWishListCount();
+      handleRemoveCartItem(productId);
+
+    },
+    error: function (error) {
+      console.log("Error moving the product to the cart:", error);
+      // Handle the error case if the product fails to move to the cart.
+    },
+  });
+}
+
+const removeFromWishlist = (productId) => {
+  $.ajax({
+    type: "DELETE",
+    url: `/api/v1/user/wishlist/${productId}`,
+    success: function (response) {
+      // Remove the product from the wishlist UI dynamically
+      const wishlistItem = $(`.cart-items [data-product-id="${productId}"]`);
+      wishlistItem.fadeOut(400, function () {
+        wishlistItem.remove();
+      });
+
+      // Update the wishlist count dynamically
+      getWishListCount();
+      getWishList()
+      showToast();
+      setToastMessage("Moved", "Item moved to the cart");
+    },
+    error: function (error) {
+      console.log("Error removing the product from the wishlist:", error);
+      // Handle the error case if the product fails to be removed from the wishlist.
+    },
+  });
+};
+
+const saveToWishList = (productId) => {
+  $.ajax({
+    type: "POST",
+    url: "/api/v1/user/wishlist",
+    data: {
+      productId,
+    },
+    success: function (response) {
+      console.log(response);
+      getWishListCount();
+      showToast();
+      setToastMessage(response.status, response.message);
+    },
+  });
+};
+
+const handleRemoveWishListItem = (productId) => {
+  const confirm = window.confirm("Do you want to remove this item ?");
+  if (confirm) {
+    $.ajax({
+      type: "DELETE",
+      url: `/api/v1/user/wishlist/${productId}`,
+      success: function (response) {
+        getWishList();
+        getWishListCount();
+        showToast();
+        setToastMessage("Removed", "Item Removed from Wishlist");
+      },
+    });
+  }
+};
 
 function removeCoupon() {
   $.ajax({
@@ -871,7 +1098,6 @@ function removeCoupon() {
     },
   });
 }
-
 
 const handleRemoveCartItem = (productId) => {
   // Find the index of the item with matching productId
@@ -915,7 +1141,6 @@ const goToChekOut = () => {
     },
   });
 };
-
 
 const getCheckOut = () => {
   const row = $(".address_list");
@@ -980,7 +1205,6 @@ const getCheckOut = () => {
   });
 };
 
-
 const getCoupons = () => {
   const row = $("#coupon-codes-container");
 
@@ -1018,7 +1242,6 @@ const getCoupons = () => {
 
 getCoupons();
 
-
 const updateCartTotal = (totalPrice) => {
   $.ajax({
     type: "PATCH",
@@ -1034,7 +1257,6 @@ const updateCartTotal = (totalPrice) => {
     },
   });
 };
-
 
 getCheckOut();
 
@@ -1171,6 +1393,5 @@ const getPaymentDetails = () => {
     }
   }
 };
-
 
 // getOrders function included in order.ejs

@@ -11,6 +11,7 @@ const ErrorHandler = require("../Controllers/errorController");
 const twilio = require("twilio");
 const Cart = require("../Models/Cart");
 const GuestUser = require("../Models/guestUser");
+const Wishlist = require("../Models/wishList");
 
 function generateNumericOTP(length) {
   const digits = "0123456789";
@@ -125,6 +126,9 @@ const createSendToken = async (user, statusCode, res, req) => {
         cart.items = [];
         await cart.save();
       }
+
+      // Remove the guestUser document from the database
+    await GuestUser.findOneAndRemove({ guestUserID });
     })();
   }
 

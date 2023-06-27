@@ -26,7 +26,8 @@ const {
   getAllBanners,
   getAllCategoryOffer,
   getAllProductOffer,
-  getImageCropPage
+  getImageCropPage,
+  getWishListPage
 } = require("../Controllers/viewController");
 
 const { isAuthenticate ,isAdmin} = require("../middleware/auth");
@@ -84,6 +85,8 @@ router.get("/me",isAuthenticate , getProfile);
 router.get("/shop",isAuthenticate , getShoppingPage);
 
 router.get("/details",isAuthenticate , getProductDetails);
+
+router.get("/wishlist",isAuthenticate , getWishListPage);
 
 router.get("/cart",isAuthenticate , getCartPage);
 

@@ -177,7 +177,7 @@ TuesDay, WednesDay
 []Home Page Completion
 []product suggestion border issue (optional)
 []price filter(optional)
-[x]whish list
+[✔]whish list
 []product Details and offers
 []image zoom
 [✔]orders (orders , delivered, returned)
