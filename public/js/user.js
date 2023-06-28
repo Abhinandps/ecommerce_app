@@ -755,7 +755,9 @@ const getCart = () => {
                 `
               }
 
-              <button class="saveForLater" data-product-id="${product._id}">Save for Later</button>
+              <button class="saveForLater" data-product-id="${
+                product._id
+              }">Save for Later</button>
 
                 
 
@@ -851,15 +853,8 @@ const getCart = () => {
               moveToWishlist(productId);
             });
           },
-
-          
         });
-
-        
-       
       });
-
-      
 
       const totalPrice = document.querySelector("#totalPrice");
       const totalPayable = document.querySelector("#totalPayable");
@@ -1001,9 +996,8 @@ const moveToCart = (productId) => {
     url: "/api/v1/user/cart",
     data: { productId: productId },
     success: function (response) {
-      getCartCount()
+      getCartCount();
       removeFromWishlist(productId);
-
     },
     error: function (error) {
       console.log("Error moving the product to the cart:", error);
@@ -1012,7 +1006,7 @@ const moveToCart = (productId) => {
   });
 };
 
-const moveToWishlist = (productId)=>{
+const moveToWishlist = (productId) => {
   $.ajax({
     type: "POST",
     url: "/api/v1/user/wishlist",
@@ -1020,14 +1014,13 @@ const moveToWishlist = (productId)=>{
     success: function (response) {
       getWishListCount();
       handleRemoveCartItem(productId);
-
     },
     error: function (error) {
       console.log("Error moving the product to the cart:", error);
       // Handle the error case if the product fails to move to the cart.
     },
   });
-}
+};
 
 const removeFromWishlist = (productId) => {
   $.ajax({
@@ -1042,7 +1035,7 @@ const removeFromWishlist = (productId) => {
 
       // Update the wishlist count dynamically
       getWishListCount();
-      getWishList()
+      getWishList();
       showToast();
       setToastMessage("Moved", "Item moved to the cart");
     },
@@ -1156,7 +1149,7 @@ const getCheckOut = () => {
     url: "/api/v1/user/cart",
     success: function (response) {
       const { cart } = response;
-      const data = cart.shippingAddress;
+      const data = cart.shippingAddress.filter(address => !address.deleted);
       row.empty();
       console.log(data);
 
@@ -1175,7 +1168,6 @@ const getCheckOut = () => {
                 <p> ${address.address}, ${address.locality}, ${address.city},${address.state}, ${address.zipCode}</p>
             </div>
         </div>
-        <button>EDIT</button>
 
     </div>
         `;
@@ -1201,6 +1193,116 @@ const getCheckOut = () => {
 
       // // Update the cart collection's total value
       // updateCartTotal(totalPriceValue);
+    },
+  });
+};
+
+const getAddress = () => {
+  const row = $(".address_list");
+  $.ajax({
+    type: "GET",
+    url: "/api/v1/user/cart",
+    success: function (response) {
+      const { cart } = response;
+      const data = cart.shippingAddress.filter(address => !address.deleted);
+      row.empty();
+
+      data.forEach((address) => {
+        const addressList = `
+        <div class="address-details">
+        <div class="box">
+       <div class="group">
+       <div class="user-data">
+           <p>${address.custName}</p>
+           <p>${address.mobile}</p>
+       </div>
+       </div>
+            <div class="address">
+                <p> ${address.address}, ${address.locality}, ${address.city},${address.state}, ${address.zipCode}</p>
+            </div>
+        </div>
+
+        <button data-address-id="${address._id}" onClick="editAddress(this)" >EDIT</button>
+        &nbsp;&nbsp;&nbsp;
+        <button data-address-id="${address._id}" onClick="removeAddress(this)" >REMOVE</button>
+
+    </div>
+    <script>
+
+      function editAddress(button) {
+        var addressId = button.getAttribute("data-address-id");
+       
+        console.log("Editing address with ID:", addressId);
+        fetch(\`/api/v1/user/address/\${addressId}\`)
+        .then(response => response.json())
+        .then(data => {
+          console.log(data);
+          const res = data.address
+
+          const  currentAddress = {
+            custName: res.custName,
+            mobile: res.mobile,
+            address: res.address,
+            city: res.city,
+            state: res.state,
+            locality: res.locality,
+            zipCode: res.zipCode,
+        }
+
+        document.getElementById("name").value = currentAddress.custName;
+        document.getElementById("phone").value = currentAddress.mobile;
+        document.getElementById("zipCode").value = currentAddress.zipCode;
+        document.getElementById("locality").value = currentAddress.locality;
+        document.getElementById("address").value = currentAddress.address;
+        document.getElementById("city").value = currentAddress.city;
+        document.getElementById("state").value = currentAddress.state;
+
+        
+
+        var formPopupBg = document.querySelector('.form-popup-bg');
+        formPopupBg.classList.add('is-visible');
+
+        const form = document.getElementById("add-new-address");
+        form.setAttribute("data-mode", "update");
+
+       
+          const addressIdInput = document.getElementById('addressIdInput');
+          addressIdInput.value = addressId;
+      
+       
+        })
+        .catch(error => {
+          // Handle any errors that occurred during the request
+          console.error(error);
+        });
+      }
+
+
+      function removeAddress(button) {
+        var addressId = button.getAttribute("data-address-id");
+        console.log("Deleting address with ID:", addressId);
+        fetch(\`/api/v1/user/address/\${addressId}\`, {
+          method: "DELETE",
+        })
+          .then(response => response.json())
+          .then(data => {
+            showToast();
+             setToastMessage("Success", data.message);
+             getAddress();
+           
+          })
+          .catch(error => {
+           
+            console.error("Error deleting address:", error);
+          });
+      }
+      
+     
+    </script>
+        `;
+
+        row.append(addressList);
+      });
     },
   });
 };

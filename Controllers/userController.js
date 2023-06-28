@@ -138,20 +138,18 @@ exports.getSuggestions = catchAsync(async (req, res) => {
 // WishList Management
 
 exports.getWishList = catchAsync(async (req, res) => {
-
   const wishList = await Wishlist.findOne({ user: req.user._id });
- 
-   res.status(200).json({
-     status: "success",
-     wishList,
-   });
+
+  res.status(200).json({
+    status: "success",
+    wishList,
+  });
 });
 
-
-exports.addToWishList = catchAsync(async (req, res,next) => {
+exports.addToWishList = catchAsync(async (req, res, next) => {
   const { productId } = req.body;
-  
-  if(req.user && req.user.role === 'guest'){
+
+  if (req.user && req.user.role === "guest") {
     return res.status(201).json({
       status: "failed",
       message: "You need to login to access wishlist",
@@ -170,14 +168,13 @@ exports.addToWishList = catchAsync(async (req, res,next) => {
     (item) => item.product.toString() === productId
   );
   if (existingItem) {
-    return next(new AppError("Product already exist"))
+    return next(new AppError("Product already exist"));
     // existingItem.quantity += Number(quantity);
   } else {
     wishList.items.push({ product: productId });
   }
 
   await wishList.save();
-
 
   res.status(201).json({
     status: "success",
@@ -186,11 +183,10 @@ exports.addToWishList = catchAsync(async (req, res,next) => {
   });
 });
 
-
-exports.removeWishListItem = catchAsync(async(req,res,next)=>{
+exports.removeWishListItem = catchAsync(async (req, res, next) => {
   const { productId } = req.params;
 
-  console.log(req.user)
+  console.log(req.user);
 
   const wishList = await Wishlist.findOne({ user: req.user._id });
 
@@ -201,25 +197,20 @@ exports.removeWishListItem = catchAsync(async(req,res,next)=>{
 
   await wishList.save();
 
-
   res.status(204).json({
     status: "success",
     message: "wishlist item removed successfully.",
     wishList,
   });
-})
-
+});
 
 exports.getWishListItemsCount = catchAsync(async (req, res, next) => {
-
   const wishList = await Wishlist.findOne({ user: req.user._id });
 
   const wishListItemsCount = wishList.items.length;
 
   res.json({ count: wishListItemsCount });
 });
-
-
 
 // cart management
 
@@ -249,7 +240,6 @@ exports.getCart = catchAsync(async (req, res) => {
     totalPrice,
   });
 });
-
 
 exports.addToCart = catchAsync(async (req, res) => {
   const { productId, quantity } = req.body;
@@ -312,10 +302,7 @@ exports.addToCart = catchAsync(async (req, res) => {
     productSum,
     totalPrice,
   });
-
-
 });
-
 
 exports.updateCartItem = catchAsync(async (req, res) => {
   const { productId } = req.params;
@@ -365,7 +352,6 @@ exports.updateCartItem = catchAsync(async (req, res) => {
   });
 });
 
-
 exports.updateCartTotal = catchAsync(async (req, res) => {
   const { totalPrice } = req.body;
 
@@ -394,7 +380,6 @@ exports.updateCartTotal = catchAsync(async (req, res) => {
     cart,
   });
 });
-
 
 exports.removeCartItem = catchAsync(async (req, res) => {
   const { productId } = req.params;
@@ -458,6 +443,8 @@ exports.getCartItemsCount = catchAsync(async (req, res, next) => {
   res.json({ count: cartItemsCount });
 });
 
+
+
 exports.saveShippingAddress = catchAsync(async (req, res) => {
   const cart = await Cart.findOne({ user: req.user._id });
   cart.shippingAddress.push(req.body);
@@ -469,6 +456,104 @@ exports.saveShippingAddress = catchAsync(async (req, res) => {
   });
 });
 
+
+
+
+exports.getOneShippingAddress = catchAsync(async (req, res) => {
+  const userId = req.user._id; 
+  const addressId = req.params.id; 
+
+  // Find the cart for the specific user
+  const cart = await Cart.findOne({ user: userId });
+
+  if (!cart) {
+    return res.status(404).json({ error: "Cart not found" });
+  }
+
+  // Find the shipping address with the given address ID
+  const address = cart.shippingAddress.find(
+    (address) => address._id.toString() === addressId
+  );
+
+  if (!address) {
+    return res.status(404).json({ error: "Address not found" });
+  }
+
+  return res.status(200).json({ address });
+});
+
+
+exports.updateShippingAddress = catchAsync(async (req, res) => {
+  
+
+  const userId = req.user._id; 
+
+  const  addressId  = req.params.id
+
+
+  const updatedAddress = req.body; 
+
+  // Find the cart for the specific user
+  const cart = await Cart.findOne({ user: userId });
+
+  if (!cart) {
+    return res.status(404).json({ error: "Cart not found" });
+  }
+
+  // Find the index of the address to update within the shippingAddress array
+  const addressIndex = cart.shippingAddress.findIndex(
+    (address) => {
+      console.log(address)
+      return address._id.toString() === addressId
+    }
+  );
+
+  if (addressIndex === -1) {
+    return res.status(404).json({ error: "Address not found" });
+  }
+
+  // Update the address at the specified index
+  cart.shippingAddress[addressIndex] = updatedAddress;
+
+  
+  // Save the updated cart
+  await cart.save();
+
+  res.status(200).json({ message: "Address updated successfully" });
+});
+
+exports.deleteShippingAddress = catchAsync(async (req, res) => {
+  const userId = req.user._id;
+  const addressId = req.params.id;
+
+  // Find the cart for the specific user
+  const cart = await Cart.findOne({ user: userId });
+
+  if (!cart) {
+    return res.status(404).json({ error: "Cart not found" });
+  }
+
+  // Find the index of the address to delete within the shippingAddress array
+  const addressIndex = cart.shippingAddress.findIndex(
+    (address) => address._id.toString() === addressId
+  );
+
+  if (addressIndex === -1) {
+    return res.status(404).json({ error: "Address not found" });
+  }
+
+  // Remove the address from the shippingAddress array
+  cart.shippingAddress[addressIndex].deleted = true;
+
+  // Save the updated cart
+  await cart.save();
+
+  res.status(200).json({ message: "Address deleted successfully" });
+});
+
+
+
+
 // Coupon
 
 exports.getAllCoupons = async (req, res) => {
@@ -479,6 +564,7 @@ exports.getAllCoupons = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 exports.applyCoupon = async (req, res) => {
   try {
@@ -551,6 +637,7 @@ exports.applyCoupon = async (req, res) => {
   }
 };
 
+
 exports.removeCoupon = catchAsync(async (req, res) => {
   try {
     const userId = req.user._id;
@@ -584,6 +671,7 @@ exports.removeCoupon = catchAsync(async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
 
 // initialPayment [ COD ] or razorpay orderID generate
 
@@ -705,6 +793,7 @@ exports.initialPayment = catchAsync(async (req, res, next) => {
   }
 });
 
+
 exports.razorpayWebhook = catchAsync(async (req, res, next) => {
   const paymentStatus = req.body.event;
   if (
@@ -718,6 +807,7 @@ exports.razorpayWebhook = catchAsync(async (req, res, next) => {
 });
 
 // place an order with razorpay
+
 
 exports.placeOrder = catchAsync(async (req, res, next) => {
   const { orderID, shippingAddress, paymentMethod, totalPrice } = req.body;
@@ -761,6 +851,7 @@ exports.placeOrder = catchAsync(async (req, res, next) => {
   // Return the Razorpay order ID to the frontend
   res.status(200).json({ message: "Order Placed Successfully" });
 });
+
 
 // Orders
 exports.orderHistory = catchAsync(async (req, res, next) => {
@@ -820,6 +911,7 @@ exports.orderCancel = catchAsync(async (req, res, next) => {
   }
 });
 
+
 // invoice
 
 function generateInvoiceNumber() {
@@ -831,6 +923,7 @@ function generateInvoiceNumber() {
   return invoiceNumber;
 }
 
+
 exports.downloadInvoice = catchAsync(async (req, res, next) => {
   const order = await Order.findOne({ orderID: req.params.orderId });
 
@@ -841,6 +934,7 @@ exports.downloadInvoice = catchAsync(async (req, res, next) => {
   }
   generateInvoice(order, req, res);
 });
+
 
 // Banners
 exports.fetchBanners = catchAsync(async (req, res, next) => {
@@ -863,6 +957,7 @@ exports.fetchBanners = catchAsync(async (req, res, next) => {
     data: banners,
   });
 });
+
 
 // Profile
 

@@ -47,7 +47,7 @@
                 </div>
                 <div class="group-data">
                     <div class="data-total">total Payable:</div>
-                    <div  class="title-value">₹<span id="totalPayable"></span>  </div>
+                    <div class="title-value">₹<span id="totalPayable"></span> </div>
                 </div>
                 <button class="btn-proceed" proceed-pay>Proceed to Payment</button>
             </div>
@@ -73,7 +73,7 @@
                     </div>
                     <div class="form-group">
                         <label for="">Mobile</label>
-                        <input class="form-control" type="number" id="phone" name="mobile" type="text"  />
+                        <input class="form-control" type="number" id="phone" name="mobile" type="text" />
                         <span class="invalid error" id="mobile-error"></span>
                     </div>
                 </div>
@@ -126,7 +126,9 @@
 
     <script>
         const form = document.getElementById('add-new-address');
-        
+
+       
+
         let isValid = true;
 
         form.addEventListener('submit', async (e) => {
@@ -186,18 +188,18 @@
 
             try {
                 if (isValid) {
-                    alert("submitted")
                     const formData = {
-                        custName:name.value,
-                        mobile:mobile.value,
-                        zipCode:zipCode.value,
-                        state:state.value,
-                        locality:locality.value,
-                        city:city.value,
-                        address:address.value
+                        custName: name.value,
+                        mobile: mobile.value,
+                        zipCode: zipCode.value,
+                        state: state.value,
+                        locality: locality.value,
+                        city: city.value,
+                        address: address.value
                     }
                     const response = await axios.post('/api/v1/user/address', formData);
                     getCheckOut()
+
                 }
             } catch (error) {
                 const message = error.response.data.message;
@@ -257,10 +259,6 @@
 
 
     </script>
-
-
-
-
 
     <script>
         function closeForm() {

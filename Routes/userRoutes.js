@@ -39,6 +39,9 @@ const {
   getWishList,
   removeWishListItem,
   getWishListItemsCount,
+  updateShippingAddress,
+  getOneShippingAddress,
+  deleteShippingAddress,
 } = require("../Controllers/userController");
 
 const upload = require("../utils/multerConfig");
@@ -107,10 +110,16 @@ router
 
 router.patch("/cart/total", isAuthenticate, updateCartTotal);
 
-
 router.get("/cart/items/count", isAuthenticate, getCartItemsCount);
 
 router.post("/address", isAuthenticate, saveShippingAddress);
+
+router.get("/address/:id", isAuthenticate, getOneShippingAddress);
+
+router.put("/address/:id", isAuthenticate, updateShippingAddress);
+
+router.delete("/address/:id", isAuthenticate, deleteShippingAddress);
+
 
 router.post("/cart/initialPayment", isAuthenticate, initialPayment);
 

@@ -116,60 +116,385 @@
                         </div>
 
                         <div class="avatar-name">
-                            <p>h'ello abhinand</p>
+                            <p>h'ello <%= locals.user.username %>
+                            </p>
                         </div>
+
 
 
 
                     </div>
                     <div class="grid-item center">
-                        <div class="input-group">
-                            <div class="head">
-                                <p>personal information</p> <button editOne>Edit</button>
-                            </div>
-                            <form username>
-                                <div class="form-group">
-                                    <label for="username">Username</label>
-                                    <input type="text" name="username" username-field disabled>
-                                </div>
-                                <button type="submit" style="display: none;">Save</button>
-                            </form>
-                        </div>
 
-                        <div class="input-group">
-                            <div class="head">
-                                <p>Email Address </p> <button editTwo>Edit</button>
+                        <div class="input-container">
+                            <div class="input-group">
+                                <div class="head">
+                                    <p>personal information</p> <button editOne>Edit</button>
+                                </div>
+                                <form username>
+                                    <div class="form-group">
+                                        <label for="username">Username</label>
+                                        <input type="text" name="username" username-field disabled required>
+                                        <span class="invalid" id="error1"></span>
+                                    </div>
+                                    <button type="submit" style="display: none;">Save</button>
+                                </form>
                             </div>
 
-                            <form email>
-                                <div class="form-group">
-                                    <label for="email">Email</label>
-                                    <input type="email" name="email" id="email-field" disabled>
+                            <div class="input-group">
+                                <div class="head">
+                                    <p>Email Address </p> <button editTwo>Edit</button>
                                 </div>
-                                <button type="submit" style="display: none;">Save</button>
-                            </form>
-                        </div>
 
-
-                        <div class="input-group">
-                            <div class="head">
-                                <p>Mobile Number </p> <button editThree>Edit</button>
+                                <form email>
+                                    <div class="form-group">
+                                        <label for="email">Email</label>
+                                        <input type="email" name="email" id="email-field" disabled>
+                                        <span class="invalid" id="error2"></span>
+                                    </div>
+                                    <button type="submit" style="display: none;">Save</button>
+                                </form>
                             </div>
-                            <form mobile>
-                                <div class="form-group">
-                                    <label for="mobile">Mobile</label>
-                                    <input type="number" name="mobile" mobile-field disabled>
-                                </div>
-                                <button type="submit" style="display: none;">Save</button>
-                            </form>
 
+
+                            <div class="input-group">
+                                <div class="head">
+                                    <p>Mobile Number </p> <button editThree>Edit</button>
+                                </div>
+                                <form mobile>
+                                    <div class="form-group">
+                                        <label for="mobile">Mobile</label>
+                                        <input type="number" name="mobile" mobile-field disabled>
+                                        <span class="invalid" id="error3"></span>
+                                    </div>
+                                    <button type="submit" style="display: none;">Save</button>
+                                </form>
+
+                            </div>
                         </div>
 
+                        <div class="cart-items" style="display: none;">
+                            <div class=" checkout">
+                                <div class="banner">Manage Address</div>
+                                <div class="address_list">
 
+                                </div>
+                            </div>
+                            <button style="width:100%" id="btnOpenForm">Add New Address</button>
+                        </div>
 
                     </div>
-                    <div class="grid-item bottom-left">myorders</div>
+                    <div class="grid-item bottom-left">
+                        <div class="nav_row">
+                            <img src="/src/images/icons/bag.svg" width="20" height="20" alt="">
+                            <a href="/myorders">myorders</a>
+                        </div>
+
+                        <div class="nav_row">
+                            <img src="/src/images/icons/hat.svg" width="20" height="20" alt="">
+                            <a onclick="showAddress()">Manage Address</a>
+                        </div>
+
+                    </div>
                 </div>
+
+
+
+                <div class="form-popup-bg">
+                    <div class="form-container">
+                        <button id="btnCloseForm" class="modal-close-btn">
+                            <ion-icon id="btnCloseForm" name="close-outline"></ion-icon>
+                        </button>
+                        <h1>Add Shipping address</h1>
+                        <!-- <p>For more information. Please complete this form.</p> -->
+
+                        <form id="add-new-address" onsubmit="handleSubmit(event)" data-mode="add" method="post">
+                            <div class="field-group">
+                                <div class="form-group">
+                                    <label for="">Name</label>
+                                    <input id="name" type="text" name="custName" class="form-control" />
+                                    <span class="invalid error" id="error-name"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="">Mobile</label>
+                                    <input class="form-control" type="number" id="phone" name="mobile" type="text" />
+                                    <span class="invalid error" id="mobile-error"></span>
+                                </div>
+                            </div>
+
+                            <div class="field-group">
+                                <div class="form-group">
+                                    <label for="">zipCode</label>
+                                    <input class="form-control" id="zipCode" name="zipCode" type="text" />
+                                    <span class="invalid error" id="zipcode-error"></span>
+
+                                </div>
+                                <div class="form-group">
+                                    <label for="">Locality</label>
+                                    <input class="form-control" id="locality" name="locality" type="text" />
+                                    <span class="invalid error" id="locality-error"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="">Address</label>
+                                <textarea class="form-control" id="address" name="address" type="text" cols="30"
+                                    rows="5"></textarea>
+                                <span class="invalid error" id="address-error"></span>
+
+                            </div>
+
+
+                            <div class="field-group">
+                                <div class="form-group">
+                                    <label for="">City</label>
+                                    <input class="form-control" id="city" name="city" type="text" />
+                                    <span class="invalid error" id="city-error"></span>
+
+                                </div>
+                                <div class="form-group">
+                                    <label for="">State</label>
+                                    <select class="form-control" id="state" name="state" type="text">
+                                        <option value=""></option>
+                                    </select>
+                                    <span class="invalid error" id="state-error"></span>
+
+
+                                </div>
+
+                                <input type="hidden" id="addressIdInput" value="">
+
+                            </div>
+
+                            <button type="submit">Submit</button>
+                        </form>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+                <script>
+                    const form = document.getElementById('add-new-address');
+
+
+
+                    let isValid = true;
+
+                    function getAddressId() {
+                        const addressIdInput = document.getElementById('addressIdInput');
+                        return addressIdInput.value;
+                    }
+
+
+                    async function handleSubmit(event) {
+                        event.preventDefault();
+
+
+
+                        const isUpdate = form.getAttribute("data-mode")
+
+                        clearErrorMessages();
+
+                        // Validate form fields
+                        const name = document.getElementById('name');
+                        const mobile = document.getElementById('phone');
+                        const zipCode = document.getElementById('zipCode');
+                        const locality = document.getElementById('locality');
+                        const address = document.getElementById('address');
+                        const city = document.getElementById('city');
+                        const state = document.getElementById('state');
+
+                        let isValid = true; // Reset isValid before validating the form fields
+
+                        if (!name.value.trim()) {
+                            showError("error-name", "name field is required !");
+                            isValid = false;
+                        }
+
+                        if (state.value === "") {
+                            showError("state-error", "Please select a state.");
+                            isValid = false;
+                        }
+
+                        if (!mobile.value.trim()) {
+                            showError("mobile-error", "mobile field is required !");
+                            isValid = false;
+                        }
+
+                        if (!locality.value.trim()) {
+                            showError("locality-error", "locality field is required !");
+                            isValid = false;
+                        }
+
+                        if (!city.value.trim()) {
+                            showError("city-error", "city field is required !");
+                            isValid = false;
+                        }
+
+                        if (!zipCode.value.trim()) {
+                            showError("zipcode-error", "zipCode field is required !");
+                            isValid = false;
+                        } else if (isNaN(zipCode.value)) {
+                            showError("zipcode-error", "zipCode must be a valid number.");
+                            isValid = false;
+                        }
+
+                        if (!address.value.trim()) {
+                            showError("address-error", "Please enter the shipping address.");
+                            isValid = false;
+                        }
+
+                        try {
+                            if (isValid) {
+                                const formData = {
+                                    custName: name.value,
+                                    mobile: mobile.value,
+                                    zipCode: zipCode.value,
+                                    state: state.value,
+                                    locality: locality.value,
+                                    city: city.value,
+                                    address: address.value
+                                };
+
+                                var formPopupBg = document.querySelector('.form-popup-bg');
+
+                                if (isUpdate === 'update') {
+                                    const addressId = getAddressId()
+
+                                    const response = await axios.put(`/api/v1/user/address/${addressId}`, formData);
+                                    formPopupBg.classList.remove('is-visible');
+                                    showToast();
+                                    setToastMessage("Success", response.data.message);
+                                    getAddress();
+                                    form.setAttribute("data-mode", "add");
+                                } else if(form.getAttribute("data-mode") === 'add'){
+                                    const response = await axios.post('/api/v1/user/address', formData);
+                                    formPopupBg.classList.remove('is-visible');
+                                    showToast();
+                                    setToastMessage("Success", response.data.message);
+                                    getAddress();
+                                    getCheckOut();
+                                }
+                            }
+                        } catch (error) {
+                            const message = error.response?.data?.message;
+                            console.log(message);
+                        }
+                    }
+
+
+                    function showError(element, errorMessage) {
+                        const errorElement = document.querySelector(`#${element}`)
+                        errorElement.textContent = errorMessage
+                    }
+
+                    function countWords(text) {
+                        const trimmedText = text.trim();
+                        const words = trimmedText.split(/\s+/);
+                        return words.length;
+                    }
+
+                    function clearErrorMessages() {
+                        const errorElements = document.querySelectorAll(".error");
+                        errorElements.forEach((element) => {
+                            element.textContent = "";
+                        });
+                    }
+
+                    function fetchStates() {
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('GET', 'https://cdn-api.co-vin.in/api/v2/admin/location/states', true);
+
+                        xhr.onload = function () {
+                            if (xhr.status >= 200 && xhr.status < 400) {
+                                var response = JSON.parse(xhr.responseText);
+                                var states = response.states;
+                                var selectElement = document.getElementById('state');
+                                console.log(state)
+
+                                states.forEach(function (state) {
+                                    var option = document.createElement('option');
+                                    option.value = state.state_name;
+                                    option.textContent = state.state_name;
+                                    selectElement.appendChild(option);
+                                });
+                            } else {
+                                console.error('Error fetching states:', xhr.status);
+                            }
+                        };
+
+                        xhr.onerror = function () {
+                            console.error('Error fetching states:', xhr.status);
+                        };
+
+                        xhr.send();
+                    }
+
+                    // Call the fetchStates function to fetch and render the states
+                    fetchStates();
+
+
+
+                </script>
+
+                <script>
+
+
+
+
+
+                    function showAddress() {
+                        const inputContainer = document.querySelector(".input-container")
+                        const addressContainer = document.querySelector(".cart-items")
+                        var formPopupBg = document.querySelector('.form-popup-bg');
+
+                        inputContainer.style.display = "none"
+                        addressContainer.style.display = "block"
+                    }
+
+
+
+
+
+                    function closeForm() {
+                        document.querySelector('.form-popup-bg').classList.remove('is-visible');
+                    }
+
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var btnOpenForm = document.getElementById('btnOpenForm');
+                        var formPopupBg = document.querySelector('.form-popup-bg');
+                        var btnCloseForm = document.getElementById('btnCloseForm');
+
+                        /* Contact Form Interactions */
+                        btnOpenForm.addEventListener('click', function (event) {
+                            event.preventDefault();
+                            formPopupBg.classList.add('is-visible');
+                        });
+
+                        // close popup when clicking x or off popup
+                        formPopupBg.addEventListener('click', function (event) {
+                            if (event.target.classList.contains('form-popup-bg') || event.target.id === 'btnCloseForm') {
+                                event.preventDefault();
+                                formPopupBg.classList.remove('is-visible');
+                            }
+                        });
+                    });
+
+
+
+
+
+
+                </script>
+
+
 
             </div>
 
@@ -180,8 +505,9 @@
 
     <script>
         window.onload = async function () {
-            await getProducts()
+            // await getProducts()
             await getCategories()
+            await getAddress()
         }
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -219,6 +545,15 @@
 
         getProfile()
 
+        function validateInput(inputValue, type, errorId) {
+            const value = inputValue.trim();
+            if (value === '') {
+                document.getElementById(errorId).textContent = `${type} cannot be empty.`;
+            } else {
+                document.getElementById(errorId).textContent = '';
+            }
+        }
+
         const editButtonOne = document.querySelector("button[editOne]");
         const saveButtonOne = document.querySelector("form[username] button[type='submit']");
 
@@ -241,26 +576,36 @@
         }
 
         editButtonOne.addEventListener("click", function () {
+            validateInput(usernameField.value, "username", 'error1')
             toggleEditMode(editButtonOne, saveButtonOne, usernameField);
         });
 
         saveButtonOne.addEventListener("click", function () {
+            validateInput(usernameField.value, "username", 'error1')
+
+
             toggleViewMode(editButtonOne, saveButtonOne, usernameField);
         });
 
         editButtonTwo.addEventListener("click", function () {
+            validateInput(emailField.value, "email", 'error2')
             toggleEditMode(editButtonTwo, saveButtonTwo, emailField);
         });
 
         saveButtonTwo.addEventListener("click", function () {
+            validateInput(emailField.value, "email", 'error2')
+
             toggleViewMode(editButtonTwo, saveButtonTwo, emailField);
         });
 
         editButtonThree.addEventListener("click", function () {
+            validateInput(mobileField.value, "mobile", 'error3')
             toggleEditMode(editButtonThree, saveButtonThree, mobileField);
         });
 
         saveButtonThree.addEventListener("click", function () {
+            validateInput(mobileField.value, "mobile", 'error3')
+
             toggleViewMode(editButtonThree, saveButtonThree, mobileField);
         });
 
@@ -307,7 +652,7 @@
             e.preventDefault()
             $.ajax({
                 type: "PUT",
-                url: "/api/v1/user/profile/email",
+                url: "/api/v1/user/profile/mobile",
                 data: {
                     mobile: mobileField.value
                 },
