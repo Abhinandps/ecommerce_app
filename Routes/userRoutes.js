@@ -42,6 +42,7 @@ const {
   updateShippingAddress,
   getOneShippingAddress,
   deleteShippingAddress,
+  categoryItems,
 } = require("../Controllers/userController");
 
 const upload = require("../utils/multerConfig");
@@ -150,13 +151,18 @@ module.exports = router;
 
 // Home
 
-router.get("/newarrivals", isAuthenticate, newArrivals);
+
+router.get("/categoryItems", isAuthenticate, categoryItems); //  <pending...>
+
+router.get("/newArrivals", isAuthenticate, newArrivals);
 
 router.get("/trending", isAuthenticate, trending);
 
 router.get("/toprated", isAuthenticate, toprated);
 
 router.get("/bestsellers", isAuthenticate, bestSellers);
+
+router.get("/home", isAuthenticate, getHomeProducts);
 
 // Banners
 

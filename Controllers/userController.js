@@ -29,21 +29,101 @@ const generateOrderID = () => {
 
 exports.getHomeProducts = catchAsync(async (req, res) => {
   const products = await Product.find()
-    .limit(10) // Limit to 10 products
+    .limit(8) 
     .populate("category", "name");
 
   res.json(products);
 });
 
+// <pending...>
+exports.categoryItems = catchAsync(async (req, res) => {});
+
+
+
+
 exports.newArrivals = catchAsync(async (req, res) => {
-  const newArrivals = await Product.find().sort({ createdAt: -1 }).limit(5);
-  res.json(newArrivals);
+  const newArrivals = await Product.find()
+    .sort({ createdAt: -1 })
+    .limit(8)
+    .populate("category", "name"); // Populate the "category" field and include only the "name" field
+
+  const formattedNewArrivals = newArrivals.map((product) => {
+    return {
+      _id: product._id,
+      name: product.name,
+      price: product.price,
+      category: product.category._id,
+      categoryName: product.category.name,
+      image: product.image,
+    };
+  });
+
+  res.json(formattedNewArrivals);
 });
 
+
+
+// exports.trending = catchAsync(async (req, res) => {
+//   const { productId } = req.query;
+
+//   if (productId) {
+//     // Find the product by its ID
+//     const product = await Product.findById(productId);
+
+//     if (!product) {
+//       return res.status(404).json({ message: "Product not found" });
+//     }
+
+//     // Increment the view count in the product schema
+//     product.views += 1;
+//     console.log(product);
+//     await product.save();
+//   } else {
+//     // Fetch the trending products with the updated view count
+//     const trendingProducts = await Product.find().sort({ views: -1 }).limit(8);
+
+//     res.json(trendingProducts);
+//   }
+// });
+
+
 exports.trending = catchAsync(async (req, res) => {
-  const trendingProducts = await Product.find().sort({ views: -1 }).limit(5);
-  res.json(trendingProducts);
+  const { productId } = req.query;
+
+  if (productId) {
+    // Find the product by its ID
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Increment the view count in the product schema
+    product.views += 1;
+    console.log(product);
+    await product.save();
+  }
+
+  // Fetch the trending products with the updated view count
+  const trendingProducts = await Product.find()
+    .sort({ views: -1 })
+    .limit(8)
+    .populate("category", "name"); // Populate the "category" field and include only the "name" field
+
+  const formattedTrendingProducts = trendingProducts.map((product) => {
+    return {
+      _id: product._id,
+      name: product.name,
+      price: product.price,
+      category: product.category._id,
+      categoryName: product.category.name,
+      image: product.image,
+    };
+  });
+
+  res.json(formattedTrendingProducts);
 });
+
 
 exports.toprated = catchAsync(async (req, res) => {
   const topRatedProducts = await Product.find().sort({ rating: -1 }).limit(5);
@@ -84,38 +164,7 @@ exports.bestSellers = catchAsync(async (req, res) => {
   });
 });
 
-// exports.getAllProducts = catchAsync(async (req, res) => {
-//   const products = await Product.find({ deleted: false }).populate("category");
-
-//  // Retrieve the productOffer values and attach them to the products
-//  const productIds = products.map((product) => product._id);
-//  const productOffers = await ProductOffer.find({ product: { $in: productIds } });
-
-//  const productsWithOffers = products.map((product) => {
-//    const offer = productOffers.find((offer) => offer.product.toString() === product._id.toString());
-//    return {
-//      ...product._doc,
-//      offer: offer ? offer.description : null,
-//    };
-//  });
-
-//   res.json({ status: "success", data: productsWithOffers });
-// });
-
 exports.getAllProducts = catchAsync(async (req, res) => {
-  // const filters = req.query;
-
-  // const productsWithOffers = res.paginatedResults.results;
-  // const nextPage = res.paginatedResults.next;
-  // const previousPage = res.paginatedResults.previous;
-
-  // const currentPage = {
-  //   page: req.query.page || 1,
-  //   limit: req.query.limit || 10,
-  // };\
-
-  // console.log(res.paginatedResults)
-
   res.status(200).json({
     status: "success",
     result: res.paginatedUserResults.length,
@@ -443,8 +492,6 @@ exports.getCartItemsCount = catchAsync(async (req, res, next) => {
   res.json({ count: cartItemsCount });
 });
 
-
-
 exports.saveShippingAddress = catchAsync(async (req, res) => {
   const cart = await Cart.findOne({ user: req.user._id });
   cart.shippingAddress.push(req.body);
@@ -456,12 +503,9 @@ exports.saveShippingAddress = catchAsync(async (req, res) => {
   });
 });
 
-
-
-
 exports.getOneShippingAddress = catchAsync(async (req, res) => {
-  const userId = req.user._id; 
-  const addressId = req.params.id; 
+  const userId = req.user._id;
+  const addressId = req.params.id;
 
   // Find the cart for the specific user
   const cart = await Cart.findOne({ user: userId });
@@ -482,16 +526,12 @@ exports.getOneShippingAddress = catchAsync(async (req, res) => {
   return res.status(200).json({ address });
 });
 
-
 exports.updateShippingAddress = catchAsync(async (req, res) => {
-  
+  const userId = req.user._id;
 
-  const userId = req.user._id; 
+  const addressId = req.params.id;
 
-  const  addressId  = req.params.id
-
-
-  const updatedAddress = req.body; 
+  const updatedAddress = req.body;
 
   // Find the cart for the specific user
   const cart = await Cart.findOne({ user: userId });
@@ -501,12 +541,10 @@ exports.updateShippingAddress = catchAsync(async (req, res) => {
   }
 
   // Find the index of the address to update within the shippingAddress array
-  const addressIndex = cart.shippingAddress.findIndex(
-    (address) => {
-      console.log(address)
-      return address._id.toString() === addressId
-    }
-  );
+  const addressIndex = cart.shippingAddress.findIndex((address) => {
+    console.log(address);
+    return address._id.toString() === addressId;
+  });
 
   if (addressIndex === -1) {
     return res.status(404).json({ error: "Address not found" });
@@ -515,7 +553,6 @@ exports.updateShippingAddress = catchAsync(async (req, res) => {
   // Update the address at the specified index
   cart.shippingAddress[addressIndex] = updatedAddress;
 
-  
   // Save the updated cart
   await cart.save();
 
@@ -551,9 +588,6 @@ exports.deleteShippingAddress = catchAsync(async (req, res) => {
   res.status(200).json({ message: "Address deleted successfully" });
 });
 
-
-
-
 // Coupon
 
 exports.getAllCoupons = async (req, res) => {
@@ -564,7 +598,6 @@ exports.getAllCoupons = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 exports.applyCoupon = async (req, res) => {
   try {
@@ -637,7 +670,6 @@ exports.applyCoupon = async (req, res) => {
   }
 };
 
-
 exports.removeCoupon = catchAsync(async (req, res) => {
   try {
     const userId = req.user._id;
@@ -671,7 +703,6 @@ exports.removeCoupon = catchAsync(async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-
 
 // initialPayment [ COD ] or razorpay orderID generate
 
@@ -793,7 +824,6 @@ exports.initialPayment = catchAsync(async (req, res, next) => {
   }
 });
 
-
 exports.razorpayWebhook = catchAsync(async (req, res, next) => {
   const paymentStatus = req.body.event;
   if (
@@ -807,7 +837,6 @@ exports.razorpayWebhook = catchAsync(async (req, res, next) => {
 });
 
 // place an order with razorpay
-
 
 exports.placeOrder = catchAsync(async (req, res, next) => {
   const { orderID, shippingAddress, paymentMethod, totalPrice } = req.body;
@@ -852,7 +881,6 @@ exports.placeOrder = catchAsync(async (req, res, next) => {
   res.status(200).json({ message: "Order Placed Successfully" });
 });
 
-
 // Orders
 exports.orderHistory = catchAsync(async (req, res, next) => {
   let filter = { user: req.user._id };
@@ -879,7 +907,6 @@ exports.orderHistory = catchAsync(async (req, res, next) => {
   });
 });
 
-
 exports.getOrderDetails = catchAsync(async (req, res, next) => {
   const { orderID } = req.params;
   const order = await Order.findOne({ orderID, user: req.user._id });
@@ -891,7 +918,6 @@ exports.getOrderDetails = catchAsync(async (req, res, next) => {
     data: order,
   });
 });
-
 
 exports.orderCancel = catchAsync(async (req, res, next) => {
   const { orderID } = req.params;
@@ -911,7 +937,6 @@ exports.orderCancel = catchAsync(async (req, res, next) => {
   }
 });
 
-
 // invoice
 
 function generateInvoiceNumber() {
@@ -923,7 +948,6 @@ function generateInvoiceNumber() {
   return invoiceNumber;
 }
 
-
 exports.downloadInvoice = catchAsync(async (req, res, next) => {
   const order = await Order.findOne({ orderID: req.params.orderId });
 
@@ -934,7 +958,6 @@ exports.downloadInvoice = catchAsync(async (req, res, next) => {
   }
   generateInvoice(order, req, res);
 });
-
 
 // Banners
 exports.fetchBanners = catchAsync(async (req, res, next) => {
@@ -957,7 +980,6 @@ exports.fetchBanners = catchAsync(async (req, res, next) => {
     data: banners,
   });
 });
-
 
 // Profile
 

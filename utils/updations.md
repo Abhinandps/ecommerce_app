@@ -174,7 +174,7 @@ my pending..
 
 TuesDay, WednesDay
 
-[]Home Page Completion
+[✔]Home Page Completion
 []product suggestion border issue (optional)
 []price filter(optional)
 [✔]whish list
@@ -184,8 +184,8 @@ TuesDay, WednesDay
 [✔]group order
 [x]pagination for orders
 []Hot offers
-[x]profile address management
-[]checkout page address remove option needed
+[✔]profile address management
+[x]checkout page address remove option needed
 []payment page design cleanup
 []cart remove custom alert
 []rating (optional)

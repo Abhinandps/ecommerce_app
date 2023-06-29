@@ -1,3 +1,10 @@
+
+
+
+
+
+
+
 const logout = async () => {
   const res = await axios.get("http://127.0.0.1:3000/api/v1/user/logout");
   if (res.data.status === "success") {
@@ -78,6 +85,139 @@ const bestSellers = () => {
 
 bestSellers();
 
+
+
+const newArrivals = () => {
+  const row = document.querySelector("#new-arrivals-showcase-wrapper");
+
+  if (row) {
+    row.innerHTML = "";
+
+    $.ajax({
+      type: "GET",
+      url: "/api/v1/user/newArrivals",
+      success: function (res) {
+        const products = res;
+
+        let showcaseContainer = document.createElement("div");
+        showcaseContainer.classList.add("showcase-container");
+        row.appendChild(showcaseContainer);
+
+        products.forEach((product, index) => {
+          const firstImage = product.image.map((image) => image.split("public")[1])[0];
+
+          const item = `
+            <div class="showcase">
+              <a href="#" class="showcase-img-box">
+                <img src=${firstImage} alt="product_img" style="width:70px;" class="showcase-img">
+              </a>
+              <div class="showcase-content">
+                <a href="#">
+                  <h4 class="showcase-title">${product.name}</h4>
+                </a>
+                <a href="#" class="showcase-category">${product.categoryName}</a>
+                <div class="price-box">
+                  <p class="price">₹${product.price}</p>
+                  <del>₹ ${
+                    product.originalPrice ? product.originalPrice : product.price + 299
+                  }</del>
+                </div>
+              </div>
+            </div>`;
+
+          showcaseContainer.innerHTML += item;
+
+          // Check if the current index is a multiple of 4 to create a new showcase container
+          if ((index + 1) % 4 === 0 && index < products.length - 1) {
+            showcaseContainer = document.createElement("div");
+            showcaseContainer.classList.add("showcase-container");
+            row.appendChild(showcaseContainer);
+          }
+        });
+      },
+    });
+  }
+};
+
+newArrivals()
+
+
+//   document.addEventListener("click", function (event) {
+//     if (
+//       event.target.classList.contains("showcase") ||
+//       event.target.closest(".showcase")
+//     ) {
+//       const button = event.target.classList.contains("showcase")
+//         ? event.target
+//         : event.target.closest(".showcase");
+//       const product = JSON.parse(button.dataset.product);
+//       handleViewDetails(product);
+//     }
+//   });
+// };
+
+
+
+
+const trending = () => {
+  const row = document.querySelector("#trending-showcase-wrapper");
+
+  if (row) {
+    row.innerHTML = "";
+
+    $.ajax({
+      type: "GET",
+      url: "/api/v1/user/trending",
+      success: function (res) {
+        const products = res;
+
+        let showcaseContainer = document.createElement("div");
+        showcaseContainer.classList.add("showcase-container");
+        row.appendChild(showcaseContainer);
+
+
+        products.forEach((product, index) => {
+          const firstImage = product.image.map((image) => image.split("public")[1])[0];
+
+          const item = `
+            <div class="showcase">
+              <a href="#" class="showcase-img-box">
+                <img src=${firstImage} alt="product_img" style="width:70px;" class="showcase-img">
+              </a>
+              <div class="showcase-content">
+                <a href="#">
+                  <h4 class="showcase-title">${product.name}</h4>
+                </a>
+                
+                <a href="#" class="showcase-category">${product.categoryName}</a>
+                <div class="price-box">
+                  <p class="price">₹${product.price}</p>
+                  <del>₹ ${
+                    product.originalPrice ? product.originalPrice : product.price + 299
+                  }</del>
+                </div>
+              </div>
+            </div>`;
+
+          showcaseContainer.innerHTML += item;
+
+          // Check if the current index is a multiple of 4 to create a new showcase container
+          if ((index + 1) % 4 === 0 && index < products.length - 1) {
+            showcaseContainer = document.createElement("div");
+            showcaseContainer.classList.add("showcase-container");
+            row.appendChild(showcaseContainer);
+          }
+        });
+      },
+    });
+  }
+};
+
+trending()
+
+
+
+
 const getCategories = () => {
   $.ajax({
     type: "GET",
@@ -130,98 +270,94 @@ const getCategories = () => {
   });
 };
 
-// category filter based product render
+// Home Products Render
 
-// const getProducts = (categoryId) => {
-//   const row = $(".product-grid");
-//   const filter = {};
+const getHomeProducts = () => {
+  const row = $("#home-product-grid");
+  
+  row.empty();
 
-//   row.empty();
+  $.ajax({
+    type: "GET",
+    url: `/api/v1/user/home`,
+    success: function (products) {
+      const data  = products;
 
-//   if (categoryId) {
-//     filter.category = categoryId;
-//   }
+      data.forEach((product) => {
 
-//   const queryString = $.param(filter);
+        const card = `
+        <div class="showcase fade-in-animation">
 
-//   $.ajax({
-//     type: "GET",
-//     url: `/api/v1/user/products${queryString ? `?${queryString}` : ""}`,
-//     success: function (products) {
-//       const { data } = products;
+        <div class="showcase-banner">
 
-//       data.results.forEach((product) => {
+        ${product.image.map((path, index) => {
+          const newPath = path.replace("public", "");
+          let className = "product-img default";
 
-//         const card = `
-//         <div class="showcase fade-in-animation">
+          if (index === 1) {
+            className = " product-img hover";
+          }
+          console.log(newPath);
+          return `<img src="${newPath}" alt="Mens Winter Leathers Jackets" width="300" class="${className}">`;
+        })}
 
-//         <div class="showcase-banner">
+        <p class="showcase-badge">${product.offer ? product.offer : ""}</p>
 
-//         ${product.image.map((path, index) => {
-//           const newPath = path.replace("public", "");
-//           let className = "product-img default";
+        <div class="showcase-actions">
 
-//           if (index === 1) {
-//             className = " product-img hover";
-//           }
-//           console.log(newPath);
-//           return `<img src="${newPath}" alt="Mens Winter Leathers Jackets" width="300" class="${className}">`;
-//         })}
+        <button class="btn-action add-to-wishlist"  data-productId='${
+          product._id
+        }'>
+            <ion-icon name="heart-outline" ></ion-icon>
+        </button>
 
-//         <p class="showcase-badge">${product.offer ? product.offer : ""}</p>
+            <button class="btn-action view-details" data-product='${JSON.stringify(
+              product
+            )}'>
+            <ion-icon name="eye-outline"></ion-icon>
+              </button>
 
-//         <div class="showcase-actions">
+            <button class="btn-action add-to-cart" data-productId='${
+              product._id
+            }'>
+                <ion-icon name="bag-add-outline"></ion-icon>
+            </button>
 
-//             <button class="btn-action">
-//                 <ion-icon name="heart-outline"></ion-icon>
-//             </button>
+        </div>
 
-//             <button class="btn-action view-details" data-product='${JSON.stringify(
-//               product
-//             )}'>
-//             <ion-icon name="eye-outline"></ion-icon>
-//               </button>
+    </div>
 
-//             <button class="btn-action add-to-cart" data-productId='${
-//               product._id
-//             }'>
-//                 <ion-icon name="bag-add-outline"></ion-icon>
-//             </button>
+    <div class="showcase-content">
 
-//         </div>
+        <a href="#">
+            <h3 class="showcase-title">${product.name}</h3>
+        </a>
 
-//     </div>
+        <div class="showcase-rating">
+            <ion-icon name="star"></ion-icon>
+            <ion-icon name="star"></ion-icon>
+            <ion-icon name="star"></ion-icon>
+            <ion-icon name="star-outline"></ion-icon>
+            <ion-icon name="star-outline"></ion-icon>
+        </div>
 
-//     <div class="showcase-content">
+        <div class="price-box">
+            <p class="price">₹${product.price}</p>
+            <del>₹ ${
+              product.originalPrice ? product.originalPrice : product.price * 2
+            }</del>
+        </div>
 
-//         <a href="#">
-//             <h3 class="showcase-title">${product.name}</h3>
-//         </a>
+    </div>
+    </div>
+        `;
 
-//         <div class="showcase-rating">
-//             <ion-icon name="star"></ion-icon>
-//             <ion-icon name="star"></ion-icon>
-//             <ion-icon name="star"></ion-icon>
-//             <ion-icon name="star-outline"></ion-icon>
-//             <ion-icon name="star-outline"></ion-icon>
-//         </div>
+        row.append(card);
+      });
+    },
+  });
+};
 
-//         <div class="price-box">
-//             <p class="price">₹${product.price}</p>
-//             <del>₹ ${
-//               product.originalPrice ? product.originalPrice : product.price * 2
-//             }</del>
-//         </div>
-
-//     </div>
-//     </div>
-//         `;
-
-//         row.append(card);
-//       });
-//     },
-//   });
-// };
 
 // PAGINATION START
 
@@ -599,6 +735,13 @@ document.addEventListener("click", function (event) {
 // Function to handle the view details functionality
 const handleViewDetails = (product) => {
   localStorage.setItem("product", JSON.stringify(product));
+  $.ajax({
+    type:"GET",
+    url:`/api/v1/user/trending?productId=${product._id}`,
+    success:function(response){
+
+    }
+  })
   window.location.href = "/details";
 };
 

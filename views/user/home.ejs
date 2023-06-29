@@ -1,268 +1,175 @@
 <%- include ('../layouts/header.ejs') %>
-<style>
+  <style>
     .page-loader {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-}
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
 
-.loader {
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  animation: spin 1s linear infinite;
-}
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+    }
 
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
 
-</style>
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
 
-    <main>
-        <!--
+  
+
+  <main>
+    <!--
       - BANNER
     -->
 
-        <div class="banner">
+    <div class="banner">
 
-            <div class="container">
+      <div class="container">
 
-                <div class="slider-container has-scrollbar" id="header-slider-item">
+        <div class="slider-container has-scrollbar" id="header-slider-item">
 
 
-                    <div class="slider-item">
+          <div class="slider-item">
 
-                        <img src="/src/images/banner-1.jpg" alt="women's latest fashion sale" class="banner-img">
+            <img src="/src/images/banner-1.jpg" alt="women's latest fashion sale" class="banner-img">
 
-                        <div class="banner-content">
+            <div class="banner-content">
 
-                            <p class="banner-subtitle">Trending item</p>
+              <p class="banner-subtitle">Trending item</p>
 
-                            <h2 class="banner-title">Women's latest fashion sale</h2>
+              <h2 class="banner-title">Women's latest fashion sale</h2>
 
-                            <p class="banner-text">
-                                starting at &dollar; <b>20</b>.00
-                            </p>
+              <p class="banner-text">
+                starting at &dollar; <b>20</b>.00
+              </p>
 
-                            <a href="#" class="banner-btn">Shop now</a>
-
-                        </div>
-
-                    </div>
-                    
-                    <div class="slider-item">
-
-                        <img src="/src/images/banner-2.jpg" alt="women's latest fashion sale" class="banner-img">
-
-                        <div class="banner-content">
-
-                            <p class="banner-subtitle">Trending Asscesories</p>
-
-                            <h2 class="banner-title">Modern Sun Glasses</h2>
-
-                            <p class="banner-text">
-                                starting at &dollar; <b>149</b>.00
-                            </p>
-
-                            <a href="#" class="banner-btn">Shop now</a>
-
-                        </div>
-
-                    </div> 
-                </div>
+              <a href="#" class="banner-btn">Shop now</a>
 
             </div>
+
+          </div>
+
+          <div class="slider-item">
+
+            <img src="/src/images/banner-2.jpg" alt="women's latest fashion sale" class="banner-img">
+
+            <div class="banner-content">
+
+              <p class="banner-subtitle">Trending Asscesories</p>
+
+              <h2 class="banner-title">Modern Sun Glasses</h2>
+
+              <p class="banner-text">
+                starting at &dollar; <b>149</b>.00
+              </p>
+
+              <a href="#" class="banner-btn">Shop now</a>
+
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+  
+    <!--
+      - PRODUCT
+    -->
+
+    <div class="product-container">
+
+      <div class="container">
+        <div class="product-box">
+
+          <!--
+            - PRODUCT MINIMAL
+          -->
+
+          <div class="product-minimal">
+
+            <div  class="product-showcase">
+
+              <h2 class="title">New Arrivals</h2>
+
+              <div id="new-arrivals-showcase-wrapper" class="showcase-wrapper has-scrollbar">
+              <!-- DYNAMIC DATA  -->
+
+                </div>
+              </div>
+
+
+            <div  class="product-showcase">
+
+              <h2 class="title">Trending</h2>
+
+              <div id="trending-showcase-wrapper" class="showcase-wrapper has-scrollbar">
+              <!-- DYNAMIC DATA  -->
+                </div>
+              </div>
+
+              <div  class="product-showcase">
+
+                <h2 class="title">Top Rated</h2>
+  
+                <div id="topRated-showcase-wrapper" class="showcase-wrapper has-scrollbar">
+  
+                  </div>
+  
+                </div>
+                
+            </div> 
+
+             <!--
+            - PRODUCT GRID
+          -->
+
+          <div class="product-main">
+
+            <h2 class="title">New Products</h2>
+
+            <div id="home-product-grid" class="product-grid">
+              <!-- DYNAMIC DATA  -->
+
+            </div>
+
+          </div>
+
+
+            
+
+            </div>
+
+          </div>
+
+
+
+
+
+         
+
 
         </div>
 
+      </div>
 
-
-
-
-        <!--
-        - CATEGORY
-      -->
-
-        <!-- <div class="category">
-
-            <div class="container">
-
-                <div class="category-item-container has-scrollbar">
-
-                    <div class="category-item">
-
-                        <div class="category-img-box">
-                            <img src="/src/icons/dress.svg" alt="dress & frock" width="30">
-                        </div>
-
-                        <div class="category-content-box">
-
-                            <div class="category-content-flex">
-                                <h3 class="category-item-title">Dress & frock</h3>
-
-                                <p class="category-item-amount">(53)</p>
-                            </div>
-
-                            <a href="#" class="category-btn">Show all</a>
-
-                        </div>
-
-                    </div>
-
-                    <div class="category-item">
-
-                        <div class="category-img-box">
-                            <img src="/src/icons/coat.svg" alt="winter wear" width="30">
-                        </div>
-
-                        <div class="category-content-box">
-
-                            <div class="category-content-flex">
-                                <h3 class="category-item-title">Winter wear</h3>
-
-                                <p class="category-item-amount">(58)</p>
-                            </div>
-
-                            <a href="#" class="category-btn">Show all</a>
-
-                        </div>
-
-                    </div>
-
-                    <div class="category-item">
-
-                        <div class="category-img-box">
-                            <img src="/src/icons/glasses.svg" alt="glasses & lens" width="30">
-                        </div>
-
-                        <div class="category-content-box">
-
-                            <div class="category-content-flex">
-                                <h3 class="category-item-title">Glasses & lens</h3>
-
-                                <p class="category-item-amount">(68)</p>
-                            </div>
-
-                            <a href="#" class="category-btn">Show all</a>
-
-                        </div>
-
-                    </div>
-
-                    <div class="category-item">
-
-                        <div class="category-img-box">
-                            <img src="/src/icons/shorts.svg" alt="shorts & jeans" width="30">
-                        </div>
-
-                        <div class="category-content-box">
-
-                            <div class="category-content-flex">
-                                <h3 class="category-item-title">Shorts & jeans</h3>
-
-                                <p class="category-item-amount">(84)</p>
-                            </div>
-
-                            <a href="#" class="category-btn">Show all</a>
-
-                        </div>
-
-                    </div>
-
-                    <div class="category-item">
-
-                        <div class="category-img-box">
-                            <img src="/src/icons/tee.svg" alt="t-shirts" width="30">
-                        </div>
-
-                        <div class="category-content-box">
-
-                            <div class="category-content-flex">
-                                <h3 class="category-item-title">T-shirts</h3>
-
-                                <p class="category-item-amount">(35)</p>
-                            </div>
-
-                            <a href="#" class="category-btn">Show all</a>
-
-                        </div>
-
-                    </div>
-
-                    <div class="category-item">
-
-                        <div class="category-img-box">
-                            <img src="/src/icons/jacket.svg" alt="jacket" width="30">
-                        </div>
-
-                        <div class="category-content-box">
-
-                            <div class="category-content-flex">
-                                <h3 class="category-item-title">Jacket</h3>
-
-                                <p class="category-item-amount">(16)</p>
-                            </div>
-
-                            <a href="#" class="category-btn">Show all</a>
-
-                        </div>
-
-                    </div>
-
-                    <div class="category-item">
-
-                        <div class="category-img-box">
-                            <img src="/src/icons/watch.svg" alt="watch" width="30">
-                        </div>
-
-                        <div class="category-content-box">
-
-                            <div class="category-content-flex">
-                                <h3 class="category-item-title">Watch</h3>
-
-                                <p class="category-item-amount">(27)</p>
-                            </div>
-
-                            <a href="#" class="category-btn">Show all</a>
-
-                        </div>
-
-                    </div>
-
-                    <div class="category-item">
-
-                        <div class="category-img-box">
-                            <img src="/src/icons/hat.svg" alt="hat & caps" width="30">
-                        </div>
-
-                        <div class="category-content-box">
-
-                            <div class="category-content-flex">
-                                <h3 class="category-item-title">Hat & caps</h3>
-
-                                <p class="category-item-amount">(39)</p>
-                            </div>
-
-                            <a href="#" class="category-btn">Show all</a>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div> -->
+    </div>
 
 
     <!--
@@ -271,28 +178,27 @@
 
     <div>
 
-        <div class="container">
-  
-          <div class="testimonials-box">
-  
-            <!--
+      <div class="container">
+
+        <div class="testimonials-box">
+
+          <!--
               - TESTIMONIALS
             -->
-  
-            <!-- <div class="testimonial">
+
+          <div class="testimonial">
   
               <h2 class="title">testimonial</h2>
   
               <div class="testimonial-card">
   
-                <img src="/src/images/testimonial-1.jpg" alt="alan doe" class="testimonial-banner" width="80"
-                  height="80">
+                <img src="/src/images/testimonial-1.jpg" alt="alan doe" class="testimonial-banner" style="width:80px; height:80px">
   
                 <p class="testimonial-name">Alan Doe</p>
   
                 <p class="testimonial-title">CEO & Founder Invision</p>
   
-                <img src="/src/images/icons/quotes.svg" alt="quotation" class="quotation-img" width="26">
+                <img src="/src/images/icons/quotes.svg" style="width:26px;"  alt="quotation" class="quotation-img" >
   
                 <p class="testimonial-desc">
                   Lorem ipsum dolor sit amet consectetur Lorem ipsum
@@ -301,138 +207,138 @@
   
               </div>
   
-            </div> -->
-  
-  
-  
-            <!--
+            </div>
+
+
+
+          <!--
               - CTA
             -->
-  
-            <div class="cta-container">
-  
-              <img src="/src/images/cta-banner.jpg" alt="summer collection" class="cta-banner">
-  
-              <a href="#" class="cta-content">
-  
-                <p class="discount">25% Discount</p>
-  
-                <h2 class="cta-title">Summer collection</h2>
-  
-                <p class="cta-text">Starting @ $10</p>
-  
-                <button class="cta-btn">Shop now</button>
-  
-              </a>
-  
-            </div>
-  
-  
-  
-            <!--
+
+          <div class="cta-container">
+
+            <img src="/src/images/cta-banner.jpg" alt="summer collection" class="cta-banner">
+
+            <a href="#" class="cta-content">
+
+              <p class="discount">25% Discount</p>
+
+              <h2 class="cta-title">Summer collection</h2>
+
+              <p class="cta-text">Starting @ $10</p>
+
+              <button class="cta-btn">Shop now</button>
+
+            </a>
+
+          </div>
+
+
+
+          <!--
               - SERVICE
             -->
-  
-            <div class="service">
-  
-              <h2 class="title">Our Services</h2>
-  
-              <div class="service-container">
-  
-                <a href="#" class="service-item">
-  
-                  <div class="service-icon">
-                    <ion-icon name="boat-outline"></ion-icon>
-                  </div>
-  
-                  <div class="service-content">
-  
-                    <h3 class="service-title">Worldwide Delivery</h3>
-                    <p class="service-desc">For Order Over $100</p>
-  
-                  </div>
-  
-                </a>
-  
-                <a href="#" class="service-item">
-  
-                  <div class="service-icon">
-                    <ion-icon name="rocket-outline"></ion-icon>
-                  </div>
-  
-                  <div class="service-content">
-  
-                    <h3 class="service-title">Next Day delivery</h3>
-                    <p class="service-desc">UK Orders Only</p>
-  
-                  </div>
-  
-                </a>
-  
-                <a href="#" class="service-item">
-  
-                  <div class="service-icon">
-                    <ion-icon name="call-outline"></ion-icon>
-                  </div>
-  
-                  <div class="service-content">
-  
-                    <h3 class="service-title">Best Online Support</h3>
-                    <p class="service-desc">Hours: 8AM - 11PM</p>
-  
-                  </div>
-  
-                </a>
-  
-                <a href="#" class="service-item">
-  
-                  <div class="service-icon">
-                    <ion-icon name="arrow-undo-outline"></ion-icon>
-                  </div>
-  
-                  <div class="service-content">
-  
-                    <h3 class="service-title">Return Policy</h3>
-                    <p class="service-desc">Easy & Free Return</p>
-  
-                  </div>
-  
-                </a>
-  
-                <a href="#" class="service-item">
-  
-                  <div class="service-icon">
-                    <ion-icon name="ticket-outline"></ion-icon>
-                  </div>
-  
-                  <div class="service-content">
-  
-                    <h3 class="service-title">30% money back</h3>
-                    <p class="service-desc">For Order Over $100</p>
-  
-                  </div>
-  
-                </a>
-  
-              </div>
-  
+
+          <div class="service">
+
+            <h2 class="title">Our Services</h2>
+
+            <div class="service-container">
+
+              <a href="#" class="service-item">
+
+                <div class="service-icon">
+                  <ion-icon name="boat-outline"></ion-icon>
+                </div>
+
+                <div class="service-content">
+
+                  <h3 class="service-title">Worldwide Delivery</h3>
+                  <p class="service-desc">For Order Over $100</p>
+
+                </div>
+
+              </a>
+
+              <a href="#" class="service-item">
+
+                <div class="service-icon">
+                  <ion-icon name="rocket-outline"></ion-icon>
+                </div>
+
+                <div class="service-content">
+
+                  <h3 class="service-title">Next Day delivery</h3>
+                  <p class="service-desc">UK Orders Only</p>
+
+                </div>
+
+              </a>
+
+              <a href="#" class="service-item">
+
+                <div class="service-icon">
+                  <ion-icon name="call-outline"></ion-icon>
+                </div>
+
+                <div class="service-content">
+
+                  <h3 class="service-title">Best Online Support</h3>
+                  <p class="service-desc">Hours: 8AM - 11PM</p>
+
+                </div>
+
+              </a>
+
+              <a href="#" class="service-item">
+
+                <div class="service-icon">
+                  <ion-icon name="arrow-undo-outline"></ion-icon>
+                </div>
+
+                <div class="service-content">
+
+                  <h3 class="service-title">Return Policy</h3>
+                  <p class="service-desc">Easy & Free Return</p>
+
+                </div>
+
+              </a>
+
+              <a href="#" class="service-item">
+
+                <div class="service-icon">
+                  <ion-icon name="ticket-outline"></ion-icon>
+                </div>
+
+                <div class="service-content">
+
+                  <h3 class="service-title">30% money back</h3>
+                  <p class="service-desc">For Order Over $100</p>
+
+                </div>
+
+              </a>
+
             </div>
-  
+
           </div>
-  
+
         </div>
-  
+
       </div>
-  
-  
-  
-  
-  
-      <!--
+
+    </div>
+
+
+
+
+
+    <!--
         - BLOG
       -->
-  
-      <!-- <div class="blog">
+
+    <!-- <div class="blog">
   
         <div class="container">
   
@@ -536,100 +442,105 @@
   
       </div> -->
 
-    </main>
+  </main>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <script>
-
-    
-        // Fetch Banners
-
-        const getBanners = () => {
-            // Fetch header banners
-            $.ajax({
-                url: "/api/v1/user/banners?position=header",
-                method: "GET",
-                success: function (headerBanners) {
-                    console.log(headerBanners)
-                    updateHeaderBannersUI(headerBanners.data);
-                },
-                error: function (error) {
-                    console.error("Error fetching header banners:", error);
-                },
-            });
-
-            $.ajax({
-                url: "/api/v1/user/banners?position=footer",
-                method: "GET",
-                success: function (footerBanners) {
-                    updateFooterBannersUI(footerBanners.data);
-                },
-                error: function (error) {
-                    console.error("Error fetching header banners:", error);
-                },
-            });
-        };
-
-        function updateHeaderBannersUI(headerBanners) {
-            const headerBannersContainer = document.querySelector("#header-slider-item");
-            headerBannersContainer.innerHTML = "";
+  <script>
 
 
-            
+    // Fetch Banners
 
-            headerBanners.forEach((banner) => {
+    const getBanners = () => {
+      // Fetch header banners
+      $.ajax({
+        url: "/api/v1/user/banners?position=header",
+        method: "GET",
+        success: function (headerBanners) {
+          console.log(headerBanners)
+          updateHeaderBannersUI(headerBanners.data);
+        },
+        error: function (error) {
+          console.error("Error fetching header banners:", error);
+        },
+      });
 
-                const imagePath = banner.image;
-                const newPath = imagePath.replace("public", "");
+      $.ajax({
+        url: "/api/v1/user/banners?position=footer",
+        method: "GET",
+        success: function (footerBanners) {
+          updateFooterBannersUI(footerBanners.data);
+        },
+        error: function (error) {
+          console.error("Error fetching header banners:", error);
+        },
+      });
+    };
 
-                const bannerElement = document.createElement("div");
-                bannerElement.classList.add("slider-item");
-
-                const imgElement = document.createElement("img");
-                imgElement.src = newPath;
-                imgElement.classList.add("banner-img");
-                bannerElement.appendChild(imgElement);
-
-                const bannerContent = document.createElement("div");
-                bannerContent.classList.add("banner-content");
-
-                const subtitleElement = document.createElement("p");
-                subtitleElement.classList.add("banner-subtitle");
-                subtitleElement.textContent = banner.subTitle;
-                bannerContent.appendChild(subtitleElement);
-
-                const titleElement = document.createElement("h2");
-                titleElement.classList.add("banner-title");
-                titleElement.textContent = banner.title;
-                bannerContent.appendChild(titleElement);
-
-                const textElement = document.createElement("p");
-                textElement.classList.add("banner-text");
-                textElement.innerHTML = `starting at ₹ <b>${banner.text}</b>.00`;
-                bannerContent.appendChild(textElement);
-
-                const btnElement = document.createElement("a");
-                btnElement.href = "#";
-                btnElement.classList.add("banner-btn");
-                btnElement.textContent = banner.button;
-                bannerContent.appendChild(btnElement);
-
-                bannerElement.appendChild(bannerContent);
-
-                headerBannersContainer.appendChild(bannerElement);
-            });
-        }
-
-        // footer pending
-        function updateFooterBannersUI(footerBanners){
-            
-        }
-        getBanners();
-
-
-    </script>
+    function updateHeaderBannersUI(headerBanners) {
+      const headerBannersContainer = document.querySelector("#header-slider-item");
+      headerBannersContainer.innerHTML = "";
 
 
 
-    <%- include ('../layouts/footer.ejs') %>
+
+      headerBanners.forEach((banner) => {
+
+        const imagePath = banner.image;
+        const newPath = imagePath.replace("public", "");
+
+        const bannerElement = document.createElement("div");
+        bannerElement.classList.add("slider-item");
+
+        const imgElement = document.createElement("img");
+        imgElement.src = newPath;
+        imgElement.classList.add("banner-img");
+        bannerElement.appendChild(imgElement);
+
+        const bannerContent = document.createElement("div");
+        bannerContent.classList.add("banner-content");
+
+        const subtitleElement = document.createElement("p");
+        subtitleElement.classList.add("banner-subtitle");
+        subtitleElement.textContent = banner.subTitle;
+        bannerContent.appendChild(subtitleElement);
+
+        const titleElement = document.createElement("h2");
+        titleElement.classList.add("banner-title");
+        titleElement.textContent = banner.title;
+        bannerContent.appendChild(titleElement);
+
+        const textElement = document.createElement("p");
+        textElement.classList.add("banner-text");
+        textElement.innerHTML = `starting at ₹ <b>${banner.text}</b>.00`;
+        bannerContent.appendChild(textElement);
+
+        const btnElement = document.createElement("a");
+        btnElement.href = "#";
+        btnElement.classList.add("banner-btn");
+        btnElement.textContent = banner.button;
+        bannerContent.appendChild(btnElement);
+
+        bannerElement.appendChild(bannerContent);
+
+        headerBannersContainer.appendChild(bannerElement);
+      });
+    }
+
+    // footer pending
+    function updateFooterBannersUI(footerBanners) {
+
+    }
+    getBanners();
+
+    window.onload = async function (){
+      await getHomeProducts()
+      await getCategories()
+    }
+
+
+  </script>
+
+
+
+  <%- include ('../layouts/footer.ejs') %>
