@@ -207,7 +207,7 @@ Common
 Thursday
 
 [] Return Wallet (optional)
-
+[] 404 page
 [x] Code formatting  (must to do )
 
 

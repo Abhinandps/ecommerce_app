@@ -17,6 +17,7 @@ const { generateInvoice } = require("../utils/generateInvoice");
 const GuestUser = require("../Models/guestUser");
 const ProductOffer = require("../Models/productOffer");
 const Wishlist = require("../Models/wishList");
+const StarRating = require("../Models/rating");
 
 const generateOrderID = () => {
   const date = new Date();
@@ -28,18 +29,13 @@ const generateOrderID = () => {
 };
 
 exports.getHomeProducts = catchAsync(async (req, res) => {
-  const products = await Product.find()
-    .limit(8) 
-    .populate("category", "name");
+  const products = await Product.find().limit(8).populate("category", "name");
 
   res.json(products);
 });
 
 // <pending...>
 exports.categoryItems = catchAsync(async (req, res) => {});
-
-
-
 
 exports.newArrivals = catchAsync(async (req, res) => {
   const newArrivals = await Product.find()
@@ -60,32 +56,6 @@ exports.newArrivals = catchAsync(async (req, res) => {
 
   res.json(formattedNewArrivals);
 });
-
-
-
-// exports.trending = catchAsync(async (req, res) => {
-//   const { productId } = req.query;
-
-//   if (productId) {
-//     // Find the product by its ID
-//     const product = await Product.findById(productId);
-
-//     if (!product) {
-//       return res.status(404).json({ message: "Product not found" });
-//     }
-
-//     // Increment the view count in the product schema
-//     product.views += 1;
-//     console.log(product);
-//     await product.save();
-//   } else {
-//     // Fetch the trending products with the updated view count
-//     const trendingProducts = await Product.find().sort({ views: -1 }).limit(8);
-
-//     res.json(trendingProducts);
-//   }
-// });
-
 
 exports.trending = catchAsync(async (req, res) => {
   const { productId } = req.query;
@@ -124,10 +94,52 @@ exports.trending = catchAsync(async (req, res) => {
   res.json(formattedTrendingProducts);
 });
 
-
 exports.toprated = catchAsync(async (req, res) => {
-  const topRatedProducts = await Product.find().sort({ rating: -1 }).limit(5);
-  res.json(topRatedProducts);
+  const topRatedProducts = await StarRating.aggregate([
+    {
+      $group: {
+        _id: "$productId",
+        avgRating: { $avg: "$rating" },
+      },
+    },
+    {
+      $sort: { avgRating: -1 },
+    },
+    {
+      $limit: 8,
+    },
+  ]);
+
+  // Extracting productIds from topRatedProducts array
+  const productIds = topRatedProducts.map((product) => product._id);
+
+  // Fetching product details for each productId
+  const products = await Product.find({ _id: { $in: productIds } }).populate(
+    "category",
+    "name"
+  );
+
+  // Mapping product details to the topRatedProducts array
+  const topRatedProductsWithDetails = topRatedProducts.map((product) => {
+    const productDetails = products.find(
+      (p) => p._id.toString() === product._id.toString()
+    );
+
+    return {
+      
+        _id: productDetails._id,
+        avgRating: product.avgRating,
+        name: productDetails.name,
+        price: productDetails.price,
+        originalPrice: productDetails.originalPrice,
+        image: productDetails.image,
+        categoryName: productDetails.category.name,
+        originalPrice:productDetails.originalPrice
+      
+    };
+  });
+
+  res.json(topRatedProductsWithDetails);
 });
 
 exports.bestSellers = catchAsync(async (req, res) => {
@@ -161,6 +173,51 @@ exports.bestSellers = catchAsync(async (req, res) => {
     data: {
       bestSellers: topSellers,
     },
+  });
+});
+
+exports.starRating = catchAsync(async (req, res) => {
+  const { orderId, productId, rating } = req.body;
+  const userId = req.user._id;
+
+  const existingRating = await StarRating.findOne({ productId, userId });
+
+  if (existingRating) {
+    // Update the existing rating
+    existingRating.rating = rating;
+    await existingRating.save();
+  } else {
+    const newRating = new StarRating({
+      productId,
+      userId,
+      rating,
+    });
+
+    await newRating.save();
+  }
+
+  // Update the rating for the product in the order
+
+  const order = await Order.findOne({ orderID: orderId });
+
+  if (!order) {
+    return res.status(404).json({ message: "Order not found." });
+  }
+
+  const itemToUpdate = order.items.find(
+    (item) => item.product.toString() === productId
+  );
+
+  if (!itemToUpdate) {
+    return res.status(404).json({ message: "Item not found in the order." });
+  }
+
+  itemToUpdate.rating = rating;
+  await order.save();
+
+  res.status(201).json({
+    order,
+    message: "Rating Added Successfully",
   });
 });
 

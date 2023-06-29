@@ -121,6 +121,7 @@
         <main id="orders-history">
             <!-- DYNAMIC DATA COMES  -->
 
+            <input type="hidden" id="rating-input" name="rating" value="" />
 
         </main>
 
@@ -238,12 +239,14 @@
                           <p>${products.name}</p>
                         </div>
                         <div class="showcase-rating">
-                          <ion-icon name="star" role="img" class="md hydrated" aria-label="star"></ion-icon>
-                          <ion-icon name="star" role="img" class="md hydrated" aria-label="star"></ion-icon>
-                          <ion-icon name="star" role="img" class="md hydrated" aria-label="star"></ion-icon>
-                          <ion-icon name="star-outline" role="img" class="md hydrated" aria-label="star outline"></ion-icon>
-                          <ion-icon name="star-outline" role="img" class="md hydrated" aria-label="star outline"></ion-icon>
-                        </div>
+                            
+  ${products.rating >= 1 ? '<ion-icon name="star" role="img" class="md hydrated" aria-label="star"></ion-icon>' : '<ion-icon name="star-outline" role="img" class="md hydrated" aria-label="star outline"></ion-icon>'}
+  ${products.rating >= 2 ? '<ion-icon name="star" role="img" class="md hydrated" aria-label="star"></ion-icon>' : '<ion-icon name="star-outline" role="img" class="md hydrated" aria-label="star outline"></ion-icon>'}
+  ${products.rating >= 3 ? '<ion-icon name="star" role="img" class="md hydrated" aria-label="star"></ion-icon>' : '<ion-icon name="star-outline" role="img" class="md hydrated" aria-label="star outline"></ion-icon>'}
+  ${products.rating >= 4 ? '<ion-icon name="star" role="img" class="md hydrated" aria-label="star"></ion-icon>' : '<ion-icon name="star-outline" role="img" class="md hydrated" aria-label="star outline"></ion-icon>'}
+  ${products.rating >= 5 ? '<ion-icon name="star" role="img" class="md hydrated" aria-label="star"></ion-icon>' : '<ion-icon name="star-outline" role="img" class="md hydrated" aria-label="star outline"></ion-icon>'}
+</div>
+
                       </div>
                     </div>
                     <div class="product_price">
@@ -311,6 +314,8 @@
                             const { cart } = cartResponse
 
                             let shippingAddress = cart.shippingAddress.find(address => address._id === order.shippingAddress)
+                            console.log("shipping address")
+                            console.log(shippingAddress)
                             if (!shippingAddress) {
                                 console.log("no address found")
                             }
@@ -330,6 +335,7 @@
                                 }
                             })}
                     </div>
+
 
                     <div class="product_name">
                       <p>${products.name}</p>
@@ -364,6 +370,7 @@
                       </div>
                       <div class="line"></div>
                     </div>
+                    
                   </div>
 
               
@@ -394,7 +401,14 @@
                   Banking ICICI
                 </p>`: ''}
                 <button onClick="downloadInvoice('${order.orderID}')">Invoice</button>
-              </div>` : ''}
+              </div>
+</div>
+                    
+                        
+                  
+
+              
+              ` : ''}
               
 
             ${currentStatus === 'delivered' ?
@@ -416,7 +430,7 @@
                             tempElement.innerHTML = orderedDetailsCard;
                             row.append(tempElement);
 
-                            const statusOrder = ['pending', 'confirmed', 'shipped', 'delivered','cancelled'];
+                            const statusOrder = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
                             const status = statusOrder.find((item) => item == currentStatus)
 
                             let progressPercentage;
@@ -447,10 +461,12 @@
 
                             styleElement.textContent += cssRule;
 
-                            //  div 
+                            //
 
                             order.items.forEach((product, index) => {
                                 const { product: productID } = product
+                                console.log("product")
+                                
 
                                 $.ajax({
                                     type: "GET",
@@ -482,7 +498,25 @@
                                     <div class="product_desc">
                                     <p></p>
                                     </div>
-                                    <div class="rating"></div>
+                                    ${currentStatus === 'delivered' ? `
+              <div class="product-grid" style="width:100%">
+              
+                            <div id="rating-stars-${products._id}" class="showcase-rating rating-stars"  data-order-id="${order.orderID}"  data-product-id="${products._id}"  onClick="handleStarRating(event)">
+                          <ion-icon data-value="1" style="font-size:23px; margin-right:10px; cursor:pointer;"  name="${product.rating >= 1 ? 'star' : 'star-outline'}" role="img" class="md hydrated" aria-label="star"></ion-icon>
+                          <ion-icon data-value="2" style="font-size:23px; margin-right:10px; cursor:pointer;" name="${product.rating >= 2 ? 'star' : 'star-outline'}" role="img" class="md hydrated" aria-label="star"></ion-icon>
+                          <ion-icon data-value="3" style="font-size:23px; margin-right:10px; cursor:pointer;"  name="${product.rating >= 3 ? 'star' : 'star-outline'}" role="img" class="md hydrated" aria-label="star"></ion-icon>
+                          <ion-icon data-value="4" style="font-size:23px; margin-right:10px; cursor:pointer;" name="${product.rating >= 4 ? 'star' : 'star-outline'}" role="img" class="md hydrated" aria-label="star outline"></ion-icon>
+                          <ion-icon data-value="5" style="font-size:23px; margin-right:10px; cursor:pointer;" name="${product.rating >= 5 ? 'star' : 'star-outline'}" role="img" class="md hydrated" aria-label="star outline"></ion-icon>
+                             </div>
+                            
+                        </div>
+
+
+                       
+
+
+                        
+              `: ''}
                                     <div class="product_price">
                                       <p>₹<span>${products.price}/-</span></p>
                                     </div>
@@ -535,7 +569,11 @@
 
                             })
 
+
+
                         }
+
+
                     });
                 }
             });
@@ -543,6 +581,61 @@
 
 
         }
+
+        // rating start
+
+
+        const ratingInput = document.getElementById('rating-input');
+
+        function handleStarRating(event) {
+            const selectedStar = event.target;
+            const element = document.querySelector('.rating-stars');
+
+            const productId = element.dataset.productId;
+            const orderId = element.dataset.orderId;
+
+            if (selectedStar.tagName === 'ION-ICON') {
+                const selectedValue = selectedStar.getAttribute('data-value');
+                const ratingInput = document.getElementById('rating-input');
+
+                ratingInput.value = selectedValue;
+
+                $.ajax({
+                    type: "POST",
+                    url: `/api/v1/user/ratings`,
+                    data: JSON.stringify({ orderId: orderId, productId: productId, rating: ratingInput.value }),
+                    contentType: "application/json",
+                    success: function (response) {
+                     
+                        showToast()
+                        setToastMessage("success", response.message)
+
+                        // Store the updated order data back into local storage
+                        localStorage.setItem('myorder', JSON.stringify(response.order));
+                        
+                        // Update the star rating UI
+                        const stars = document.querySelectorAll(`#rating-stars-${productId} ion-icon`);
+                        stars.forEach(star => {
+                            const starValue = star.getAttribute('data-value');
+                            if (starValue <= selectedValue) {
+                                star.setAttribute('name', 'star');
+                            } else {
+                                star.setAttribute('name', 'star-outline');
+                            }
+                        });
+                    },
+                    error: function (error) {
+                        console.error(error);
+                    }
+                });
+
+
+            }
+        }
+
+        // rating end
+
+
 
 
 
@@ -668,7 +761,12 @@
         }
 
 
+
+
+
     </script>
+
+
 
 
 

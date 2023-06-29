@@ -217,6 +217,61 @@ trending()
 
 
 
+const topRated = () => {
+  const row = document.querySelector("#topRated-showcase-wrapper");
+
+  if (row) {
+    row.innerHTML = "";
+
+    $.ajax({
+      type: "GET",
+      url: "/api/v1/user/topRated",
+      success: function (res) {
+        const products = res;
+
+        let showcaseContainer = document.createElement("div");
+        showcaseContainer.classList.add("showcase-container");
+        row.appendChild(showcaseContainer);
+
+
+        products.forEach((product, index) => {
+          const firstImage = product.image.map((image) => image.split("public")[1])[0];
+
+          const item = `
+            <div class="showcase">
+              <a href="#" class="showcase-img-box">
+                <img src=${firstImage} alt="product_img" style="width:70px;" class="showcase-img">
+              </a>
+              <div class="showcase-content">
+                <a href="#">
+                  <h4 class="showcase-title">${product.name}</h4>
+                </a>
+                
+                <a href="#" class="showcase-category">${product.categoryName}</a>
+                <div class="price-box">
+                  <p class="price">₹${product.price}</p>
+                  <del>₹ ${
+                    product.originalPrice ? product.originalPrice : product.price + 299
+                  }</del>
+                </div>
+              </div>
+            </div>`;
+
+          showcaseContainer.innerHTML += item;
+
+          // Check if the current index is a multiple of 4 to create a new showcase container
+          if ((index + 1) % 4 === 0 && index < products.length - 1) {
+            showcaseContainer = document.createElement("div");
+            showcaseContainer.classList.add("showcase-container");
+            row.appendChild(showcaseContainer);
+          }
+        });
+      },
+    });
+  }
+};
+
+topRated()
 
 const getCategories = () => {
   $.ajax({
@@ -1287,14 +1342,17 @@ const getCheckOut = () => {
   const shippingHandlingFee = 98;
 
   const text = totalPrice.querySelector("span");
+
   $.ajax({
     type: "GET",
     url: "/api/v1/user/cart",
     success: function (response) {
       const { cart } = response;
       const data = cart.shippingAddress.filter(address => !address.deleted);
+      console.log("address")
+      console.log(data)
+      
       row.empty();
-      console.log(data);
 
       data.forEach((address) => {
         const addressList = `
@@ -1320,6 +1378,7 @@ const getCheckOut = () => {
       proceedPay.addEventListener("click", () => {
         const selectedAddressId = $('input[name="user-info"]:checked').val();
         console.log(`Selected address ID: ${selectedAddressId}`);
+        
         if (selectedAddressId) {
           window.location.href = "/payment?addressId=" + selectedAddressId;
         } else {
@@ -1505,6 +1564,7 @@ const updateCartTotal = (totalPrice) => {
 
 getCheckOut();
 
+
 const getPaymentDetails = () => {
   const shippingHandlingFee = 98;
 
@@ -1638,5 +1698,12 @@ const getPaymentDetails = () => {
     }
   }
 };
+
+
+
+
+
+
+
 
 // getOrders function included in order.ejs

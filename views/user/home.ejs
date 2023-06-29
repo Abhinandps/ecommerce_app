@@ -1,4 +1,5 @@
 <%- include ('../layouts/header.ejs') %>
+
   <style>
     .page-loader {
       display: flex;
@@ -27,7 +28,7 @@
     }
   </style>
 
-  
+
 
   <main>
     <!--
@@ -52,7 +53,7 @@
               <h2 class="banner-title">Women's latest fashion sale</h2>
 
               <p class="banner-text">
-                starting at &dollar; <b>20</b>.00
+                starting at ₹ <b>599</b>.00
               </p>
 
               <a href="#" class="banner-btn">Shop now</a>
@@ -72,7 +73,7 @@
               <h2 class="banner-title">Modern Sun Glasses</h2>
 
               <p class="banner-text">
-                starting at &dollar; <b>149</b>.00
+                starting at ₹ <b>149</b>.00
               </p>
 
               <a href="#" class="banner-btn">Shop now</a>
@@ -88,7 +89,7 @@
 
 
 
-  
+
     <!--
       - PRODUCT
     -->
@@ -104,39 +105,39 @@
 
           <div class="product-minimal">
 
-            <div  class="product-showcase">
+            <div class="product-showcase">
 
               <h2 class="title">New Arrivals</h2>
 
               <div id="new-arrivals-showcase-wrapper" class="showcase-wrapper has-scrollbar">
-              <!-- DYNAMIC DATA  -->
+                <!-- DYNAMIC DATA  -->
 
-                </div>
               </div>
+            </div>
 
 
-            <div  class="product-showcase">
+            <div class="product-showcase">
 
               <h2 class="title">Trending</h2>
 
               <div id="trending-showcase-wrapper" class="showcase-wrapper has-scrollbar">
-              <!-- DYNAMIC DATA  -->
-                </div>
+                <!-- DYNAMIC DATA  -->
+              </div>
+            </div>
+
+            <div class="product-showcase">
+
+              <h2 class="title">Top Rated</h2>
+
+              <div id="topRated-showcase-wrapper" class="showcase-wrapper has-scrollbar">
+
               </div>
 
-              <div  class="product-showcase">
+            </div>
 
-                <h2 class="title">Top Rated</h2>
-  
-                <div id="topRated-showcase-wrapper" class="showcase-wrapper has-scrollbar">
-  
-                  </div>
-  
-                </div>
-                
-            </div> 
+          </div>
 
-             <!--
+          <!--
             - PRODUCT GRID
           -->
 
@@ -152,22 +153,22 @@
           </div>
 
 
-            
-
-            </div>
-
-          </div>
-
-
-
-
-
-         
 
 
         </div>
 
       </div>
+
+
+
+
+
+
+
+
+    </div>
+
+    </div>
 
     </div>
 
@@ -187,27 +188,28 @@
             -->
 
           <div class="testimonial">
-  
-              <h2 class="title">testimonial</h2>
-  
-              <div class="testimonial-card">
-  
-                <img src="/src/images/testimonial-1.jpg" alt="alan doe" class="testimonial-banner" style="width:80px; height:80px">
-  
-                <p class="testimonial-name">Alan Doe</p>
-  
-                <p class="testimonial-title">CEO & Founder Invision</p>
-  
-                <img src="/src/images/icons/quotes.svg" style="width:26px;"  alt="quotation" class="quotation-img" >
-  
-                <p class="testimonial-desc">
-                  Lorem ipsum dolor sit amet consectetur Lorem ipsum
-                  dolor dolor sit amet.
-                </p>
-  
-              </div>
-  
+
+            <h2 class="title">testimonial</h2>
+
+            <div class="testimonial-card">
+
+              <img src="/src/images/testimonial-1.jpg" alt="alan doe" class="testimonial-banner"
+                style="width:80px; height:80px">
+
+              <p class="testimonial-name">Alan Doe</p>
+
+              <p class="testimonial-title">CEO & Founder Invision</p>
+
+              <img src="/src/images/icons/quotes.svg" style="width:26px;" alt="quotation" class="quotation-img">
+
+              <p class="testimonial-desc">
+                Lorem ipsum dolor sit amet consectetur Lorem ipsum
+                dolor dolor sit amet.
+              </p>
+
             </div>
+
+          </div>
 
 
 
@@ -216,8 +218,8 @@
             -->
 
           <div class="cta-container">
-
-            <img src="/src/images/cta-banner.jpg" alt="summer collection" class="cta-banner">
+            
+            <!-- <img src="/src/images/cta-banner.jpg" alt="summer collection" class="cta-banner">
 
             <a href="#" class="cta-content">
 
@@ -225,11 +227,11 @@
 
               <h2 class="cta-title">Summer collection</h2>
 
-              <p class="cta-text">Starting @ $10</p>
+              <p class="cta-text">Starting @ ₹399</p>
 
               <button class="cta-btn">Shop now</button>
 
-            </a>
+            </a> -->
 
           </div>
 
@@ -527,13 +529,55 @@
       });
     }
 
-    // footer pending
-    function updateFooterBannersUI(footerBanners) {
+    // // footer pending
+    // function updateFooterBannersUI(footerBanners) {
 
+    // }
+
+
+    function updateFooterBannersUI(footerBanners) {
+      const ctaContainer = document.querySelector(".cta-container");
+
+      footerBanners.forEach((banner) => {
+
+        const imgElement = document.createElement("img");
+        imgElement.src = banner.image.split("public")[1];
+        imgElement.alt = banner.title;
+        imgElement.classList.add("cta-banner");
+        ctaContainer.appendChild(imgElement);
+
+        const ctaContent = document.createElement("a");
+        ctaContent.href = banner.links;
+        ctaContent.classList.add("cta-content");
+
+        const discountElement = document.createElement("p");
+        discountElement.classList.add("discount");
+        discountElement.textContent = banner.button;
+        ctaContent.appendChild(discountElement);
+
+        const titleElement = document.createElement("h2");
+        titleElement.classList.add("cta-title");
+        titleElement.textContent = banner.title;
+        ctaContent.appendChild(titleElement);
+
+        const textElement = document.createElement("p");
+        textElement.classList.add("cta-text");
+        textElement.textContent = banner.subTitle;
+        ctaContent.appendChild(textElement);
+
+        const btnElement = document.createElement("button");
+        btnElement.classList.add("cta-btn");
+        btnElement.textContent = banner.text;
+        ctaContent.appendChild(btnElement);
+
+        ctaContainer.appendChild(ctaContent);
+        ctaContainer.appendChild(ctaContainer);
+      });
     }
+
     getBanners();
 
-    window.onload = async function (){
+    window.onload = async function () {
       await getHomeProducts()
       await getCategories()
     }

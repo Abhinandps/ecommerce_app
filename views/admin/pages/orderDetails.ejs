@@ -193,9 +193,12 @@
                         type: "GET",
                         url: `/api/v1/admin/carts?userId=${order.user}`,
                         success: function (response) {
+                            console.log("res")
                             const data = response.cartsWithShippingAddress[0].shippingAddress[0]
                             const products = response.cartsWithShippingAddress[0].cart.items
+                            
                             const address = `${data.address} ${data.locality} ${data.city} ${data.state} ${data.zipCode}.`
+                            console.log(address)
 
 
                             const userContent = `

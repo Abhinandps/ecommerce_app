@@ -5536,19 +5536,13 @@ body.loading .loader-bg {
 
 
 
-
-/* --salmon-pink: hsl(353, 100%, 78%);
---sandy-brown: hsl(29, 90%, 65%);
---bittersweet: hsl(0, 100%, 70%);
---ocean-green: hsl(152, 51%, 52%); */
-
 :root {
 	--hue: 353;
 	--bg: hsl(var(--hue),10%,90%);
 	--fg: hsl(var(--hue),10%,10%); 
 	--primary: hsl(var(--hue),100%,78%);
 	--trans-dur: 0.3s;
-	font-size: calc(10px + (20 - 16) * (100vw - 320px) / (1280 - 320));
+	font-size: calc(11px + (20 - 16) * (100vw - 120px) / (1280 - 320));
 }
 
 .preloader {
