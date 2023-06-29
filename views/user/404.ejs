@@ -1,17 +1,114 @@
-<%- include ('../layouts/header.ejs') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 page error</title>
 
-  <section class="error-container">
-    <span>4</span>
-    <span><span class="screen-reader-text">0</span></span>
-    <span>4</span>
-  </section>
-  <div class="link-container">
-    <a target="" href="/" class="more-link">Back To Home</a>
-  </div>
+  <style>
+    @import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
 
-  </div>
-  </div>
-  </div>
-  <!-- Navbar End -->
+:root {
+	--pink1: #f3ceab;
+	--pink2: #e9b567;
+}
 
-  <%- include ('../layouts/footer.ejs') %>
+body, html {
+	margin: 0;
+	overflow: hidden;
+	position: relative;
+}
+
+body {
+	align-items: center;
+	background-image: linear-gradient(to bottom right, var(--pink1), var(--pink2));
+	color: #fff;
+	display: flex;
+	flex-direction: column;
+	font-family: 'Roboto', sans-serif;
+	justify-content: center;
+	height: 100vh;
+	text-align: center;
+}
+
+.container h1 {
+	font-size: 10em;
+	margin: 0 0 0.5em;
+	line-height: 10px;
+}
+
+.container p {
+	font-size: 1.2em;
+	line-height: 26px;
+}
+
+.container small {
+	opacity: 0.7;
+}
+
+.container a {
+	color: #eee;
+}
+
+.circle {
+	background-image: linear-gradient(to top right, var(--pink1), var(--pink2));
+	border-radius: 50%;
+	position: absolute;
+	z-index: -1;
+}
+
+.circle.small {
+	top: 200px;
+	left: 150px;
+	width: 100px;
+	height: 100px;
+}
+
+.circle.medium {
+	background-image: linear-gradient(to bottom left, var(--pink1), var(--pink2));
+	bottom: -70px;
+	left: 0;
+	width: 200px;
+	height: 200px;
+}
+
+.circle.big {
+	top: -100px;
+	right: -50px;
+	width: 400px;
+	height: 400px;
+}
+
+@media screen and (max-width: 480px) {
+	.container h1 {
+		font-size: 8em;
+	}
+	
+	.container p {
+		font-size: 1em;
+	}
+}
+
+  </style>
+  
+</head>
+<body>
+  
+
+
+  <div class="container">
+    <h1>404</h1>
+    <p>
+      The link you clicked may be broken or the <br /> page may have been removed.
+    </p>
+    <small>Visit the <a href="/">home page</a> </small>
+    <div class="circle small"></div>
+    <div class="circle medium"></div>
+    <div class="circle big"></div>
+  </div>
+  
+ 
+
+
+</body>
+</html>

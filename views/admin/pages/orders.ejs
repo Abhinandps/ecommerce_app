@@ -53,9 +53,9 @@
 
                            <div class="row">
 
-                            <div class="col-lg-6">
-                                <h2>Filters:</h2>
-                            <div class="filters">
+                            <di v class="col-lg-12 col-md-6">
+                                <p>Filters:</p>
+                            <div class="filters d-flex g-3 align-items-center justify-content-between">
                                
                                 <div class="filter-item ">
                                     <label for="order-id">Order ID:</label>
@@ -91,21 +91,21 @@
                                 <button id="apply-filters" class="btn btn-info">Apply Filters</button>
                                 <button id="apply-filters" class="btn btn-secondary" onclick="location.assign('/orders')" >Restore</button>
                               </div>
-                            </div>
+                            </di>
                             
-                            <div class="col-lg-6">
-                                <h2>Sort By:</h2>
-                                <div class="sort-options mt-3">
-                                    <select id="sort-by" class="form-control my-3">
+                            <div class="col-lg-12 col-md-6">
+                                <p>Sort By:</p>
+                                <div class="sort-options mt-3 d-flex justify-content-start align-items-center">
+                                    <select id="sort-by" class="form-control w-25 mt-1 mr-5">
                                       <option value="updatedAt">Order Date</option>
                                       <option value="totalPrice">Total Amount</option>
                                       <option value="status">Order Status</option>
                                     </select>
-                                    <select id="sort-order" class="form-control ">
+                                    <select id="sort-order" class="form-control w-25">
                                       <option value="desc">High to Low</option>
                                       <option value="asc">Low to High</option>
                                     </select>
-                                    <button id="apply-sort" class="btn btn-info">Apply Sort</button>
+                                    <button id="apply-sort" class="btn btn-info mx-4">Apply Sort</button>
                                   </div>
                             </div>
                             
