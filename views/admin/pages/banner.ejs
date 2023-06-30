@@ -193,7 +193,7 @@
                                     <div class="form-group">
                                         <label for="exampleInputName1">Banner Image</label>
                                         <input type="file" class="file-upload-info" id="image" name="image"
-                                            id="exampleInputName1"  >
+                                            id="exampleInputName1"  required>
                                     </div>
                                 </div>
                                 <div class=" col-12 col-lg-6">
@@ -410,15 +410,17 @@
 
                     const form = document.getElementById('banner-form');
                     const formData = new FormData(form)
+                    const purpose = 'banner'
 
 
-                    const response = await axios.post('/api/v1/admin/banners', formData, {
+                    const response = await axios.post(`/api/v1/admin/banners?purpose=${purpose}`, formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data'
                         }
                     });
+                    window.location.reload()
 
-                    // await getAllProducts();
+                    await getAllBanners();
                 } catch (error) {
                     const message = error.response.data.message;
 

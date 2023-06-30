@@ -73,7 +73,7 @@ const handleFormEdit = (event) => {
   const editForm = document.getElementById("edit-category-form");
   $.ajax({
     type: "GET",
-    url: `http://127.0.0.1:3000/api/v1/admin/category/${categoryID}`,
+    url: `/api/v1/admin/category/${categoryID}`,
     success: function (response) {
       const { categories } = response.data;
       console.log(categories);
@@ -94,10 +94,12 @@ const handleFormEdit = (event) => {
   editForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const formData = new FormData(editForm);
+    const purpose = 'category'
+   
 
     $.ajax({
       type: "PUT",
-      url: `http://127.0.0.1:3000/api/v1/admin/category/${categoryID}`,
+      url: `/api/v1/admin/category/${categoryID}?purpose=${purpose}`,
       data: formData,
       processData: false,
       contentType: false,
@@ -117,6 +119,7 @@ const handleFormEdit = (event) => {
     });
   });
 };
+
 
 const handleCategoryDelete = (event) => {
   const categoryID = event.target.dataset.userId;
@@ -145,6 +148,7 @@ const handleCategoryDelete = (event) => {
     }
   );
 };
+
 
 // Categories
 const getAllCategories = async () => {
@@ -183,6 +187,7 @@ const getAllCategories = async () => {
     console.error(err);
   }
 };
+
 
 // categories list in product page as dropdown
 
@@ -527,9 +532,11 @@ const handleBannerFormEdit = (event) => {
     e.preventDefault();
     try {
       const formData = new FormData(editForm);
+      const purpose = 'banner'
+
       $.ajax({
         type: "PUT",
-        url: `/api/v1/admin/banners/${bannerID}`,
+        url: `/api/v1/admin/banners/${bannerID}?purpose=${purpose}`,
         data: formData,
         processData: false,
         contentType: false,

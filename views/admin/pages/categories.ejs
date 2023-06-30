@@ -120,7 +120,8 @@
                 e.preventDefault();
                 try {
                     const formData = new FormData(form);
-                    const response = await axios.post('http://127.0.0.1:3000/api/v1/admin/category', formData, {
+                    formData.append('purpose', 'category');
+                    const response = await axios.post('/api/v1/admin/category', formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data'
                         }

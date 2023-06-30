@@ -53,6 +53,9 @@ const User = require("../Models/userModel");
 const { paginatedResultsUser } = require("../utils/pagination");
 const Product = require("../Models/products");
 
+const {uploadSingle,uploadMultiple,resizeProductPhoto} = require("../utils/multerConfig");
+
+
 router.get("/otp-login", (req, res) => {
   // if(req.session.userId){
   //     res.redirect('http://127.0.0.1:3000/api/v1/user')
@@ -183,7 +186,7 @@ router.put("/profile/mobile", isAuthenticate, updateMobile);
 
 router.put(
   "/profile/avatar",
-  upload.single("avatar"),
+  uploadSingle,
   isAuthenticate,
   updateAvatar
 );

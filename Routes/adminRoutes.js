@@ -54,7 +54,7 @@ const {
   deleteOneReferralOffer,
   getFilterProducts,
   updateImageCrop,
-
+  
 } = require("../Controllers/adminController");
 
 const { isAuthenticate, isAdmin } = require("../middleware/auth");
@@ -67,7 +67,8 @@ const Product = require("../Models/products");
 const { paginatedResults } = require("../utils/pagination");
 
 // multer
-const upload = require("../utils/multerConfig");
+const {uploadSingle,uploadMultiple,resizeProductPhoto} = require("../utils/multerConfig");
+
 const Banner = require("../Models/banner");
 
 // middleware
@@ -121,11 +122,11 @@ router.put("/:id/block", toggleBlock);
 
 router.get("/categories", isAuthenticate, isAdmin, getAllCategories);
 
-router.post("/category", upload.single("image"), addCategory);
+router.post("/category", uploadSingle,resizeProductPhoto, addCategory);
 
 router.get("/category/:id",isAuthenticate,isAdmin, getOneCategory);
 
-router.put("/category/:id", upload.single("image"), updateCategory);
+router.put("/category/:id",uploadSingle,resizeProductPhoto, updateCategory);
 
 router.delete("/category/:id", deleteCategory);
 
@@ -135,9 +136,9 @@ router.get("/products", isAuthenticate, isAdmin, paginatedResults(Product), getA
 
 router.get("/product/:id", isAuthenticate, isAdmin, getOneProduct);
 
-router.post("/product", upload.array('image',2), addProduct);
+router.post("/product", uploadMultiple, resizeProductPhoto, addProduct);
 
-router.put("/product/:id", upload.array('image',2), updateProduct);
+router.put("/product/:id", uploadMultiple,resizeProductPhoto, updateProduct);
 
 router.delete("/product/:id", deleteProduct);
 
@@ -176,14 +177,14 @@ router.route("/coupons/:id")
   .delete(isAdmin, deleteCoupon)
 
 
-router.post("/banners", upload.single("image"), addBanners)
+router.post("/banners", uploadSingle,resizeProductPhoto, addBanners)
 
 router.get("/banners", isAdmin,paginatedResults(Banner), getBanners)
 
 
 router.route("/banners/:id")
 .get(isAdmin, getOneBanner)
-  .put(isAdmin,  upload.single("image"), updateBanner)
+  .put(isAdmin,  uploadSingle,resizeProductPhoto, updateBanner)
   .delete(isAdmin, deleteBanner)
 
 

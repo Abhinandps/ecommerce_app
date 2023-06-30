@@ -14,7 +14,6 @@ const { generatePDF, generateCSV } = require("../utils/generateReport");
 const CategoryOffer = require("../Models/categoryOffer");
 const ProductOffer = require("../Models/productOffer");
 
-
 exports.getAllUsers = catchAsync(async (req, res) => {
   const users = await User.find();
   res.status(200).json({
@@ -24,7 +23,6 @@ exports.getAllUsers = catchAsync(async (req, res) => {
   });
 });
 
-
 exports.getOneUsers = catchAsync(async (req, res) => {
   const user = await User.findOne({ _id: req.params.id });
   res.status(200).json({
@@ -32,7 +30,6 @@ exports.getOneUsers = catchAsync(async (req, res) => {
     data: user,
   });
 });
-
 
 exports.getOneCategory = catchAsync(async (req, res) => {
   const categories = await Category.findOne({ _id: req.params.id });
@@ -43,7 +40,6 @@ exports.getOneCategory = catchAsync(async (req, res) => {
   });
 });
 
-
 exports.getAllCategories = catchAsync(async (req, res) => {
   const categories = await Category.find({ isDeleted: false });
   res.status(200).json({
@@ -52,7 +48,6 @@ exports.getAllCategories = catchAsync(async (req, res) => {
     data: { categories },
   });
 });
-
 
 exports.toggleBlock = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.params.id);
@@ -67,14 +62,13 @@ exports.toggleBlock = catchAsync(async (req, res, next) => {
   });
 });
 
-
 exports.addCategory = catchAsync(async (req, res, next) => {
   const { name, description } = req.body;
 
   const category = await Category.create({
     name,
     description,
-    image: req.file.path,
+    image: req.fileDetails,
   });
   res.json(category);
 }, ErrorHandler);
@@ -85,27 +79,16 @@ exports.updateCategory = catchAsync(async (req, res, next) => {
   // 1 find the category for update
   const category = await Category.findById(req.params.id);
 
-  // 2 if the category exist
   if (category) {
     category.name = name || category.name;
     category.description = description || category.description;
 
-    // Remove the old icon file if a new file is uploaded
-    if (req.file) {
-      if (category.image) {
-        fs.unlink(category.image, (err) => {
-          if (err) console.log(err);
-        });
-      }
-      category.image = req.file.path;
-    }
+    category.image = req.fileDetails;
 
     // Save the updated category
     await category.save();
 
     res.json(category);
-  } else {
-    return next(new AppError("Category not found", 404));
   }
 });
 
@@ -128,7 +111,6 @@ exports.deleteCategory = catchAsync(async (req, res, next) => {
   res.status(204).json({ message: "Category deleted" });
 });
 
-
 exports.getAllProducts = catchAsync(async (req, res) => {
   res.status(200).json({
     status: "success",
@@ -146,7 +128,7 @@ exports.getOneProduct = catchAsync(async (req, res) => {
 
 exports.addProduct = catchAsync(async (req, res, next) => {
   const { name, price, category, description, stock } = req.body;
-  const files = req.files;
+  const files = req.fileDetails;
 
   if (!files || files.length === 0) {
     return next(new AppError("No files uploaded", 400));
@@ -175,11 +157,10 @@ exports.addProduct = catchAsync(async (req, res, next) => {
   res.status(201).json({ status: "success", product });
 });
 
-
 exports.updateProduct = catchAsync(async (req, res, next) => {
   const { name, price, category, stock, description } = req.body;
 
-  const files = req.files;
+  const files = req.fileDetails;
 
   if (!files || files.length === 0) {
     return next(new AppError("No files uploaded", 400));
@@ -202,18 +183,7 @@ exports.updateProduct = catchAsync(async (req, res, next) => {
     product.category = category || product.category;
     product.stock = stock || product.stock;
 
-    // Remove the old image file if a new file is uploaded
-    if (files.length > 0) {
-      if (Array.isArray(product.image)) {
-        // Remove all existing images
-        product.image.forEach((filePath) => {
-          fs.unlink(filePath, (err) => {
-            // if (err) console.log(err);
-          });
-        });
-      }
-      product.image = filePaths;
-    }
+    product.image = filePaths;
 
     // Save the updated product
     await product.save();
@@ -224,15 +194,12 @@ exports.updateProduct = catchAsync(async (req, res, next) => {
   }
 });
 
-
-exports.updateImageCrop = catchAsync(async(req,res,next) =>{
-
-
+exports.updateImageCrop = catchAsync(async (req, res, next) => {
   try {
     // console.log(req.body)
-    const {cropWidth,cropHeight,cropX,cropY,imageUrl} = req.body;
- 
-    console.log(imageUrl)
+    const { cropWidth, cropHeight, cropX, cropY, imageUrl } = req.body;
+
+    console.log(imageUrl);
     // const baseDirectory = process.cwd();
     // const filePath = path.join(baseDirectory,'public',imgPath)
     // console.log(filePath)
@@ -257,15 +224,12 @@ exports.updateImageCrop = catchAsync(async(req,res,next) =>{
 
     // res.status(200).json({msg:"Image cropped successfully"})
 
-    res.json({message:"image cropped successfully"})
-} catch (error) {
-    console.error('Error cropping image:', error);
-    res.status(500).json({ msg: 'Error occurred while cropping the image.' });
-        }
-
-
-})
-
+    res.json({ message: "image cropped successfully" });
+  } catch (error) {
+    console.error("Error cropping image:", error);
+    res.status(500).json({ msg: "Error occurred while cropping the image." });
+  }
+});
 
 exports.deleteProduct = catchAsync(async (req, res, next) => {
   const product = await Product.findById(req.params.id);
@@ -383,15 +347,11 @@ exports.addCoupons = catchAsync(async (req, res, next) => {
   }
 
   if (currentDate >= expiryDate) {
-    return next(
-      new AppError("Coupon code is Expired", 400)
-    );
+    return next(new AppError("Coupon code is Expired", 400));
   }
 
   if (value < 0) {
-    return next(
-      new AppError("Ensure discount value entered correctly.", 400)
-    );
+    return next(new AppError("Ensure discount value entered correctly.", 400));
   }
 
   const newCoupon = await Coupon.create(couponData);
@@ -411,7 +371,7 @@ exports.getOneCoupon = catchAsync(async (req, res) => {
   res.json(coupon);
 });
 
-exports.updateCoupon = catchAsync(async (req, res,next) => {
+exports.updateCoupon = catchAsync(async (req, res, next) => {
   const couponData = req.body;
   const value = Number(couponData.value);
   const minValue = couponData.minimumOrderValue;
@@ -424,17 +384,12 @@ exports.updateCoupon = catchAsync(async (req, res,next) => {
   }
 
   if (currentDate >= expiryDate) {
-    return next(
-      new AppError("Coupon code is Expired", 400)
-    );
+    return next(new AppError("Coupon code is Expired", 400));
   }
 
   if (value < 0) {
-    return next(
-      new AppError("Ensure discount value entered correctly.", 400)
-    );
+    return next(new AppError("Ensure discount value entered correctly.", 400));
   }
-
 
   const coupon = await Coupon.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
@@ -462,7 +417,7 @@ exports.addBanners = catchAsync(async (req, res) => {
   console.log(bannerData);
   const newBanner = await Banner.create({
     ...bannerData,
-    image: req.file.path,
+    image: req.fileDetails,
   });
   res.status(201).json(newBanner);
 });
@@ -514,15 +469,7 @@ exports.updateBanner = catchAsync(async (req, res) => {
   banner.endDate = endDate || banner.endDate;
   banner.status = status || banner.status;
 
-  // Remove the old icon file if a new file is uploaded
-  if (req.file) {
-    if (banner.image) {
-      fs.unlink(banner.image, (err) => {
-        if (err) console.log(err);
-      });
-    }
-    banner.image = req.file.path;
-  }
+  banner.image = req.fileDetails;
 
   // Save the updated banner
   await banner.save();
@@ -538,34 +485,34 @@ exports.deleteBanner = catchAsync(async (req, res) => {
   res.status(200).json({ message: "banner deleted" });
 });
 
-exports.updateCategory = catchAsync(async (req, res, next) => {
-  const { name, description } = req.body;
-  // 1 find the category for update
-  const category = await Category.findById(req.params.id);
+// exports.updateCategory = catchAsync(async (req, res, next) => {
+//   const { name, description } = req.body;
+//   // 1 find the category for update
+//   const category = await Category.findById(req.params.id);
 
-  // 2 if the category exist
-  if (category) {
-    category.name = name || category.name;
-    category.description = description || category.description;
+//   // 2 if the category exist
+//   if (category) {
+//     category.name = name || category.name;
+//     category.description = description || category.description;
 
-    // Remove the old icon file if a new file is uploaded
-    if (req.file) {
-      if (category.image) {
-        fs.unlink(category.image, (err) => {
-          if (err) console.log(err);
-        });
-      }
-      category.image = req.file.path;
-    }
+//     // Remove the old icon file if a new file is uploaded
+//     if (req.file) {
+//       if (category.image) {
+//         fs.unlink(category.image, (err) => {
+//           if (err) console.log(err);
+//         });
+//       }
+//       category.image = req.file.path;
+//     }
 
-    // Save the updated category
-    await category.save();
+//     // Save the updated category
+//     await category.save();
 
-    res.json(category);
-  } else {
-    return next(new AppError("Category not found", 404));
-  }
-});
+//     res.json(category);
+//   } else {
+//     return next(new AppError("Category not found", 404));
+//   }
+// });
 
 // Filtered Chart Data
 exports.getSalesChartData = catchAsync(async (req, res, next) => {
