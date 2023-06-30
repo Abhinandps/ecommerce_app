@@ -23,16 +23,16 @@ const orderSchema = new mongoose.Schema(
           type: Number,
           required: true,
         },
-        rating:{
-          type:Number,
-          default:0
-        }
+        rating: {
+          type: Number,
+          default: 0,
+        },
       },
     ],
     shippingAddress: {
-      type:mongoose.Schema.Types.ObjectId,
-      ref:'Cart',
-      require:true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Cart",
+      require: true,
     },
     paymentMethod: {
       type: String,
@@ -51,15 +51,13 @@ const orderSchema = new mongoose.Schema(
       type: String,
       unique: true,
     },
-    cancellationReason:{
-      type:String,
-      default:"product damaged"
-    }
+    cancellationReason: {
+      type: String,
+      default: "product damaged",
+    },
   },
   { timestamps: true }
 );
-
-
 
 let Order = mongoose.model("Order", orderSchema);
 module.exports = Order;

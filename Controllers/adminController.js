@@ -1,18 +1,23 @@
 const fs = require("fs");
 const mongoose = require("mongoose");
+
+const catchAsync = require("../utils/catchAsync");
+const AppError = require("../utils/appError");
+const ErrorHandler = require("../Controllers/errorController");
+
 const User = require("../Models/userModel");
 const Product = require("../Models/products");
 const Category = require("../Models/category");
 const Cart = require("../Models/Cart");
-const catchAsync = require("../utils/catchAsync");
-const AppError = require("../utils/appError");
-const ErrorHandler = require("../Controllers/errorController");
 const Order = require("../Models/orders");
 const Coupon = require("../Models/coupen");
 const Banner = require("../Models/banner");
+
 const { generatePDF, generateCSV } = require("../utils/generateReport");
 const CategoryOffer = require("../Models/categoryOffer");
 const ProductOffer = require("../Models/productOffer");
+
+// Users controls
 
 exports.getAllUsers = catchAsync(async (req, res) => {
   const users = await User.find();
@@ -30,6 +35,21 @@ exports.getOneUsers = catchAsync(async (req, res) => {
     data: user,
   });
 });
+
+exports.toggleBlock = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return next(new AppError("User not found", 400));
+  }
+  user.isBlock = !user.isBlock;
+  await user.save();
+  res.status(200).json({
+    status: "success",
+    data: { user },
+  });
+});
+
+//Category controls
 
 exports.getOneCategory = catchAsync(async (req, res) => {
   const categories = await Category.findOne({ _id: req.params.id });
@@ -49,19 +69,6 @@ exports.getAllCategories = catchAsync(async (req, res) => {
   });
 });
 
-exports.toggleBlock = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.params.id);
-  if (!user) {
-    return next(new AppError("User not found", 400));
-  }
-  user.isBlock = !user.isBlock;
-  await user.save();
-  res.status(200).json({
-    status: "success",
-    data: { user },
-  });
-});
-
 exports.addCategory = catchAsync(async (req, res, next) => {
   const { name, description } = req.body;
 
@@ -72,7 +79,6 @@ exports.addCategory = catchAsync(async (req, res, next) => {
   });
   res.json(category);
 }, ErrorHandler);
-
 
 exports.updateCategory = catchAsync(async (req, res, next) => {
   const { name, description } = req.body;
@@ -110,6 +116,8 @@ exports.deleteCategory = catchAsync(async (req, res, next) => {
 
   res.status(204).json({ message: "Category deleted" });
 });
+
+// Products controls
 
 exports.getAllProducts = catchAsync(async (req, res) => {
   res.status(200).json({
@@ -194,12 +202,12 @@ exports.updateProduct = catchAsync(async (req, res, next) => {
   }
 });
 
+// deletes need
 exports.updateImageCrop = catchAsync(async (req, res, next) => {
   try {
     // console.log(req.body)
     const { cropWidth, cropHeight, cropX, cropY, imageUrl } = req.body;
 
-    console.log(imageUrl);
     // const baseDirectory = process.cwd();
     // const filePath = path.join(baseDirectory,'public',imgPath)
     // console.log(filePath)
@@ -245,7 +253,8 @@ exports.deleteProduct = catchAsync(async (req, res, next) => {
   res.status(204).json({ message: "Product deleted" });
 });
 
-// Carts
+// Cart Management
+
 exports.getAllCarts = catchAsync(async (req, res, next) => {
   const { userId } = req.query;
   const filters = {};
@@ -275,7 +284,7 @@ exports.getAllCarts = catchAsync(async (req, res, next) => {
   res.status(200).json({ cartsWithShippingAddress });
 });
 
-// Orders
+// Orders Management
 
 exports.getAllOrders = catchAsync(async (req, res, next) => {
   res.status(200).json({
@@ -414,7 +423,7 @@ exports.deleteCoupon = catchAsync(async (req, res) => {
 
 exports.addBanners = catchAsync(async (req, res) => {
   const bannerData = req.body;
-  console.log(bannerData);
+
   const newBanner = await Banner.create({
     ...bannerData,
     image: req.fileDetails,
@@ -452,7 +461,7 @@ exports.updateBanner = catchAsync(async (req, res) => {
     endDate,
     status,
   } = req.body;
-  console.log(req.body);
+
   const banner = await Banner.findById(req.params.id);
 
   if (!banner) {
@@ -485,36 +494,9 @@ exports.deleteBanner = catchAsync(async (req, res) => {
   res.status(200).json({ message: "banner deleted" });
 });
 
-// exports.updateCategory = catchAsync(async (req, res, next) => {
-//   const { name, description } = req.body;
-//   // 1 find the category for update
-//   const category = await Category.findById(req.params.id);
+// Filtered Chart Data - Sales Report
+// ===============================
 
-//   // 2 if the category exist
-//   if (category) {
-//     category.name = name || category.name;
-//     category.description = description || category.description;
-
-//     // Remove the old icon file if a new file is uploaded
-//     if (req.file) {
-//       if (category.image) {
-//         fs.unlink(category.image, (err) => {
-//           if (err) console.log(err);
-//         });
-//       }
-//       category.image = req.file.path;
-//     }
-
-//     // Save the updated category
-//     await category.save();
-
-//     res.json(category);
-//   } else {
-//     return next(new AppError("Category not found", 404));
-//   }
-// });
-
-// Filtered Chart Data
 exports.getSalesChartData = catchAsync(async (req, res, next) => {
   const { filter } = req.query;
 
@@ -858,10 +840,6 @@ exports.getSalesChartData = catchAsync(async (req, res, next) => {
     },
   };
 
-  filteredSalesChartData.map((data) => {
-    console.log(data);
-  });
-
   res.json({
     status: "success",
     result: salesChartData.length,
@@ -869,7 +847,8 @@ exports.getSalesChartData = catchAsync(async (req, res, next) => {
   });
 });
 
-// Revenue , Sales, Orders
+// Revenue , Sales, Orders ( Dashboard data )
+
 exports.getMetricsData = catchAsync(async (req, res, next) => {
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
@@ -916,6 +895,7 @@ exports.getMetricsData = catchAsync(async (req, res, next) => {
   );
   const totalOrders = salesReport.length;
 
+  // data here
   const data = {
     revenue,
     orders: orderCount,
@@ -929,15 +909,14 @@ exports.getMetricsData = catchAsync(async (req, res, next) => {
 });
 
 /*
-REPORTS
-========
+REPORTS Downloadable start
+==========================
 */
 
 // Generate Sales Report Data
+
 exports.getSalesReportData = catchAsync(async (req, res, next) => {
   const { startDate, endDate, downloadType } = req.query;
-
-  console.log(startDate, endDate, downloadType);
 
   if (!startDate || !endDate || !downloadType) {
     return next(new AppError("error", 401));
@@ -1086,9 +1065,9 @@ exports.getSalesReportData = catchAsync(async (req, res, next) => {
 });
 
 // Stock Report
+
 exports.generateStockReport = catchAsync(async (req, res, next) => {
   const { downloadType } = req.query;
-  console.log(downloadType);
 
   const products = await Product.find();
 
@@ -1203,10 +1182,9 @@ exports.generateStockReport = catchAsync(async (req, res, next) => {
 });
 
 // Cancelation Report
+
 exports.generateCancellationReport = catchAsync(async (req, res, next) => {
   const { startDate, endDate, downloadType } = req.query;
-
-  console.log(startDate, endDate, downloadType);
 
   if (!startDate || !endDate || !downloadType) {
     return next(new AppError("error", 401));
@@ -1215,8 +1193,6 @@ exports.generateCancellationReport = catchAsync(async (req, res, next) => {
   // Fetch all orders from the database
   const start = new Date(startDate);
   const end = new Date(endDate);
-
-  console.log(start, end);
 
   const orders = await Order.find({
     updatedAt: {
@@ -1335,7 +1311,8 @@ exports.generateCancellationReport = catchAsync(async (req, res, next) => {
     });
 });
 
-// ReturnRefundReport Report < pending... >
+// ReturnRefundReport Report < pending... need updations>
+
 exports.generateReturnRefundReport = catchAsync(async (req, res) => {
   // Fetch all orders from the database
   const orders = await Order.find();
@@ -1389,9 +1366,14 @@ exports.generateReturnRefundReport = catchAsync(async (req, res) => {
   });
 });
 
+/*
+REPORTS Downloadable End
+========================
+*/
+
 // OFFER MANAGEMENT START
 
-/* Category*/
+/* Category Start*/
 
 exports.getAllCategoryOffers = catchAsync(async (req, res) => {
   const categoryOffers = await CategoryOffer.find();
@@ -1413,7 +1395,7 @@ exports.getAllCategoryOffers = catchAsync(async (req, res) => {
 
 exports.createNewCategoryOffer = catchAsync(async (req, res) => {
   const { categoryId, discount, description } = req.body;
-  console.log(categoryId, discount, description);
+
   const products = await Product.find({ category: { $in: categoryId } });
 
   // Validate the request body
@@ -1498,8 +1480,6 @@ exports.updateOneCategoryOffer = catchAsync(async (req, res) => {
 
   const { discount, description } = req.body;
 
-  console.log(categoryId, discount, description);
-
   // Find the category offer by category ID
   const categoryOffer = await CategoryOffer.findOne({ category: categoryId });
 
@@ -1527,7 +1507,7 @@ exports.updateOneCategoryOffer = catchAsync(async (req, res) => {
   // Revert the prices of the products to their original prices
   for (const product of products) {
     const productOffer = await ProductOffer.findById(product.productOffer);
-    // console.log(productOffer);
+
     if (!productOffer) {
       // If the product offer is not found, clear the original price
       product.price = product.originalPrice;
@@ -1571,8 +1551,6 @@ exports.deleteOneCategoryOffer = catchAsync(async (req, res) => {
 
   const categoryOffer = await CategoryOffer.findOne({ category: categoryId });
 
-  console.log(categoryOffer);
-
   if (!categoryOffer) {
     return res.status(404).json({ error: "Category offer not found" });
   }
@@ -1599,7 +1577,9 @@ exports.deleteOneCategoryOffer = catchAsync(async (req, res) => {
   res.status(200).json({ status: "deleted" });
 });
 
-/* Product*/
+/* Category End*/
+
+/* Product Start*/
 
 // product retrieve by category id
 
@@ -1751,7 +1731,6 @@ exports.updateOneProductOffer = catchAsync(async (req, res) => {
   }
 
   const categoryOffer = await CategoryOffer.findById(product.categoryOffer);
-  console.log(categoryOffer);
 
   if (!categoryOffer) {
     // If the product offer is not found, clear the original price
@@ -1780,7 +1759,6 @@ exports.updateOneProductOffer = catchAsync(async (req, res) => {
   productOffer.discount = discount;
   productOffer.description = `${discount}%`;
 
-  console.log(productOffer);
   // Save the updated category offer
   await productOffer.save();
 
@@ -1818,7 +1796,9 @@ exports.deleteOneProductOffer = catchAsync(async (req, res) => {
   res.status(200).json({ status: "deleted" });
 });
 
-/* Referral*/
+/* Product End*/
+
+/* Referral Offer < ... pending >*/
 
 exports.getAllReferralOffers = catchAsync(async (req, res) => {});
 

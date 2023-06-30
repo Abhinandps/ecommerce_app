@@ -43,12 +43,11 @@ const couponSchema = new mongoose.Schema({
   },
 });
 
-
 // Post middleware
 couponSchema.post("findOneAndUpdate", function (doc) {
-    doc.isActive = doc.expiryDate >= new Date();
-    doc.save();
-  });
+  doc.isActive = doc.expiryDate >= new Date();
+  doc.save();
+});
 
 const Coupon = mongoose.model("Coupon", couponSchema);
 

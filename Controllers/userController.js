@@ -1,24 +1,24 @@
 const fs = require("fs");
-const Product = require("../Models/products");
-const Cart = require("../Models/Cart");
-const catchAsync = require("../utils/catchAsync");
 
 const Razorpay = require("razorpay");
-
+const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const ErrorHandler = require("../Controllers/errorController");
 
+const Product = require("../Models/products");
+const Cart = require("../Models/Cart");
 const User = require("../Models/userModel");
 const Order = require("../Models/orders");
 const Coupon = require("../Models/coupen");
 const Banner = require("../Models/banner");
-
-const { generateInvoice } = require("../utils/generateInvoice");
 const GuestUser = require("../Models/guestUser");
 const ProductOffer = require("../Models/productOffer");
 const Wishlist = require("../Models/wishList");
 const StarRating = require("../Models/rating");
 
+const { generateInvoice } = require("../utils/generateInvoice");
+
+// Custom orderID generator
 const generateOrderID = () => {
   const date = new Date();
   const timestamp = date.getTime();
@@ -28,14 +28,16 @@ const generateOrderID = () => {
   return orderID;
 };
 
+/*
+Home Page START
+==============
+*/
+
 exports.getHomeProducts = catchAsync(async (req, res) => {
   const products = await Product.find().limit(8).populate("category", "name");
 
   res.json(products);
 });
-
-// <pending...>
-exports.categoryItems = catchAsync(async (req, res) => {});
 
 exports.newArrivals = catchAsync(async (req, res) => {
   const newArrivals = await Product.find()
@@ -70,7 +72,7 @@ exports.trending = catchAsync(async (req, res) => {
 
     // Increment the view count in the product schema
     product.views += 1;
-    console.log(product);
+   
     await product.save();
   }
 
@@ -126,16 +128,14 @@ exports.toprated = catchAsync(async (req, res) => {
     );
 
     return {
-      
-        _id: productDetails._id,
-        avgRating: product.avgRating,
-        name: productDetails.name,
-        price: productDetails.price,
-        originalPrice: productDetails.originalPrice,
-        image: productDetails.image,
-        categoryName: productDetails.category.name,
-        originalPrice:productDetails.originalPrice
-      
+      _id: productDetails._id,
+      avgRating: product.avgRating,
+      name: productDetails.name,
+      price: productDetails.price,
+      originalPrice: productDetails.originalPrice,
+      image: productDetails.image,
+      categoryName: productDetails.category.name,
+      originalPrice: productDetails.originalPrice,
     };
   });
 
@@ -221,6 +221,20 @@ exports.starRating = catchAsync(async (req, res) => {
   });
 });
 
+exports.categoryItems = catchAsync(async (req, res) => {}); // <pending...>
+
+/*
+Home Page END
+==============
+
+
+
+
+RENDER ALL PRODUCTS 
+===================
+
+*/
+
 exports.getAllProducts = catchAsync(async (req, res) => {
   res.status(200).json({
     status: "success",
@@ -292,7 +306,7 @@ exports.addToWishList = catchAsync(async (req, res, next) => {
 exports.removeWishListItem = catchAsync(async (req, res, next) => {
   const { productId } = req.params;
 
-  console.log(req.user);
+
 
   const wishList = await Wishlist.findOne({ user: req.user._id });
 
@@ -318,7 +332,7 @@ exports.getWishListItemsCount = catchAsync(async (req, res, next) => {
   res.json({ count: wishListItemsCount });
 });
 
-// cart management
+// Cart management
 
 exports.getCart = catchAsync(async (req, res) => {
   if (req.user.role === "guest") {
@@ -349,7 +363,7 @@ exports.getCart = catchAsync(async (req, res) => {
 
 exports.addToCart = catchAsync(async (req, res) => {
   const { productId, quantity } = req.body;
-  console.log(productId, quantity);
+ 
 
   if (req.user.role === "guest") {
     let cart = await GuestUser.findOne({
@@ -549,103 +563,7 @@ exports.getCartItemsCount = catchAsync(async (req, res, next) => {
   res.json({ count: cartItemsCount });
 });
 
-exports.saveShippingAddress = catchAsync(async (req, res) => {
-  const cart = await Cart.findOne({ user: req.user._id });
-  cart.shippingAddress.push(req.body);
-  await cart.save();
-  res.status(201).json({
-    status: "success",
-    message: "Shipping address saved successfully.",
-    cart,
-  });
-});
-
-exports.getOneShippingAddress = catchAsync(async (req, res) => {
-  const userId = req.user._id;
-  const addressId = req.params.id;
-
-  // Find the cart for the specific user
-  const cart = await Cart.findOne({ user: userId });
-
-  if (!cart) {
-    return res.status(404).json({ error: "Cart not found" });
-  }
-
-  // Find the shipping address with the given address ID
-  const address = cart.shippingAddress.find(
-    (address) => address._id.toString() === addressId
-  );
-
-  if (!address) {
-    return res.status(404).json({ error: "Address not found" });
-  }
-
-  return res.status(200).json({ address });
-});
-
-exports.updateShippingAddress = catchAsync(async (req, res) => {
-  const userId = req.user._id;
-
-  const addressId = req.params.id;
-
-  const updatedAddress = req.body;
-
-  // Find the cart for the specific user
-  const cart = await Cart.findOne({ user: userId });
-
-  if (!cart) {
-    return res.status(404).json({ error: "Cart not found" });
-  }
-
-  // Find the index of the address to update within the shippingAddress array
-  const addressIndex = cart.shippingAddress.findIndex((address) => {
-    console.log(address);
-    return address._id.toString() === addressId;
-  });
-
-  if (addressIndex === -1) {
-    return res.status(404).json({ error: "Address not found" });
-  }
-
-  // Update the address at the specified index
-  cart.shippingAddress[addressIndex] = updatedAddress;
-
-  // Save the updated cart
-  await cart.save();
-
-  res.status(200).json({ message: "Address updated successfully" });
-});
-
-exports.deleteShippingAddress = catchAsync(async (req, res) => {
-  const userId = req.user._id;
-  const addressId = req.params.id;
-
-  // Find the cart for the specific user
-  const cart = await Cart.findOne({ user: userId });
-
-  if (!cart) {
-    return res.status(404).json({ error: "Cart not found" });
-  }
-
-  // Find the index of the address to delete within the shippingAddress array
-  const addressIndex = cart.shippingAddress.findIndex(
-    (address) => address._id.toString() === addressId
-  );
-
-  if (addressIndex === -1) {
-    return res.status(404).json({ error: "Address not found" });
-  }
-
-  // Remove the address from the shippingAddress array
-  cart.shippingAddress[addressIndex].deleted = true;
-
-  // Save the updated cart
-  await cart.save();
-
-  res.status(200).json({ message: "Address deleted successfully" });
-});
-
-// Coupon
+// Coupon Management
 
 exports.getAllCoupons = async (req, res) => {
   try {
@@ -869,7 +787,7 @@ exports.initialPayment = catchAsync(async (req, res, next) => {
       payment_capture: 1,
     });
 
-    console.log(razorpayOrder);
+    console.log("UPI payment ID : " + razorpayOrder);
 
     // Retrieve the Razorpay order ID
     const razorpayOrderID = razorpayOrder.id;
@@ -891,13 +809,13 @@ exports.razorpayWebhook = catchAsync(async (req, res, next) => {
   }
 
   res.status(200).send("Payment successful");
-});
+}); // Not mandatory
 
 // place an order with razorpay
 
 exports.placeOrder = catchAsync(async (req, res, next) => {
   const { orderID, shippingAddress, paymentMethod, totalPrice } = req.body;
-  console.log(orderID, shippingAddress, paymentMethod, totalPrice);
+  
 
   const user = await User.findById(req.user._id);
   if (!user) {
@@ -938,7 +856,7 @@ exports.placeOrder = catchAsync(async (req, res, next) => {
   res.status(200).json({ message: "Order Placed Successfully" });
 });
 
-// Orders
+// Orders Management
 exports.orderHistory = catchAsync(async (req, res, next) => {
   let filter = { user: req.user._id };
 
@@ -994,7 +912,7 @@ exports.orderCancel = catchAsync(async (req, res, next) => {
   }
 });
 
-// invoice
+// INVOICE DOWNLOAD
 
 function generateInvoiceNumber() {
   const timestamp = Date.now().toString().substr(-6);
@@ -1016,7 +934,8 @@ exports.downloadInvoice = catchAsync(async (req, res, next) => {
   generateInvoice(order, req, res);
 });
 
-// Banners
+// HOME PAGE BANNERS
+
 exports.fetchBanners = catchAsync(async (req, res, next) => {
   const { position } = req.query;
 
@@ -1135,4 +1054,100 @@ exports.updateAvatar = catchAsync(async (req, res, next) => {
   }
 
   res.status(200).json({ status: "success", data: updatedUser });
+});
+
+exports.saveShippingAddress = catchAsync(async (req, res) => {
+  const cart = await Cart.findOne({ user: req.user._id });
+  cart.shippingAddress.push(req.body);
+  await cart.save();
+  res.status(201).json({
+    status: "success",
+    message: "Shipping address saved successfully.",
+    cart,
+  });
+});
+
+exports.getOneShippingAddress = catchAsync(async (req, res) => {
+  const userId = req.user._id;
+  const addressId = req.params.id;
+
+  // Find the cart for the specific user
+  const cart = await Cart.findOne({ user: userId });
+
+  if (!cart) {
+    return res.status(404).json({ error: "Cart not found" });
+  }
+
+  // Find the shipping address with the given address ID
+  const address = cart.shippingAddress.find(
+    (address) => address._id.toString() === addressId
+  );
+
+  if (!address) {
+    return res.status(404).json({ error: "Address not found" });
+  }
+
+  return res.status(200).json({ address });
+});
+
+exports.updateShippingAddress = catchAsync(async (req, res) => {
+  const userId = req.user._id;
+
+  const addressId = req.params.id;
+
+  const updatedAddress = req.body;
+
+  // Find the cart for the specific user
+  const cart = await Cart.findOne({ user: userId });
+
+  if (!cart) {
+    return res.status(404).json({ error: "Cart not found" });
+  }
+
+  // Find the index of the address to update within the shippingAddress array
+  const addressIndex = cart.shippingAddress.findIndex((address) => {
+    
+    return address._id.toString() === addressId;
+  });
+
+  if (addressIndex === -1) {
+    return res.status(404).json({ error: "Address not found" });
+  }
+
+  // Update the address at the specified index
+  cart.shippingAddress[addressIndex] = updatedAddress;
+
+  // Save the updated cart
+  await cart.save();
+
+  res.status(200).json({ message: "Address updated successfully" });
+});
+
+exports.deleteShippingAddress = catchAsync(async (req, res) => {
+  const userId = req.user._id;
+  const addressId = req.params.id;
+
+  // Find the cart for the specific user
+  const cart = await Cart.findOne({ user: userId });
+
+  if (!cart) {
+    return res.status(404).json({ error: "Cart not found" });
+  }
+
+  // Find the index of the address to delete within the shippingAddress array
+  const addressIndex = cart.shippingAddress.findIndex(
+    (address) => address._id.toString() === addressId
+  );
+
+  if (addressIndex === -1) {
+    return res.status(404).json({ error: "Address not found" });
+  }
+
+  // Remove the address from the shippingAddress array
+  cart.shippingAddress[addressIndex].deleted = true;
+
+  // Save the updated cart
+  await cart.save();
+
+  res.status(200).json({ message: "Address deleted successfully" });
 });

@@ -5,7 +5,7 @@ const productSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
-      unique:true
+      unique: true,
     },
     productOffer: {
       type: mongoose.Schema.Types.ObjectId,
@@ -17,7 +17,7 @@ const productSchema = new mongoose.Schema(
     },
     originalPrice: {
       type: Number,
-      default:undefined
+      default: undefined,
     },
     price: {
       type: Number,
@@ -25,7 +25,7 @@ const productSchema = new mongoose.Schema(
     },
     views: {
       type: Number,
-      default:0
+      default: 0,
     },
     stock: {
       type: Number,
@@ -49,8 +49,8 @@ const productSchema = new mongoose.Schema(
     },
     rating: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   },
   { timestamps: true }
 );

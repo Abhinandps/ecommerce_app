@@ -1,12 +1,12 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const categoryOfferSchema = new mongoose.Schema(
   {
     category: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Category",
-        required: true,
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
     description: {
       type: String,
       required: true,
@@ -21,6 +21,6 @@ const categoryOfferSchema = new mongoose.Schema(
   }
 );
 
-const CategoryOffer = mongoose.model('CategoryOffer', categoryOfferSchema);
+const CategoryOffer = mongoose.model("CategoryOffer", categoryOfferSchema);
 
 module.exports = CategoryOffer;

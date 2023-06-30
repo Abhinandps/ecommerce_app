@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     type: String,
-    default: 'src/images/avatar.png'
+    default: "src/images/avatar.png",
   },
   email: {
     type: String,
@@ -55,7 +55,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: undefined,
   },
-  role: { type: String, enum: ["user", "admin","guest"], default: "user" },
+  role: { type: String, enum: ["user", "admin", "guest"], default: "user" },
 });
 
 userSchema.pre("save", async function (next) {
@@ -64,7 +64,7 @@ userSchema.pre("save", async function (next) {
   }
   // Hash the password with cost of 12
   this.password = await bcrypt.hash(this.password, 12);
-  this.confirmPassword = undefined
+  this.confirmPassword = undefined;
   next();
 });
 
@@ -74,7 +74,6 @@ userSchema.methods.correctPassword = async function (
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
 };
-
 
 // Virtual field to check if OTP is expired
 userSchema.virtual("isOTPExpired").get(function () {

@@ -1,4 +1,5 @@
 // ADMIN
+// ==============================
 
 exports.getAdminLogin = (req, res) => {
   if (req.admin) {
@@ -88,7 +89,6 @@ exports.getAllProductOffer = (req, res) => {
   }
 };
 
-
 exports.getImageCropPage = (req, res) => {
   if (req.admin) {
     res.render("admin/pages/imageCrop.ejs");
@@ -97,8 +97,8 @@ exports.getImageCropPage = (req, res) => {
   }
 };
 
-
 // USER
+// =====================================
 
 exports.getUserLogin = (req, res) => {
   if (req.user) {
@@ -171,14 +171,13 @@ exports.getCartPage = (req, res) => {
   }
 };
 
-
-exports.getWishListPage = (req,res)=>{
-  if(req.user && req.user.role === 'user'){
-    res.render("user/wishList.ejs")
-  }else{
+exports.getWishListPage = (req, res) => {
+  if (req.user && req.user.role === "user") {
+    res.render("user/wishList.ejs");
+  } else {
     res.render("user/wishList.ejs", { modal: true });
   }
-}
+};
 
 exports.getCheckoutPage = (req, res) => {
   if (req.user && req.user.role === "user") {

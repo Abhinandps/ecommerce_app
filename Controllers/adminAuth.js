@@ -1,8 +1,7 @@
 const Admin = require("../Models/adminModel");
+
 const jwt = require("jsonwebtoken");
 const { promisify } = require('util');
-
-
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const ErrorHandler = require("../Controllers/errorController");
@@ -53,9 +52,8 @@ exports.register = catchAsync(async (req, res, next) => {
 //    if everything ok, send token to client
   createSendToken(admin, 200, res);
 
-  // Create a new session for the admin
-  req.session.adminId = 1;
   });
+
 
   // Admin Login
 exports.login = catchAsync(async (req, res, next) => {
@@ -77,10 +75,9 @@ exports.login = catchAsync(async (req, res, next) => {
   // 3) if everything ok, send token to client
   createSendToken(admin, 200, res);
 
-  // Create a new session for the admin
-  req.session.adminId = 1;
-
 },ErrorHandler);
+
+
 
 // Admin Logout
 exports.logout = (req, res) => {

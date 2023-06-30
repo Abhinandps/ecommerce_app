@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const guestUserSchema = new mongoose.Schema({
   guestUserID: {
@@ -10,7 +10,7 @@ const guestUserSchema = new mongoose.Schema({
     {
       product: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product',
+        ref: "Product",
         required: true,
       },
       quantity: {
@@ -29,7 +29,6 @@ const guestUserSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
-
 
 // Calculate the product sum and total price
 guestUserSchema.methods.calculatePrices = async function () {
@@ -56,7 +55,6 @@ guestUserSchema.pre("save", async function (next) {
   next();
 });
 
-
-const GuestUser = mongoose.model('GuestUser', guestUserSchema);
+const GuestUser = mongoose.model("GuestUser", guestUserSchema);
 
 module.exports = GuestUser;

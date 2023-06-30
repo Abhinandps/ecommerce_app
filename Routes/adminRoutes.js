@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 
-
 const adminAuth = require("../Controllers/adminAuth");
 const {
   getSalesReportData,
@@ -54,7 +53,6 @@ const {
   deleteOneReferralOffer,
   getFilterProducts,
   updateImageCrop,
-  
 } = require("../Controllers/adminController");
 
 const { isAuthenticate, isAdmin } = require("../middleware/auth");
@@ -67,42 +65,32 @@ const Product = require("../Models/products");
 const { paginatedResults } = require("../utils/pagination");
 
 // multer
-const {uploadSingle,uploadMultiple,resizeProductPhoto} = require("../utils/multerConfig");
+const {
+  uploadSingle,
+  uploadMultiple,
+  resizeProductPhoto,
+} = require("../utils/multerConfig");
 
 const Banner = require("../Models/banner");
-
-// middleware
-
-
-
-router.get("/login", (req, res) => {
-  res.render("admin/login");
-});
-
-
-router.get("/", (req, res) => {
-  res.render("admin/dashboard");
-});
 
 
 router.post("/register", adminAuth.register);
 router.post("/login", adminAuth.login);
 router.get("/logout", adminAuth.logout);
 
-
 // Dashboard
 
-router.get('/sales/report', isAdmin, getSalesReportData)
+router.get("/sales/report", isAdmin, getSalesReportData);
 
-router.get('/sales/graph/report', isAdmin, getSalesChartData)
+router.get("/sales/graph/report", isAdmin, getSalesChartData);
 
-router.get('/sales/data', isAdmin, getMetricsData)
+router.get("/sales/data", isAdmin, getMetricsData);
 
-// Reports 
+// Reports
 
-router.get('/stock/report',isAdmin, generateStockReport)
+router.get("/stock/report", isAdmin, generateStockReport);
 
-router.get('/cancelled/report', isAdmin, generateCancellationReport)
+router.get("/cancelled/report", isAdmin, generateCancellationReport);
 
 // Excel|Pdf
 
@@ -114,7 +102,7 @@ router.get('/cancelled/report', isAdmin, generateCancellationReport)
 
 router.get("/users", getAllUsers);
 
-router.get("/users/:id",isAdmin, getOneUsers);
+router.get("/users/:id", isAdmin, getOneUsers);
 
 router.put("/:id/block", toggleBlock);
 
@@ -122,35 +110,37 @@ router.put("/:id/block", toggleBlock);
 
 router.get("/categories", isAuthenticate, isAdmin, getAllCategories);
 
-router.post("/category", uploadSingle,resizeProductPhoto, addCategory);
+router.post("/category", uploadSingle, resizeProductPhoto, addCategory);
 
-router.get("/category/:id",isAuthenticate,isAdmin, getOneCategory);
+router.get("/category/:id", isAuthenticate, isAdmin, getOneCategory);
 
-router.put("/category/:id",uploadSingle,resizeProductPhoto, updateCategory);
+router.put("/category/:id", uploadSingle, resizeProductPhoto, updateCategory);
 
 router.delete("/category/:id", deleteCategory);
 
 // Products
 
-router.get("/products", isAuthenticate, isAdmin, paginatedResults(Product), getAllProducts);
+router.get(
+  "/products",
+  isAuthenticate,
+  isAdmin,
+  paginatedResults(Product),
+  getAllProducts
+);
 
 router.get("/product/:id", isAuthenticate, isAdmin, getOneProduct);
 
 router.post("/product", uploadMultiple, resizeProductPhoto, addProduct);
 
-router.put("/product/:id", uploadMultiple,resizeProductPhoto, updateProduct);
+router.put("/product/:id", uploadMultiple, resizeProductPhoto, updateProduct);
 
 router.delete("/product/:id", deleteProduct);
 
-router.post("/crop-image",isAdmin, updateImageCrop)
-
+router.post("/crop-image", isAdmin, updateImageCrop);
 
 // cart
 
 router.get("/carts", isAdmin, getAllCarts);
-
-
-
 
 // Orders
 
@@ -158,91 +148,78 @@ router.get("/orders", isAdmin, paginatedResults(Order), getAllOrders);
 
 // router.get("/orders/filter", isAdmin,paginatedResults(Order),getFilteredOrders );
 
-
-router.route("/orders/:orderID")
+router
+  .route("/orders/:orderID")
   .get(isAdmin, getOrder)
-  .put(isAdmin,updateOrderStatus)
-  .delete(isAdmin,orderCancel)
-
+  .put(isAdmin, updateOrderStatus)
+  .delete(isAdmin, orderCancel);
 
 // Coupons
 
-router.post("/coupons", isAdmin, addCoupons)
+router.post("/coupons", isAdmin, addCoupons);
 
-router.get("/coupons", isAdmin, getCoupons)
+router.get("/coupons", isAdmin, getCoupons);
 
-router.route("/coupons/:id")
+router
+  .route("/coupons/:id")
   .get(isAdmin, getOneCoupon)
   .patch(isAdmin, updateCoupon)
-  .delete(isAdmin, deleteCoupon)
+  .delete(isAdmin, deleteCoupon);
 
+router.post("/banners", uploadSingle, resizeProductPhoto, addBanners);
 
-router.post("/banners", uploadSingle,resizeProductPhoto, addBanners)
+router.get("/banners", isAdmin, paginatedResults(Banner), getBanners);
 
-router.get("/banners", isAdmin,paginatedResults(Banner), getBanners)
+router
+  .route("/banners/:id")
+  .get(isAdmin, getOneBanner)
+  .put(isAdmin, uploadSingle, resizeProductPhoto, updateBanner)
+  .delete(isAdmin, deleteBanner);
 
-
-router.route("/banners/:id")
-.get(isAdmin, getOneBanner)
-  .put(isAdmin,  uploadSingle,resizeProductPhoto, updateBanner)
-  .delete(isAdmin, deleteBanner)
-
-
-
-  
-  // retrieve product based on category id
-  router.get("/categories/:categoryId/products", isAdmin, getFilterProducts)
-  
+// retrieve product based on category id
+router.get("/categories/:categoryId/products", isAdmin, getFilterProducts);
 
 // OFFER MANAGEMENT START
-  
+
 /* Category*/
 
-router.route("/category-offers")
+router
+  .route("/category-offers")
   .get(isAdmin, getAllCategoryOffers)
-  .post(isAdmin,createNewCategoryOffer)
-  
+  .post(isAdmin, createNewCategoryOffer);
 
-router.route("/category-offers/:id")
-  .get(isAdmin,getOneCategoryOffer)
-  .put(isAdmin,updateOneCategoryOffer)
-  .delete(isAdmin, deleteOneCategoryOffer)
-
+router
+  .route("/category-offers/:id")
+  .get(isAdmin, getOneCategoryOffer)
+  .put(isAdmin, updateOneCategoryOffer)
+  .delete(isAdmin, deleteOneCategoryOffer);
 
 /* Product*/
 
-router.route("/product-offers")
+router
+  .route("/product-offers")
   .get(isAdmin, getAllProductOffers)
-  .post(isAdmin,createNewProductOffer)
-  
+  .post(isAdmin, createNewProductOffer);
 
-router.route("/product-offers/:id")
-  .get(isAdmin,getOneProductOffer)
-  .put(isAdmin,updateOneProductOffer)
-  .delete(isAdmin, deleteOneProductOffer)
-
+router
+  .route("/product-offers/:id")
+  .get(isAdmin, getOneProductOffer)
+  .put(isAdmin, updateOneProductOffer)
+  .delete(isAdmin, deleteOneProductOffer);
 
 /* Referral <pending...> */
 
-router.route("referral-offers")
+router
+  .route("referral-offers")
   .get(isAdmin, getAllReferralOffers)
-  .post(isAdmin,createNewReferralOffer)
-  
+  .post(isAdmin, createNewReferralOffer);
 
-router.route("referral-offers/:id")
-  .get(isAdmin,getOneReferralOffer)
-  .put(isAdmin,updateOneReferralOffer)
-  .delete(isAdmin, deleteOneReferralOffer)
+router
+  .route("referral-offers/:id")
+  .get(isAdmin, getOneReferralOffer)
+  .put(isAdmin, updateOneReferralOffer)
+  .delete(isAdmin, deleteOneReferralOffer);
 
 // OFFER MANAGEMENT END
 
-
-
-
-
-  
-
 module.exports = router;
-
-
-

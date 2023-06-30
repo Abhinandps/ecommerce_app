@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const cartSchema = new mongoose.Schema({
@@ -98,4 +97,3 @@ cartSchema.pre("save", async function (next) {
 
 let Cart = mongoose.model("Cart", cartSchema);
 module.exports = Cart;
-

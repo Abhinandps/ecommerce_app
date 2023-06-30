@@ -6,9 +6,8 @@ const { generateGuestID } = require("../utils/guestUtils");
 const GuestUser = require("../Models/guestUser");
 
 
-
 // User auth
-
+// ================
 exports.isAuthenticate = async (req, res, next) => {
   let token;
   if (
@@ -72,7 +71,7 @@ exports.isAuthenticate = async (req, res, next) => {
       const guestUser = new GuestUser({
         guestUserID: newGuestUserID,
         items: [],
-        role:"guest"
+        role: "guest",
       });
 
       try {
@@ -87,7 +86,10 @@ exports.isAuthenticate = async (req, res, next) => {
   next();
 };
 
-// User auth
+
+
+// Admin auth
+// =================
 exports.isAdmin = async (req, res, next) => {
   if (req.cookies && req.cookies.admin) {
     try {

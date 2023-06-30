@@ -1,17 +1,13 @@
-const User = require("../Models/userModel");
-
 const jwt = require("jsonwebtoken");
-
-// const otpGenerator = require("otp-generator");
 const nodemailer = require("nodemailer");
-
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const ErrorHandler = require("../Controllers/errorController");
 const twilio = require("twilio");
+
+const User = require("../Models/userModel");
 const Cart = require("../Models/Cart");
 const GuestUser = require("../Models/guestUser");
-const Wishlist = require("../Models/wishList");
 
 function generateNumericOTP(length) {
   const digits = "0123456789";
@@ -128,7 +124,7 @@ const createSendToken = async (user, statusCode, res, req) => {
       }
 
       // Remove the guestUser document from the database
-    await GuestUser.findOneAndRemove({ guestUserID });
+      await GuestUser.findOneAndRemove({ guestUserID });
     })();
   }
 
@@ -187,7 +183,6 @@ exports.signup = catchAsync(async (req, res, next) => {
   res.json({ status: "success" });
 }, ErrorHandler);
 
-
 // Verify the OTP
 exports.verifyOTP = async (req, res, next) => {
   const { email, phoneNumber, otp } = req.body;
@@ -199,7 +194,6 @@ exports.verifyOTP = async (req, res, next) => {
   } else if (phoneNumber) {
     user = await User.findOne({ mobile: phoneNumber });
   }
-
 
   if (!user) {
     console.log("not found");
@@ -216,7 +210,6 @@ exports.verifyOTP = async (req, res, next) => {
     await user.save();
     return next(new Error(`OTP has expired`));
   }
-  
 
   // Clear the valid OTP
   user.clearOTP();
@@ -227,7 +220,6 @@ exports.verifyOTP = async (req, res, next) => {
 };
 
 // validate
-
 exports.validate = catchAsync(async (req, res, next) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
