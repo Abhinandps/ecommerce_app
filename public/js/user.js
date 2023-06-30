@@ -1,10 +1,3 @@
-
-
-
-
-
-
-
 const logout = async () => {
   const res = await axios.get("http://127.0.0.1:3000/api/v1/user/logout");
   if (res.data.status === "success") {
@@ -85,8 +78,6 @@ const bestSellers = () => {
 
 bestSellers();
 
-
-
 const newArrivals = () => {
   const row = document.querySelector("#new-arrivals-showcase-wrapper");
 
@@ -104,10 +95,12 @@ const newArrivals = () => {
         row.appendChild(showcaseContainer);
 
         products.forEach((product, index) => {
-          const firstImage = product.image.map((image) => image.split("public")[1])[0];
+          const firstImage = product.image.map(
+            (image) => image.split("public")[1]
+          )[0];
 
           const item = `
-            <div class="showcase">
+            <div class="showcase" data-product='${JSON.stringify(product)}'>
               <a href="#" class="showcase-img-box">
                 <img src=${firstImage} alt="product_img" style="width:70px;" class="showcase-img">
               </a>
@@ -115,11 +108,15 @@ const newArrivals = () => {
                 <a href="#">
                   <h4 class="showcase-title">${product.name}</h4>
                 </a>
-                <a href="#" class="showcase-category">${product.categoryName}</a>
+                <a href="#" class="showcase-category">${
+                  product.categoryName
+                }</a>
                 <div class="price-box">
                   <p class="price">₹${product.price}</p>
                   <del>₹ ${
-                    product.originalPrice ? product.originalPrice : product.price + 299
+                    product.originalPrice
+                      ? product.originalPrice
+                      : product.price + 299
                   }</del>
                 </div>
               </div>
@@ -137,27 +134,22 @@ const newArrivals = () => {
       },
     });
   }
+
+  document.addEventListener("click", function (event) {
+    if (
+      event.target.classList.contains("showcase") ||
+      event.target.closest(".showcase")
+    ) {
+      const button = event.target.classList.contains("showcase")
+        ? event.target
+        : event.target.closest(".showcase");
+      const product = JSON.parse(button.dataset.product);
+      handleViewDetails(product);
+    }
+  });
 };
 
-newArrivals()
-
-
-//   document.addEventListener("click", function (event) {
-//     if (
-//       event.target.classList.contains("showcase") ||
-//       event.target.closest(".showcase")
-//     ) {
-//       const button = event.target.classList.contains("showcase")
-//         ? event.target
-//         : event.target.closest(".showcase");
-//       const product = JSON.parse(button.dataset.product);
-//       handleViewDetails(product);
-//     }
-//   });
-// };
-
-
-
+newArrivals();
 
 const trending = () => {
   const row = document.querySelector("#trending-showcase-wrapper");
@@ -175,12 +167,13 @@ const trending = () => {
         showcaseContainer.classList.add("showcase-container");
         row.appendChild(showcaseContainer);
 
-
         products.forEach((product, index) => {
-          const firstImage = product.image.map((image) => image.split("public")[1])[0];
+          const firstImage = product.image.map(
+            (image) => image.split("public")[1]
+          )[0];
 
           const item = `
-            <div class="showcase">
+            <div class="showcase" data-product='${JSON.stringify(product)}'>
               <a href="#" class="showcase-img-box">
                 <img src=${firstImage} alt="product_img" style="width:70px;" class="showcase-img">
               </a>
@@ -189,11 +182,15 @@ const trending = () => {
                   <h4 class="showcase-title">${product.name}</h4>
                 </a>
                 
-                <a href="#" class="showcase-category">${product.categoryName}</a>
+                <a href="#" class="showcase-category">${
+                  product.categoryName
+                }</a>
                 <div class="price-box">
                   <p class="price">₹${product.price}</p>
                   <del>₹ ${
-                    product.originalPrice ? product.originalPrice : product.price + 299
+                    product.originalPrice
+                      ? product.originalPrice
+                      : product.price + 299
                   }</del>
                 </div>
               </div>
@@ -211,11 +208,22 @@ const trending = () => {
       },
     });
   }
+
+  document.addEventListener("click", function (event) {
+    if (
+      event.target.classList.contains("showcase") ||
+      event.target.closest(".showcase")
+    ) {
+      const button = event.target.classList.contains("showcase")
+        ? event.target
+        : event.target.closest(".showcase");
+      const product = JSON.parse(button.dataset.product);
+      handleViewDetails(product);
+    }
+  });
 };
 
-trending()
-
-
+trending();
 
 const topRated = () => {
   const row = document.querySelector("#topRated-showcase-wrapper");
@@ -233,12 +241,13 @@ const topRated = () => {
         showcaseContainer.classList.add("showcase-container");
         row.appendChild(showcaseContainer);
 
-
         products.forEach((product, index) => {
-          const firstImage = product.image.map((image) => image.split("public")[1])[0];
+          const firstImage = product.image.map(
+            (image) => image.split("public")[1]
+          )[0];
 
           const item = `
-            <div class="showcase">
+            <div class="showcase" data-product='${JSON.stringify(product)}'>
               <a href="#" class="showcase-img-box">
                 <img src=${firstImage} alt="product_img" style="width:70px;" class="showcase-img">
               </a>
@@ -247,11 +256,15 @@ const topRated = () => {
                   <h4 class="showcase-title">${product.name}</h4>
                 </a>
                 
-                <a href="#" class="showcase-category">${product.categoryName}</a>
+                <a href="#" class="showcase-category">${
+                  product.categoryName
+                }</a>
                 <div class="price-box">
                   <p class="price">₹${product.price}</p>
                   <del>₹ ${
-                    product.originalPrice ? product.originalPrice : product.price + 299
+                    product.originalPrice
+                      ? product.originalPrice
+                      : product.price + 299
                   }</del>
                 </div>
               </div>
@@ -269,9 +282,21 @@ const topRated = () => {
       },
     });
   }
+  document.addEventListener("click", function (event) {
+    if (
+      event.target.classList.contains("showcase") ||
+      event.target.closest(".showcase")
+    ) {
+      const button = event.target.classList.contains("showcase")
+        ? event.target
+        : event.target.closest(".showcase");
+      const product = JSON.parse(button.dataset.product);
+      handleViewDetails(product);
+    }
+  });
 };
 
-topRated()
+topRated();
 
 const getCategories = () => {
   $.ajax({
@@ -329,17 +354,16 @@ const getCategories = () => {
 
 const getHomeProducts = () => {
   const row = $("#home-product-grid");
-  
+
   row.empty();
 
   $.ajax({
     type: "GET",
     url: `/api/v1/user/home`,
     success: function (products) {
-      const data  = products;
+      const data = products;
 
       data.forEach((product) => {
-
         const card = `
         <div class="showcase fade-in-animation">
 
@@ -412,7 +436,6 @@ const getHomeProducts = () => {
     },
   });
 };
-
 
 // PAGINATION START
 
@@ -791,12 +814,10 @@ document.addEventListener("click", function (event) {
 const handleViewDetails = (product) => {
   localStorage.setItem("product", JSON.stringify(product));
   $.ajax({
-    type:"GET",
-    url:`/api/v1/user/trending?productId=${product._id}`,
-    success:function(response){
-
-    }
-  })
+    type: "GET",
+    url: `/api/v1/user/trending?productId=${product._id}`,
+    success: function (response) {},
+  });
   window.location.href = "/details";
 };
 
@@ -1348,10 +1369,10 @@ const getCheckOut = () => {
     url: "/api/v1/user/cart",
     success: function (response) {
       const { cart } = response;
-      const data = cart.shippingAddress.filter(address => !address.deleted);
-      console.log("address")
-      console.log(data)
-      
+      const data = cart.shippingAddress.filter((address) => !address.deleted);
+      console.log("address");
+      console.log(data);
+
       row.empty();
 
       data.forEach((address) => {
@@ -1378,7 +1399,7 @@ const getCheckOut = () => {
       proceedPay.addEventListener("click", () => {
         const selectedAddressId = $('input[name="user-info"]:checked').val();
         console.log(`Selected address ID: ${selectedAddressId}`);
-        
+
         if (selectedAddressId) {
           window.location.href = "/payment?addressId=" + selectedAddressId;
         } else {
@@ -1406,7 +1427,7 @@ const getAddress = () => {
     url: "/api/v1/user/cart",
     success: function (response) {
       const { cart } = response;
-      const data = cart.shippingAddress.filter(address => !address.deleted);
+      const data = cart.shippingAddress.filter((address) => !address.deleted);
       row.empty();
 
       data.forEach((address) => {
@@ -1564,7 +1585,6 @@ const updateCartTotal = (totalPrice) => {
 
 getCheckOut();
 
-
 const getPaymentDetails = () => {
   const shippingHandlingFee = 98;
 
@@ -1698,12 +1718,5 @@ const getPaymentDetails = () => {
     }
   }
 };
-
-
-
-
-
-
-
 
 // getOrders function included in order.ejs
