@@ -2,9 +2,7 @@
   #style.css
 \*-----------------------------------*/
 
-/**
- * copyright 2022 @codewithsadee 
- */
+/*
 
 /*-----------------------------------*\
   #CUSTOM PROPERTY
@@ -5542,7 +5540,7 @@ body.loading .loader-bg {
 	--fg: hsl(var(--hue),10%,10%); 
 	--primary: hsl(var(--hue),100%,78%);
 	--trans-dur: 0.3s;
-	font-size: calc(11px + (20 - 16) * (100vw - 120px) / (1280 - 320));
+	/* font-size: calc(11px + (20 - 16) * (100vw - 120px) / (1280 - 320)); */
 }
 
 .preloader {
