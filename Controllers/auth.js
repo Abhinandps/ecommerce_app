@@ -6,7 +6,7 @@ const ErrorHandler = require("../Controllers/errorController");
 const twilio = require("twilio");
 
 const User = require("../Models/userModel");
-const Cart = require("../Models/Cart");
+const Cart = require("../Models/cartModel");
 const GuestUser = require("../Models/guestUser");
 
 function generateNumericOTP(length) {

@@ -6,7 +6,7 @@ const AppError = require("../utils/appError");
 const ErrorHandler = require("../Controllers/errorController");
 
 const Product = require("../Models/products");
-const Cart = require("../Models/Cart");
+const Cart = require("../Models/cartModel");
 const User = require("../Models/userModel");
 const Order = require("../Models/orders");
 const Coupon = require("../Models/coupen");
