@@ -2,6 +2,8 @@ const path = require("path");
 const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser");
+const cors = require('cors');
+
 
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./Controllers/errorController");
