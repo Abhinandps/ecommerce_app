@@ -17,6 +17,9 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use(cookieParser());
 
+app.use(cors());
+
+
 app.use((req, res, next) => {
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   next();
