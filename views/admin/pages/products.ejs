@@ -388,7 +388,7 @@
                 try {
                     if (isValid) {
                         const formData = new FormData(form);
-                        const response = await axios.post('http://127.0.0.1:3000/api/v1/admin/product', formData, {
+                        const response = await axios.post('/api/v1/admin/product', formData, {
                             headers: {
                                 'Content-Type': 'multipart/form-data'
                             }

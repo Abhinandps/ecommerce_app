@@ -1,5 +1,5 @@
 const adminlogout = async () => {
-  const res = await axios.get("http://127.0.0.1:3000/api/v1/admin/logout");
+  const res = await axios.get("/api/v1/admin/logout");
   if (res.data.status === "success") {
     location.reload(true);
   }
@@ -8,7 +8,7 @@ const adminlogout = async () => {
 // Get All Users
 const getUsers = async () => {
   try {
-    const res = await axios.get("http://127.0.0.1:3000/api/v1/admin/users");
+    const res = await axios.get("/api/v1/admin/users");
     const { data } = res.data;
     const users = data.users;
     const tableBody = document.querySelector("#user-table tbody");
@@ -46,7 +46,7 @@ const handleClick = (event) => {
       if (result) {
         $.ajax({
           type: "PUT",
-          url: `http://127.0.0.1:3000/api/v1/admin/${userId}/block`,
+          url: `/api/v1/admin/${userId}/block`,
           success: function (user) {
             const btn = $(`label[data-user-id="${user._id}"]`);
             btn.addClass(user.isBlock ? "badge-danger" : "badge-primary");
@@ -130,7 +130,7 @@ const handleCategoryDelete = (event) => {
       if (result) {
         $.ajax({
           type: "DELETE",
-          url: `http://127.0.0.1:3000/api/v1/admin/category/${categoryID}`,
+          url: `/api/v1/admin/category/${categoryID}`,
           success: function (response) {
             console.log(response);
 
@@ -154,7 +154,7 @@ const handleCategoryDelete = (event) => {
 const getAllCategories = async () => {
   try {
     const res = await axios.get(
-      "http://127.0.0.1:3000/api/v1/admin/categories"
+      "/api/v1/admin/categories"
     );
     const { data } = res.data;
     const categories = data.categories;
@@ -278,7 +278,7 @@ const handleProductFormEdit = (event) => {
 
   $.ajax({
     type: "GET",
-    url: `http://127.0.0.1:3000/api/v1/admin/product/${productID}`,
+    url: `/api/v1/admin/product/${productID}`,
     success: async function (response) {
       const { products } = response.data;
       // console.log(products.category)
@@ -286,7 +286,7 @@ const handleProductFormEdit = (event) => {
       // Fetch the category name using the category ID
       $.ajax({
         type: "GET",
-        url: `http://127.0.0.1:3000/api/v1/admin/categories`,
+        url: `/api/v1/admin/categories`,
         success: function (response) {
           const { categories } = response.data;
 
@@ -398,7 +398,7 @@ const handleProductFormEdit = (event) => {
         console.log(formData);
         $.ajax({
           type: "PUT",
-          url: `http://127.0.0.1:3000/api/v1/admin/product/${productID}`,
+          url: `/api/v1/admin/product/${productID}`,
           data: formData,
           processData: false,
           contentType: false,
@@ -454,7 +454,7 @@ const handleProductDelete = (event) => {
       if (result) {
         $.ajax({
           type: "DELETE",
-          url: `http://127.0.0.1:3000/api/v1/admin/product/${productID}`,
+          url: `/api/v1/admin/product/${productID}`,
           success: async function (response) {
             console.log(response);
 
@@ -594,7 +594,7 @@ const handleBannerDelete = (event) => {
 // Categories
 const getAllCoupons = async () => {
   try {
-    const res = await axios.get("http://127.0.0.1:3000/api/v1/admin/coupons");
+    const res = await axios.get("/api/v1/admin/coupons");
     const data = res.data;
     console.log(data);
     // const categories = data.categories;
@@ -640,7 +640,7 @@ const handleCouponFormEdit = (event) => {
   const editForm = document.getElementById("edit-coupon-form");
   $.ajax({
     type: "GET",
-    url: `http://127.0.0.1:3000/api/v1/admin/coupons/${couponID}`,
+    url: `/api/v1/admin/coupons/${couponID}`,
     success: function (response) {
       console.log(response);
       const data = response;
@@ -863,7 +863,7 @@ const handleProductPaginationClick = async (pageNumber, searchQuery) => {
 
       $.ajax({
         type: "GET",
-        url: `http://127.0.0.1:3000/api/v1/admin/category/${product.category}`,
+        url: `/api/v1/admin/category/${product.category}`,
         success: function (response) {
           const categoryName = response.data.categories.name;
           row.innerHTML = `
@@ -1032,7 +1032,7 @@ async function fetchDataAndPaginate(url, currentPage, dataType) {
 
         $.ajax({
           type: "GET",
-          url: `http://127.0.0.1:3000/api/v1/admin/category/${product.category}`,
+          url: `/api/v1/admin/category/${product.category}`,
           success: function (response) {
             const categoryName = response.data.categories.name;
             row.innerHTML = `
@@ -1654,7 +1654,7 @@ const handleReportDownload = () => {
       if (result) {
         $.ajax({
           type: "PUT",
-          url: `http://127.0.0.1:3000/api/v1/admin/${userId}/block`,
+          url: `/api/v1/admin/${userId}/block`,
           success: function (user) {
             const btn = $(`label[data-user-id="${user._id}"]`);
             btn.addClass(user.isBlock ? "badge-danger" : "badge-primary");

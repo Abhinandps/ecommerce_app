@@ -683,7 +683,7 @@
 
                 const res = await axios({
                     method: 'POST',
-                    url: 'http://127.0.0.1:3000/api/v1/user/generate-otp',
+                    url: '/api/v1/user/generate-otp',
                     data: {
                         preferredMethod,
                         contactData
@@ -739,12 +739,12 @@
                 }
 
                 if (email) {
-                    res = await axios.post(`http://127.0.0.1:3000/api/v1/user/verify-otp`, {
+                    res = await axios.post(`/api/v1/user/verify-otp`, {
                         email,
                         otp
                     });
                 } else if (phoneNumber) {
-                    res = await axios.post(`http://127.0.0.1:3000/api/v1/user/verify-otp`, {
+                    res = await axios.post(`/api/v1/user/verify-otp`, {
                         phoneNumber,
                         otp
                     });

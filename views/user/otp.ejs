@@ -63,7 +63,7 @@
                 const email = document.getElementById('email').value;
                 const otp = document.getElementById('otp').value;
 
-                const res = await axios.post(`http://127.0.0.1:3000/api/v1/user/verify-otp`, {
+                const res = await axios.post(`/api/v1/user/verify-otp`, {
                     email,
                     otp
                 });
