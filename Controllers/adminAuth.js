@@ -44,12 +44,13 @@ const createSendToken = (user, statusCode, res) => {
   };
   
 
+
 // Admin register
 exports.register = catchAsync(async (req, res, next) => {
     // Save requested data and hashed password to the database
    const admin = await Admin.create(req.body);
 
-//    if everything ok, send token to client
+//  if everything ok, send token to client
   createSendToken(admin, 200, res);
 
   });
@@ -76,7 +77,6 @@ exports.login = catchAsync(async (req, res, next) => {
   createSendToken(admin, 200, res);
 
 },ErrorHandler);
-
 
 
 // Admin Logout

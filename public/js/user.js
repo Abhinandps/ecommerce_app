@@ -301,7 +301,7 @@ topRated();
 const getCategories = () => {
   $.ajax({
     type: "GET",
-    url: "http://127.0.0.1:3000/api/v1/admin/categories",
+    url: "/api/v1/admin/categories",
     success: function (categories) {
       const { data } = categories;
       const dropdown = document.querySelector(".dropdown-panel");
@@ -349,6 +349,41 @@ const getCategories = () => {
     },
   });
 };
+
+
+const getMobileCategories = () => {
+  $.ajax({
+    type: "GET",
+    url: "/api/v1/admin/categories",
+    success: function (categories) {
+      const { data } = categories;
+      const menuContainer = document.querySelector(".menu-category-container");
+
+      data.categories.forEach((category) => {
+        const listItem = document.createElement("li");
+        listItem.classList.add("menu-category");
+
+        const button = document.createElement("button");
+        button.classList.add("accordion-menu");
+        button.setAttribute("data-accordion-btn", "");
+
+        const title = document.createElement("p");
+        title.classList.add("menu-title");
+        title.innerHTML = category.name;
+
+        button.appendChild(title);
+        listItem.appendChild(button);
+        menuContainer.appendChild(listItem);
+
+        button.addEventListener("click", function () {
+          handleProductPaginationClick(1, null, category._id);
+        });
+      });
+    },
+  });
+};
+
+getMobileCategories()
 
 // Home Products Render
 

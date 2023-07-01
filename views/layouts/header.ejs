@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anon - eCommerce Website</title>
+    <title>Anon - Online Shopping</title>
 
     <!--
     - favicon
@@ -37,7 +37,8 @@
 
     <div class="loader-bg">
         <div class="preloader">
-            <svg class="cart" role="img" aria-label="Shopping cart line animation" viewBox="0 0 128 128" width="128px" height="128px" xmlns="http://www.w3.org/2000/svg">
+            <svg class="cart" role="img" aria-label="Shopping cart line animation" viewBox="0 0 128 128" width="128px"
+                height="128px" xmlns="http://www.w3.org/2000/svg">
                 <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="8">
                     <g class="cart__track" stroke="hsla(0,10%,10%,0.1)">
                         <polyline points="4,4 21,4 26,22 124,22 112,64 35,64 39,80 106,80" />
@@ -45,12 +46,15 @@
                         <circle cx="102" cy="111" r="13" />
                     </g>
                     <g class="cart__lines" stroke="currentColor">
-                        <polyline class="cart__top" points="4,4 21,4 26,22 124,22 112,64 35,64 39,80 106,80" stroke-dasharray="338 338" stroke-dashoffset="-338" />
+                        <polyline class="cart__top" points="4,4 21,4 26,22 124,22 112,64 35,64 39,80 106,80"
+                            stroke-dasharray="338 338" stroke-dashoffset="-338" />
                         <g class="cart__wheel1" transform="rotate(-90,43,111)">
-                            <circle class="cart__wheel-stroke" cx="43" cy="111" r="13" stroke-dasharray="81.68 81.68" stroke-dashoffset="81.68" />
+                            <circle class="cart__wheel-stroke" cx="43" cy="111" r="13" stroke-dasharray="81.68 81.68"
+                                stroke-dashoffset="81.68" />
                         </g>
                         <g class="cart__wheel2" transform="rotate(90,102,111)">
-                            <circle class="cart__wheel-stroke" cx="102" cy="111" r="13" stroke-dasharray="81.68 81.68" stroke-dashoffset="81.68" />
+                            <circle class="cart__wheel-stroke" cx="102" cy="111" r="13" stroke-dasharray="81.68 81.68"
+                                stroke-dashoffset="81.68" />
                         </g>
                     </g>
                 </g>
@@ -78,16 +82,12 @@
                 <!-- login start -->
                 <form id="otp-login-form">
                     <h2>Login</h2>
-                    <!-- <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" placeholder="email" email-field required>
-                    </div> -->
+
                     <div class="form-group">
                         <!-- <label for="email1"></label> -->
                         <input type="text" id="email1" placeholder="email or mobile" name="email" email-field required>
                         <span class="invalid" data-email-error></span>
                     </div>
-                    <!-- <div email-error class="invalid"></div> -->
 
                     <div class="form-group">
                         <button type="submit" class="btn">Request otp</button>
@@ -152,20 +152,14 @@
                         <label for="password">password:</label>
                         <input type="password" id="pass2" name="password" required>
                         <span class="invalid" password-error data-password-error></span>
-                        <!-- <div class="password-criteria">
-                            <label>*criteria</label>
-                            <pre class="message" criteria></pre>
-                        </div> -->
+
                     </div>
 
                     <div class="form-group">
                         <label for="password">confirm password:</label>
                         <input type="password" id="confirmpass2" name="confirmpassword" required>
                         <span class="invalid" confirm-password-error></span>
-                        <!-- <div class="password-criteria">
-                            <label>*criteria</label>
-                            <pre class="message" criteria></pre>
-                        </div> -->
+
                     </div>
 
 
@@ -224,9 +218,10 @@
         <div class="progress"></div>
     </div>
 
+
     <div class="mobiletoast" id="mobiletoast">
         <div class="toast-content">
-            <i class="fas fa-solid fa-check check"></i>
+            <!-- <i class="fas fa-solid fa-check check"></i> -->
 
             <div class="message">
                 <span class="text text-1"></span>
@@ -237,6 +232,7 @@
 
         <div class="progress"></div>
     </div>
+
 
     <script>
         function showToast() {
@@ -289,31 +285,7 @@
             <div class="container">
 
                 <ul class="header-social-container">
-
-                    <!-- <li>
-                        <a href="#" class="social-link">
-                            <ion-icon name="logo-facebook"></ion-icon>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#" class="social-link">
-                            <ion-icon name="logo-twitter"></ion-icon>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#" class="social-link">
-                            <ion-icon name="logo-instagram"></ion-icon>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#" class="social-link">
-                            <ion-icon name="logo-linkedin"></ion-icon>
-                        </a>
-                    </li> -->
-
+                    <!-- Social media links  -->
                 </ul>
 
                 <div class="header-alert-news">
@@ -335,8 +307,7 @@
                     <select name="language">
 
                         <option value="en-US">English</option>
-                        <!-- <option value="es-ES">Espa&ntilde;ol</option> -->
-                        <!-- <option value="fr">Fran&ccedil;ais</option> -->
+
 
                     </select>
 
@@ -441,7 +412,7 @@
                     </li>
 
                     <li class="menu-category">
-                        <a href="#" class="menu-title">Hot Offers</a>
+                        <a href="/hot" class="menu-title">Hot Offers</a>
                     </li>
 
                 </ul>
@@ -465,7 +436,7 @@
                 <ion-icon name="home-outline"></ion-icon>
             </button>
 
-            <button onclick="location.assign('/wishlist')"  class="action-btn">
+            <button onclick="location.assign('/wishlist')" class="action-btn">
                 <ion-icon name="heart-outline"></ion-icon>
 
                 <span class="count" id="wishlist_count_mobile">0</span>
@@ -508,147 +479,44 @@
                     <a href="/" class="menu-title">Home</a>
                 </li>
 
-                <li class="menu-category">
+                <div class="menu-category-container">
+                    <!-- <li class="menu-category">
+                        <button class="accordion-menu" data-accordion-btn>
+                            <p class="menu-title">Men's</p>
+                        </button>
+                    </li>
+    
+                    <li class="menu-category">
+                        <button class="accordion-menu" data-accordion-btn>
+                            <p class="menu-title">Women's</p>
+                        </button>
+                    </li>
+    
+                    <li class="menu-category">
+                        <button class="accordion-menu" data-accordion-btn>
+                            <p class="menu-title">Jewelry</p>
+                        </button>
+                    </li>
+    
+                    <li class="menu-category">
+                        <button class="accordion-menu" data-accordion-btn>
+                            <p class="menu-title">Perfume</p>
+                        </button>
+                    </li> -->
+                </div>
+            
 
-                    <button class="accordion-menu" data-accordion-btn>
-                        <p class="menu-title">Men's</p>
-
-                        <div>
-                            <ion-icon name="add-outline" class="add-icon"></ion-icon>
-                            <ion-icon name="remove-outline" class="remove-icon"></ion-icon>
-                        </div>
-                    </button>
-
-                    <ul class="submenu-category-list" data-accordion>
-
-                        <li class="submenu-category">
-                            <a href="#" class="submenu-title">Shirt</a>
-                        </li>
-
-                        <li class="submenu-category">
-                            <a href="#" class="submenu-title">Shorts & Jeans</a>
-                        </li>
-
-                        <li class="submenu-category">
-                            <a href="#" class="submenu-title">Safety Shoes</a>
-                        </li>
-
-                        <li class="submenu-category">
-                            <a href="#" class="submenu-title">Wallet</a>
-                        </li>
-
-                    </ul>
-
-                </li>
-
-                <li class="menu-category">
-
-                    <button class="accordion-menu" data-accordion-btn>
-                        <p class="menu-title">Women's</p>
-
-                        <div>
-                            <ion-icon name="add-outline" class="add-icon"></ion-icon>
-                            <ion-icon name="remove-outline" class="remove-icon"></ion-icon>
-                        </div>
-                    </button>
-
-                    <ul class="submenu-category-list" data-accordion>
-
-                        <li class="submenu-category">
-                            <a href="#" class="submenu-title">Dress & Frock</a>
-                        </li>
-
-                        <li class="submenu-category">
-                            <a href="#" class="submenu-title">Earrings</a>
-                        </li>
-
-                        <li class="submenu-category">
-                            <a href="#" class="submenu-title">Necklace</a>
-                        </li>
-
-                        <li class="submenu-category">
-                            <a href="#" class="submenu-title">Makeup Kit</a>
-                        </li>
-
-                    </ul>
-
-                </li>
-
-                <li class="menu-category">
-
-                    <button class="accordion-menu" data-accordion-btn>
-                        <p class="menu-title">Jewelry</p>
-
-                        <div>
-                            <ion-icon name="add-outline" class="add-icon"></ion-icon>
-                            <ion-icon name="remove-outline" class="remove-icon"></ion-icon>
-                        </div>
-                    </button>
-
-                    <ul class="submenu-category-list" data-accordion>
-
-                        <li class="submenu-category">
-                            <a href="#" class="submenu-title">Earrings</a>
-                        </li>
-
-                        <li class="submenu-category">
-                            <a href="#" class="submenu-title">Couple Rings</a>
-                        </li>
-
-                        <li class="submenu-category">
-                            <a href="#" class="submenu-title">Necklace</a>
-                        </li>
-
-                        <li class="submenu-category">
-                            <a href="#" class="submenu-title">Bracelets</a>
-                        </li>
-
-                    </ul>
-
-                </li>
-
-                <li class="menu-category">
-
-                    <button class="accordion-menu" data-accordion-btn>
-                        <p class="menu-title">Perfume</p>
-
-                        <div>
-                            <ion-icon name="add-outline" class="add-icon"></ion-icon>
-                            <ion-icon name="remove-outline" class="remove-icon"></ion-icon>
-                        </div>
-                    </button>
-
-                    <ul class="submenu-category-list" data-accordion>
-
-                        <li class="submenu-category">
-                            <a href="#" class="submenu-title">Clothes Perfume</a>
-                        </li>
-
-                        <li class="submenu-category">
-                            <a href="#" class="submenu-title">Deodorant</a>
-                        </li>
-
-                        <li class="submenu-category">
-                            <a href="#" class="submenu-title">Flower Fragrance</a>
-                        </li>
-
-                        <li class="submenu-category">
-                            <a href="#" class="submenu-title">Air Freshener</a>
-                        </li>
-
-                    </ul>
-
-                </li>
 
                 <li class="menu-category">
                     <a href="/shop" class="menu-title">Shops</a>
                 </li>
+
                 <li class="menu-category">
                     <a href="/myorders" class="menu-title">Orders</a>
                 </li>
 
                 <li class="menu-category">
-                    <a href="#" class="menu-title">Hot Offers</a>
+                    <a href="/hot" class="menu-title">Hot Offers</a>
                 </li>
 
             </ul>
@@ -668,17 +536,8 @@
                         <ul class="submenu-category-list" data-accordion>
 
                             <li class="submenu-category">
-                                <a href="#" class="submenu-title">English</a>
+                                <a href="/" class="submenu-title">English</a>
                             </li>
-
-                            <li class="submenu-category">
-                                <a href="#" class="submenu-title">Espa&ntilde;ol</a>
-                            </li>
-
-                            <li class="submenu-category">
-                                <a href="#" class="submenu-title">Fren&ccedil;h</a>
-                            </li>
-
                         </ul>
 
                     </li>
@@ -691,11 +550,7 @@
 
                         <ul class="submenu-category-list" data-accordion>
                             <li class="submenu-category">
-                                <a href="#" class="submenu-title">USD &dollar;</a>
-                            </li>
-
-                            <li class="submenu-category">
-                                <a href="#" class="submenu-title">EUR &euro;</a>
+                                <a href="/" class="submenu-title">IND</a>
                             </li>
                         </ul>
                     </li>
@@ -703,31 +558,7 @@
                 </ul>
 
                 <ul class="menu-social-container">
-
-                    <li>
-                        <a href="#" class="social-link">
-                            <ion-icon name="logo-facebook"></ion-icon>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#" class="social-link">
-                            <ion-icon name="logo-twitter"></ion-icon>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#" class="social-link">
-                            <ion-icon name="logo-instagram"></ion-icon>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#" class="social-link">
-                            <ion-icon name="logo-linkedin"></ion-icon>
-                        </a>
-                    </li>
-
+                    <!-- Social media links  -->
                 </ul>
 
             </div>
@@ -740,18 +571,7 @@
 
     <script>
 
-        // Suggestions
-        // function sendData(e){
-        //     fetch('getProductsSuggestions',{
-        //         method:"GET",
-        //         headers:{'Content-Type':"application/json"},
-        //         body:JSON.stringify({payload:e.value})
-        //     }).then(res=> res.json()).then(data=>{
-        //         let payload = data.payload
-        //         console.log(payload)
-        //     })
-        // }
-
+       
 
         $(document).ready(function () {
             $('#search-input').on('input', function () {
@@ -1010,7 +830,12 @@
 
                 if (res.data.status == "success") {
                     globalInputAccess = { phone: mobile }
-                    showOTPForm()
+                    showToast();
+                    setToastMessage("Success", res.data.message);
+                    startResendTimer()
+                    setTimeout(() => {
+                        showOTPForm()
+                    }, 1000)
                 }
                 else {
                     console.log(res.data);
@@ -1154,7 +979,7 @@
 
         resendBtn.addEventListener('click', async (event) => {
             event.preventDefault();
-            const contactValue = document.getElementById('email1').value;
+            const contactValue = document.getElementById('email1').value ? document.getElementById('email1').value : document.getElementById('email2').value;
 
             if (otpResendCounter < 3) { // Allowing maximum 3 resend attempts
                 if (validateEmail(contactValue)) {
@@ -1205,21 +1030,6 @@
 
         var toggleButtons = document.querySelectorAll('.dropdown-toggle');
 
-        
 
 
-
-        // toggleButtons.forEach(function (button) {
-        //     button.addEventListener('click', function () {
-        //         var dropdown = this.closest('.dropdown');
-
-        //         if (dropdown.classList.contains('open')) {
-        //             dropdown.classList.remove('open');
-        //             dropdown.classList.add('close');
-        //         } else {
-        //             dropdown.classList.remove('close');
-        //             dropdown.classList.add('open');
-        //         }
-        //     });
-        // });
     </script>

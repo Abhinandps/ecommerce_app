@@ -49,7 +49,6 @@ exports.resizeProductPhoto = async (req, res, next) => {
     let resizeOptions = { width: 800, height: 700 };
 
     // Set specific resize options based on the purpose
-    console.log(purpose)
     if (purpose == "banner") {
       resizeOptions = { width: 1920, height: 800 };
     } else if (purpose == "profile") {
@@ -78,7 +77,6 @@ exports.resizeProductPhoto = async (req, res, next) => {
 
   req.fileDetails = resizedFiles;
 
-  console.log(req.fileDetails);
 
   next();
 };

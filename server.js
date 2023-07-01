@@ -5,12 +5,31 @@ const dotenv = require("dotenv");
 
 dotenv.config({ path: "./config.env" });
 
+// mongoose
+//   .connect(process.env.DATABASE_LOCAL, {})
+//   .then(() => console.log("DB Connection successful"));
+
+const DB = process.env.DATABASE.replace(
+  '<PASSWORD>',
+  process.env.DATABASE_PASSWORD
+);
+
 mongoose
-  .connect(process.env.DATABASE_LOCAL, {})
-  .then(() => console.log("DB Connection successful"));
+  .connect(DB, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log('DB connection successful!'));
 
-const port = process.env.PORT || 4000;
-
-app.listen(port, () => {
-  console.log(`server listening to the port http://127.0.0.1:${port}`);
-});
+  const port = process.env.PORT || 3000;
+  const server = app.listen(port, () => {
+    console.log(`App running on port ${port}...`);
+  });
+  
+  process.on('unhandledRejection', err => {
+    console.log('UNHANDLED REJECTION! 💥 Shutting down...');
+    console.log(err.name, err.message);
+    server.close(() => {
+      process.exit(1);
+    });
+  });

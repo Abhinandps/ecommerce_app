@@ -18,6 +18,7 @@ const StarRating = require("../Models/rating");
 
 const { generateInvoice } = require("../utils/generateInvoice");
 
+
 // Custom orderID generator
 const generateOrderID = () => {
   const date = new Date();
@@ -27,6 +28,7 @@ const generateOrderID = () => {
   const orderID = `ORD-${timestamp}-${random}`;
   return orderID;
 };
+
 
 /*
 Home Page START
