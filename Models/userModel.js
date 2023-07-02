@@ -80,10 +80,10 @@ userSchema.virtual("isOTPExpired").get(function () {
   return this.otpExpiration && this.otpExpiration < Date.now();
 });
 
-// Pre-save hook to automatically set OTP to null after 30 seconds
+// Pre-save hook to automatically set OTP to null after 60 seconds
 userSchema.pre("save", function (next) {
   if (this.isModified("otp") || this.isNew) {
-    this.otpExpiration = Date.now() + 30000; // 30 seconds from now
+    this.otpExpiration = Date.now() + 60000; // 60 seconds from now
   }
   next();
 });

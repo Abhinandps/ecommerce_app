@@ -50,9 +50,6 @@ const sendOTP = (otp, user) => {
   });
 };
 
-
-
-
 const sendMobileOTP = async (otp, mobileNumber, res) => {
   try {
     const client = twilio(
@@ -89,7 +86,6 @@ const sendMobileOTP = async (otp, mobileNumber, res) => {
   }
 };
 
-
 const createSendToken = async (user, statusCode, res, req) => {
   // Generate a JWT containing the user's ID
   const token = signToken(user._id);
@@ -117,15 +113,17 @@ const createSendToken = async (user, statusCode, res, req) => {
     (async () => {
       const user = await findUserFromToken(token);
       // console.log(user);
-      const cart = await Cart.findOne({ user: user._id });
+      let cart = await Cart.findOne({ user: user._id });
       if (cart) {
         cart.items = guestUser.items;
         cart.totalPrice = guestUser.totalPrice;
         await cart.save();
       } else {
-        
-        // cart.items = [];
-        // await cart.save();
+        // Create a new cart if it doesn't exist for the user
+        cart = new Cart({ user: user._id, items: [] });
+        cart.items = guestUser.items;
+        cart.totalPrice = guestUser.totalPrice;
+        await cart.save();
       }
 
       // Remove the guestUser document from the database
@@ -270,7 +268,6 @@ exports.login = catchAsync(async (req, res, next) => {
   // 3) if everything ok, send token to client
   createSendToken(user, 200, res, req);
 }, ErrorHandler);
-
 
 // User generateOTP
 exports.generateOTP = catchAsync(async (req, res, next) => {

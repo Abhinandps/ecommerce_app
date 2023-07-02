@@ -191,6 +191,9 @@
                     <div class="form-group">
                         <button class="btn-black" type="submit">Log In</button>
                     </div>
+                    <div class="form-group">
+                        <button class="btn" id="get-started" onclick="location.href = `/`"  style="margin:10px 0px;" type="submit">Get Started</button>
+                    </div>
 
                     <button class="links" onclick="showSignUpForm()">Create Account</button>
                 </form>
@@ -347,7 +350,7 @@
                     <% if (locals.user && locals.user.role==='user' ) { %>
 
                         <button class="action-btn" data-menu-user-action>
-                            <img class="mobile-user-avatar" src="<%= locals.user.avatar.replace('public\\', '') %>"
+                            <img class="mobile-user-avatar" src="<%= locals.user.avatar.replace('public/', '') %>"
                                 alt="testimonial">
                         </button>
 
@@ -358,7 +361,7 @@
 
                                     </small></li>
                                 <li> <a href="/me">Profile</a></li>
-                                <li> <a href="#" class="logout">Logout</a></li>
+                                <li> <a href="" class="logout">Logout</a></li>
                             </ul>
                         </div>
 
@@ -444,7 +447,7 @@
 
             <% if (locals.user && locals.user.role==='user' ) { %>
                 <button class="action-btn" data-mobile-user-action>
-                    <img class="mobile-user-avatar" src="src/images/testimonial-1.jpg" alt="testimonial">
+                    <img class="mobile-user-avatar" src="<%= locals.user.avatar.replace('public/', '') %>" alt="testimonial">
                 </button>
 
                 <div class="mobile-profile-dropDown close">
@@ -454,7 +457,7 @@
 
                             </small></li>
                         <li> <a href="/me">Profile</a></li>
-                        <li> <a href="#" class="logout">Logout</a></li>
+                        <li> <a href="" class="logout">Logout</a></li>
                     </ul>
                 </div>
                 <% } else if (locals.user && locals.user.role==='guest' ) { %>
@@ -831,7 +834,7 @@
                 if (res.data.status == "success") {
                     globalInputAccess = { phone: mobile }
                     showToast();
-                    setToastMessage("Success", res.data.message);
+                    setToastMessage("Success", `OTP sent to ${email} Successfully.`);
                     startResendTimer()
                     setTimeout(() => {
                         showOTPForm()
@@ -961,7 +964,7 @@
         }
 
         function startResendTimer() {
-            let timerCount = 30; // Set the countdown time in seconds
+            let timerCount = 60; // Set the countdown time in seconds
             resendBtn.disabled = true; // Disable the resend button during the countdown
 
             otpResendTimer = setInterval(() => {
@@ -1029,6 +1032,11 @@
         });
 
         var toggleButtons = document.querySelectorAll('.dropdown-toggle');
+
+
+
+
+
 
 
 

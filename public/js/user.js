@@ -1121,7 +1121,7 @@ const getCart = () => {
       const couponEditCard = document.getElementById("couponEditCard");
       if (discountAmount > 0) {
         const couponListElement = document.getElementById("coupon-list");
-        couponListElement.textContent = discountAmount;
+        couponListElement.textContent = `₹${discountAmount}`;
         couponListElement.classList.add("discount-applied");
         const couponRemoveCard = `
         <div class="coupon-handle">
@@ -1748,8 +1748,10 @@ const getPaymentDetails = () => {
         razorpayInstance.open();
       }
     } catch (error) {
-      console.error("Error placing order:", error);
+      // console.error("Error placing order:", error);
+      showToast()
       setToastMessage("Failed", error.response.data.message);
+      console.log(error.response.data.message)
     }
   }
 };

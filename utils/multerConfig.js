@@ -32,6 +32,7 @@ exports.resizeProductPhoto = async (req, res, next) => {
 
   let { purpose } = req.body ;
 
+
   if (req.query && req.query.purpose) {
     purpose = req.query.purpose;
   }

@@ -925,6 +925,7 @@ function generateInvoiceNumber() {
   return invoiceNumber;
 }
 
+
 exports.downloadInvoice = catchAsync(async (req, res, next) => {
   const order = await Order.findOne({ orderID: req.params.orderId });
 
@@ -935,6 +936,7 @@ exports.downloadInvoice = catchAsync(async (req, res, next) => {
   }
   generateInvoice(order, req, res);
 });
+
 
 // HOME PAGE BANNERS
 
@@ -1038,18 +1040,21 @@ exports.updateMobile = catchAsync(async (req, res, next) => {
 });
 
 exports.updateAvatar = catchAsync(async (req, res, next) => {
-  if (!req.file) {
+  if (!req.fileDetails) {
     return next(new AppError("No Avatar file provided", 400));
   }
 
-  const avatarPath = req.file.path;
+
+  const avatarPath = req.fileDetails;
   const userId = req.user.id;
+  
 
   const updatedUser = await User.findByIdAndUpdate(
     userId,
     { avatar: avatarPath },
     { new: true }
   );
+
 
   if (!updatedUser) {
     return next(new AppError("User Not Found", 404));

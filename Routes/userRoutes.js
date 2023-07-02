@@ -53,7 +53,7 @@ const User = require("../Models/userModel");
 const { paginatedResultsUser } = require("../utils/pagination");
 const Product = require("../Models/products");
 
-const {uploadSingle,uploadMultiple,resizeProductPhoto} = require("../utils/multerConfig");
+const {uploadSingle,resizeProductPhoto} = require("../utils/multerConfig");
 
 
 router.get("/otp-login", (req, res) => {
@@ -187,6 +187,7 @@ router.put("/profile/mobile", isAuthenticate, updateMobile);
 router.put(
   "/profile/avatar",
   uploadSingle,
+  resizeProductPhoto,
   isAuthenticate,
   updateAvatar
 );
