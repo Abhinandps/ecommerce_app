@@ -1748,10 +1748,10 @@ const getPaymentDetails = () => {
         razorpayInstance.open();
       }
     } catch (error) {
-      // console.error("Error placing order:", error);
-      showToast()
-      setToastMessage("Failed", error.response.data.message);
-      console.log(error.response.data.message)
+      console.error("Error placing order:", error);
+      // showToast()
+      // setToastMessage("Failed", error.response.data.message);
+      // console.log(error.response.data.message)
     }
   }
 };

@@ -19,15 +19,24 @@ const StarRating = require("../Models/rating");
 const { generateInvoice } = require("../utils/generateInvoice");
 
 
-// Custom orderID generator
-const generateOrderID = () => {
-  const date = new Date();
-  const timestamp = date.getTime();
-  const random = Math.floor(Math.random() * 10000);
+// // Custom orderID generator
+// const generateOrderID = () => {
+//   const date = new Date();
+//   const timestamp = date.getTime();
+//   const random = Math.floor(Math.random() * 10000);
 
-  const orderID = `ORD-${timestamp}-${random}`;
+//   const orderID = `ORD-${timestamp}-${random}`;
+//   return orderID;
+// };
+
+// Generate a unique order ID
+const generateOrderID = () => {
+  const timestamp = Date.now().toString(); // Get current timestamp
+  const random = Math.floor(Math.random() * 1000).toString(); // Generate a random number
+  const orderID =`ORD-${timestamp}-${random}` // Combine timestamp and random number
   return orderID;
 };
+
 
 
 /*
@@ -686,6 +695,7 @@ exports.removeCoupon = catchAsync(async (req, res) => {
 exports.initialPayment = catchAsync(async (req, res, next) => {
   const { shippingAddress, paymentMethod, totalPrice } = req.body;
 
+
   const user = await User.findById(req.user._id);
   if (!user) {
     return next(new AppError("User Not Found", 404));
@@ -710,6 +720,7 @@ exports.initialPayment = catchAsync(async (req, res, next) => {
   if (!shippingAddress) {
     return next(new AppError("Please provide all the required fields", 400));
   }
+
 
   // Validate if the product quantities are available
 
@@ -744,11 +755,17 @@ exports.initialPayment = catchAsync(async (req, res, next) => {
   }
 
   const orderID = generateOrderID();
+  const invoiceNumber = generateInvoiceNumber();
+
+
 
   // Handle payment based on the payment method
 
   if (paymentMethod === "cod") {
-    // Handle Cash on Delivery (COD) payment
+    // Handle Cash on Delivery (COD) 
+    
+
+
 
     // Create a new order
     const order = new Order({
@@ -758,9 +775,14 @@ exports.initialPayment = catchAsync(async (req, res, next) => {
       shippingAddress,
       paymentMethod,
       totalPrice,
+      invoiceNumber
     });
 
+
     await order.save();
+
+
+
 
     // Store the user ID in the usedBy array
     const coupon = await Coupon.findOne({ usedBy: req.user._id });
@@ -774,6 +796,7 @@ exports.initialPayment = catchAsync(async (req, res, next) => {
     await cart.save();
 
     res.status(200).json({ message: "Order Placed Successfully" });
+
   } else if (paymentMethod === "upi") {
     // Set up Razorpay instance
     const razorpay = new Razorpay({
@@ -817,6 +840,8 @@ exports.razorpayWebhook = catchAsync(async (req, res, next) => {
 
 exports.placeOrder = catchAsync(async (req, res, next) => {
   const { orderID, shippingAddress, paymentMethod, totalPrice } = req.body;
+  const invoiceNumber = generateInvoiceNumber();
+
   
 
   const user = await User.findById(req.user._id);
@@ -838,6 +863,7 @@ exports.placeOrder = catchAsync(async (req, res, next) => {
     shippingAddress,
     paymentMethod,
     totalPrice,
+    invoiceNumber
     // razorpayOrderID: razorpayOrderID,
   });
 
@@ -857,6 +883,8 @@ exports.placeOrder = catchAsync(async (req, res, next) => {
   // Return the Razorpay order ID to the frontend
   res.status(200).json({ message: "Order Placed Successfully" });
 });
+
+
 
 // Orders Management
 exports.orderHistory = catchAsync(async (req, res, next) => {
@@ -921,10 +949,9 @@ function generateInvoiceNumber() {
   const random = Math.floor(Math.random() * 10000)
     .toString()
     .padStart(4, "0");
-  const invoiceNumber = `${timestamp}-${random}`;
+  const invoiceNumber = `INV-${timestamp}-${random}`;
   return invoiceNumber;
 }
-
 
 exports.downloadInvoice = catchAsync(async (req, res, next) => {
   const order = await Order.findOne({ orderID: req.params.orderId });

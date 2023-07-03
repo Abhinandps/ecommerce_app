@@ -49,6 +49,7 @@ const orderSchema = new mongoose.Schema(
     },
     invoiceNumber: {
       type: String,
+      unique:true,
     },
     cancellationReason: {
       type: String,
