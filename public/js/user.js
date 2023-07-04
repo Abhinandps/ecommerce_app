@@ -866,6 +866,14 @@ const getCartCount = () => {
       const cartCountMobile = document.querySelector("#cart_count_mobile");
       cartCount.textContent = response.count;
       cartCountMobile.textContent = response.count;
+      if(response.count>0){
+        cartCount.style.display="block"
+        cartCountMobile.style.display="block"
+      }else{
+        cartCount.style.display="none"
+        cartCountMobile.style.display="none"
+      }
+
     },
     error: function (error) {
       console.error("Error retrieving cart items count", error);
@@ -887,6 +895,15 @@ const getWishListCount = () => {
       );
       wishListCount.textContent = response.count;
       wishListCountMobile.textContent = response.count;
+      if(response.count>0){
+        wishListCount.style.display="block"
+        wishListCountMobile.style.display="block"
+      }else{
+        wishListCount.style.display="none"
+        wishListCountMobile.style.display="none"
+      }
+
+
     },
     error: function (error) {
       console.error("Error retrieving cart items count", error);
