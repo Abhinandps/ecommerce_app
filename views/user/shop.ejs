@@ -164,7 +164,7 @@
                     </div>
 
                     <div id="pagination-container">
-                        
+
                     </div>
 
 
@@ -180,6 +180,18 @@
 
 
     <script>
+        $(document).ready(function () {
+            // Retrieve the search term from the query parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchTerm = urlParams.get('search');
+
+            // Populate the search input field with the search term
+            $('#search-input').val(searchTerm);
+
+            // Execute the search functionality
+            handleProductPaginationClick(1, searchTerm, null);
+        });
+
         window.onload = async function () {
             // await getProducts()
             await getCategories()

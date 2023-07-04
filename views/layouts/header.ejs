@@ -192,7 +192,8 @@
                         <button class="btn-black" type="submit">Log In</button>
                     </div>
                     <div class="form-group">
-                        <button class="btn" id="get-started" onclick="location.href = `/`"  style="margin:10px 0px;" type="submit">Get Started</button>
+                        <button class="btn" id="get-started" onclick="location.href = `/`" style="margin:10px 0px;"
+                            type="submit">Get Started</button>
                     </div>
 
                     <button class="links" onclick="showSignUpForm()">Create Account</button>
@@ -447,7 +448,8 @@
 
             <% if (locals.user && locals.user.role==='user' ) { %>
                 <button class="action-btn" data-mobile-user-action>
-                    <img class="mobile-user-avatar" src="<%= locals.user.avatar.replace('public/', '') %>" alt="testimonial">
+                    <img class="mobile-user-avatar" src="<%= locals.user.avatar.replace('public/', '') %>"
+                        alt="testimonial">
                 </button>
 
                 <div class="mobile-profile-dropDown close">
@@ -507,7 +509,7 @@
                         </button>
                     </li> -->
                 </div>
-            
+
 
 
                 <li class="menu-category">
@@ -574,7 +576,7 @@
 
     <script>
 
-       
+
 
         $(document).ready(function () {
             $('#search-input').on('input', function () {
@@ -607,16 +609,32 @@
 
 
         // Handle product search 
-
         $('.search-btn').on('click', function () {
+            performSearch();
+        });
+
+        $('#search-input').on('keydown', function (event) {
+            if (event.keyCode === 13) {
+                performSearch();
+                return false; // Prevent form submission
+            }
+        });
+
+        function performSearch() {
             var searchTerm = $('#search-input').val();
 
-            handleProductPaginationClick(1, searchTerm, null);
-
             // Clear the suggestions and input
-            $('#search-input').val('')
+            $('#search-input').val('');
             $('#suggestions').empty();
-        });
+
+            if (window.location.pathname !== '/shop') {
+                // Redirect to the shop page with the search term as a query parameter
+                window.location.href = '/shop?search=' + encodeURIComponent(searchTerm);
+            } else {
+                // Execute the search functionality on the current page (already on /shop)
+                handleProductPaginationClick(1, searchTerm, null);
+            }
+        }
 
 
 
