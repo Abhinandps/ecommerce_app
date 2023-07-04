@@ -139,6 +139,13 @@ exports.paginatedResultsUser = (model) => {
       filterOptions.name = { $regex: searchQuery, $options: "i" };
     }
 
+     // Add price range filter
+     if (req.query.minPrice && req.query.maxPrice) {
+      const minPrice = parseFloat(req.query.minPrice);
+      const maxPrice = parseFloat(req.query.maxPrice);
+      filterOptions.price = { $gte: minPrice, $lte: maxPrice };
+    }
+
    
 
     try {

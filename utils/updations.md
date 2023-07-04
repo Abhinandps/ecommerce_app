@@ -1,3 +1,4 @@
+
 ✓ ✔ ✘ ☓ ✗
 
 
@@ -5,12 +6,12 @@ Week 1
 
 Updations in Project Figma
 
-[]OTP verification
-[]list all coupons in user side
+[✓]OTP verification
+[✓]list all coupons in user side
 []payment success/failure page
 []product return & cancel
-[]Banner management
-[]sales report
+[✓]Banner management
+[✓]sales report
 []update DB design & api doc
 
 Theory :7.5
@@ -33,11 +34,11 @@ Updations
 [✓] soft delete 
 [✓] form validation
 [✓] login UI
-[] $ to ₹
+[✓] $ to ₹
 [✓] header cleanup and UI
-[] image crop
+[✓] image crop
 [✓] multiple images (multer)
-[].gitignore
+[✓].gitignore
 
 Theory-7
 Workouts-7
@@ -51,7 +52,6 @@ Week 3 (Repeat)
 [✓] Order management & order cancellation option in admin side,
 [✓] Order cancellation option in user side.
 [✓] Order history and status in user side. Mobile OTP login.
-[] Crop
 
 Review postponed  he need 2 more days 
 to complete  tasks
@@ -66,7 +66,7 @@ Project Updations:
 [✓]currency is missing
 [✓]Order cancellation option in user side.
 [✗]reason cancel and return 
-[]return expiry
+
 [✔]place order is pending
 [✓]Mobile OTP login
 [✓]sort filter pagination for every list : admin side
@@ -74,7 +74,8 @@ Project Updations:
 [✓]category should be unique
 [✓]toaster messages for every server actions
 [✓]validation for all forms
-[]Complete the updates next week
+[✔] - Home page
+[✔]Complete the updates next week
 
 Week Repeat
 Theory:4
@@ -84,17 +85,17 @@ Workout:4
 
 Week 3 Project Updations 
 
-[] - Home page
+[✔] - Home page
 [✔] - admin login cleanup
 [✔] - category delete logic
 [✔] - order details - admin
 [✔] - add product UI
-[] - Home page
+
 [✔] - guest user experience
 [✔] - order success and order details page 
 [✔] - profile 
 [✔] - $ and ₹
-[] 
+
 [✔] + search, filter, sort, pagination
 [✔] + Coupon management
 [✔] + Online payment
@@ -106,7 +107,7 @@ Week 3 Project Updations
 [] Image Zooming, Image Cropping
 [✔] Admin dashboard
 [✔] Chart & Graph reports in Admin Side
-[✗] User profile
+[✔] User profile
 
 Theory:6
 Workout:6
@@ -119,8 +120,8 @@ Updations:
 
 -[✔]Transaction id needed
 -[✔]Order list ui updates
--[x]Order history
--[x]Product saving not showing any message
+-[✓]Order history
+-[✓]Product saving not showing any message
 -[✔]Toaster message missing
 -[✔]Inform stock is out or not
 -[✔]Add new address ui
@@ -167,7 +168,7 @@ Pending:
 
 Score:
 Theory:7.5
-Coding:7.5"
+Coding:7.5
 
 
 my pending..
@@ -178,7 +179,7 @@ TuesDay, WednesDay
 []product suggestion border issue (optional)
 []price filter(optional)
 [✔]whish list
-[]product Details and offers
+[✔]product Details and offers
 []image zoom
 [✔]orders (orders , delivered, returned)
 [✔]group order
@@ -188,33 +189,44 @@ TuesDay, WednesDay
 [x]checkout page address remove option needed
 []payment page design cleanup
 []cart remove custom alert
-[]rating (optional)
+[✔]rating (optional)
 
 
 Admin
 
-[x]product crop
-[]heading styleCart to Anon Logo and admin Dynamically
+[✔]product crop
+[✔]heading styleCart to Anon Logo and admin Dynamically
 
 
 Common 
-[]Every Page title change 
-[]Verify the document icon 
+[✔]Every Page title change 
+[✔]Verify the document icon 
 
-[]admin filtering etc.. ui clean up (optical)
+[✔]admin filtering etc.. ui clean up (optical)
 
 
 Thursday
 
-[] Return Wallet (optional)
-[] 404 page
+[x] Return Wallet (optional)
+[✔] 404 page
 [x] Code formatting  (must to do )
 
 
+Project Completed and Hosted
+
+[✔]Hide count in wishlist and cart if empty
+[✔]Search in landing page not working
+[✔]Enter button press to search in search box
+[✔]Sort and filter with search
+[]Reverse proxy
+[]Nginx configuration
+[]PM2 commands
+[]Linux commands for file handling
+
+Conceptwise Marks:6
+Programming Part Marks:6"
 
 
 
 
-
-  <!-- <option value="return">Return and Refund</option> -->
 

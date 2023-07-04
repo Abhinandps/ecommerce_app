@@ -5,6 +5,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
   setTimeout(() => {
     document.body.classList.add("loading");
-  }, 3000);
+  }, 1000);
   document.body.classList.remove("loading");
 });

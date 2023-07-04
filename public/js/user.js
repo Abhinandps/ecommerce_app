@@ -483,14 +483,19 @@ const fetchData = async (url) => {
   }
 };
 
+
+
 // Products
 
 const handleProductPaginationClick = async (
   pageNumber,
   searchQuery,
-  categoryId
+  categoryId,
+  minPrice,
+  maxPrice
 ) => {
   try {
+   
     // Get filter and sort parameters for products
 
     // const category = document.getElementById("category").value;
@@ -514,6 +519,10 @@ const handleProductPaginationClick = async (
 
     if (searchQuery) {
       queryString += `&search=${searchQuery}`;
+    }
+
+    if (minPrice && maxPrice) {
+      queryString += `&minPrice=${minPrice}&maxPrice=${maxPrice}`;
     }
 
     const response = await fetchData(queryString);
@@ -599,8 +608,10 @@ const handleProductPaginationClick = async (
     });
 
     updatePaginationNumbers(data.previous, data.next, pageNumber, "shop");
+    
   } catch (error) {
     console.error(error);
+   
   }
 };
 
