@@ -92,63 +92,63 @@
             // });
 
             $(document).ready(function () {
-  var readURL = function (input) {
-    if (input.files && input.files[0]) {
-      var reader = new FileReader();
+                var readURL = function (input) {
+                    if (input.files && input.files[0]) {
+                        var reader = new FileReader();
 
-      reader.onload = function (e) {
-        $('.profile-pic').attr('src', e.target.result);
-      }
+                        reader.onload = function (e) {
+                            $('.profile-pic').attr('src', e.target.result);
+                        }
 
-      reader.readAsDataURL(input.files[0]);
-    }
-  }
+                        reader.readAsDataURL(input.files[0]);
+                    }
+                }
 
-  $(".file-upload").on('change', function () {
-    readURL(this);
-    // Update profile picture by making an AJAX request
-    var formData = new FormData();
-    formData.append('image', this.files[0]);
-    formData.append('purpose', 'profile');
-    
-    $.ajax({
-      url: '/api/v1/user/profile/avatar',
-      type: 'PUT',
-      data: formData,
-      processData: false,
-      contentType: false,
-      success: function (data) {
-        console.log('Profile picture updated successfully');
-        // You can perform additional actions upon successful update if needed
-      },
-      error: function (error) {
-        console.error('Error updating profile picture:', error);
-        // Handle any errors that occurred during the update
-      }
-    });
+                $(".file-upload").on('change', function () {
+                    readURL(this);
+                    // Update profile picture by making an AJAX request
+                    var formData = new FormData();
+                    formData.append('image', this.files[0]);
+                    formData.append('purpose', 'profile');
 
-  });
+                    $.ajax({
+                        url: '/api/v1/user/profile/avatar',
+                        type: 'PUT',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            console.log('Profile picture updated successfully');
+                            // You can perform additional actions upon successful update if needed
+                        },
+                        error: function (error) {
+                            console.error('Error updating profile picture:', error);
+                            // Handle any errors that occurred during the update
+                        }
+                    });
 
-  $(".upload-button").on('click', function () {
-    $(".file-upload").click();
-  });
+                });
 
-  // Retrieve profile picture by making an AJAX request
-  $.ajax({
-    url: '/api/v1/user/profile',
-    type: 'GET',
-    success: function (data) {
-        console.log(data.data.userProfile.avatar)
-      var profilePicUrl = data.data.userProfile.avatar;
-      profilePicUrl
-      $('.profile-pic').attr('src', profilePicUrl.replace('public/',''));
-    },
-    error: function (error) {
-      console.error('Error retrieving profile picture:', error);
-      // Handle any errors that occurred while retrieving the profile picture
-    }
-  });
-});
+                $(".upload-button").on('click', function () {
+                    $(".file-upload").click();
+                });
+
+                // Retrieve profile picture by making an AJAX request
+                $.ajax({
+                    url: '/api/v1/user/profile',
+                    type: 'GET',
+                    success: function (data) {
+                        console.log(data.data.userProfile.avatar)
+                        var profilePicUrl = data.data.userProfile.avatar;
+                        profilePicUrl
+                        $('.profile-pic').attr('src', profilePicUrl.replace('public/', ''));
+                    },
+                    error: function (error) {
+                        console.error('Error retrieving profile picture:', error);
+                        // Handle any errors that occurred while retrieving the profile picture
+                    }
+                });
+            });
 
         </script>
 
@@ -325,7 +325,7 @@
 
                             </div>
 
-                            <button type="submit">Submit</button>
+                            <button type="submit" >Submit</button>
                         </form>
                     </div>
                 </div>
@@ -434,7 +434,7 @@
                                     setToastMessage("Success", response.data.message);
                                     getAddress();
                                     form.setAttribute("data-mode", "add");
-                                } else if(form.getAttribute("data-mode") === 'add'){
+                                } else if (form.getAttribute("data-mode") === 'add') {
                                     const response = await axios.post('/api/v1/user/address', formData);
                                     formPopupBg.classList.remove('is-visible');
                                     showToast();

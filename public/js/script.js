@@ -9,11 +9,13 @@ const modalCloseOverlay = document.querySelector("[data-modal-overlay]");
 const modalCloseFunc = function () {
   modal.classList.remove("modal-active");
   modal.classList.remove("closed");
+  
 };
 
 const modalDisplayFunc = function () {
   document.getElementById("signup-form").style.display = "none";
   document.getElementById("login").style.display = "none";
+  document.getElementById("otp-login-form").style.display = "block";
   modal.classList.remove("closed");
   modal.classList.add("modal-active");
 };
