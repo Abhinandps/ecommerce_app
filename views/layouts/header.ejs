@@ -375,12 +375,12 @@
 
                                 <button onclick="location.assign('/wishlist')" class="action-btn">
                                     <ion-icon name="heart-outline"></ion-icon>
-                                    <span class="count" id="wishlist_count">0</span>
+                                    <span class="count" style="display: none;" id="wishlist_count"></span>
                                 </button>
 
                                 <button onclick="location.assign('/cart')" class="action-btn">
                                     <ion-icon name="bag-handle-outline"></ion-icon>
-                                    <span class="count" id="cart_count">0</span>
+                                    <span class="count" id="cart_count"></span>
                                 </button>
 
                 </div>
@@ -443,7 +443,7 @@
             <button onclick="location.assign('/wishlist')" class="action-btn">
                 <ion-icon name="heart-outline"></ion-icon>
 
-                <span class="count" id="wishlist_count_mobile">0</span>
+                <span class="count" style="display: none;" id="wishlist_count_mobile">0</span>
             </button>
 
             <% if (locals.user && locals.user.role==='user' ) { %>
