@@ -70,8 +70,10 @@ const bestSellers = () => {
       const button = event.target.classList.contains("showcase")
         ? event.target
         : event.target.closest(".showcase");
-      const product = JSON.parse(button.dataset.product);
-      handleViewDetails(product);
+      if (button.dataset.product) {
+        const product = JSON.parse(button.dataset.product);
+        handleViewDetails(product);
+      }
     }
   });
 };
@@ -149,8 +151,6 @@ const newArrivals = () => {
   });
 };
 
-newArrivals();
-
 const trending = () => {
   const row = document.querySelector("#trending-showcase-wrapper");
 
@@ -223,8 +223,6 @@ const trending = () => {
   });
 };
 
-trending();
-
 const topRated = () => {
   const row = document.querySelector("#topRated-showcase-wrapper");
 
@@ -296,8 +294,6 @@ const topRated = () => {
   });
 };
 
-topRated();
-
 const getCategories = () => {
   $.ajax({
     type: "GET",
@@ -350,7 +346,6 @@ const getCategories = () => {
   });
 };
 
-
 const getMobileCategories = () => {
   $.ajax({
     type: "GET",
@@ -383,7 +378,7 @@ const getMobileCategories = () => {
   });
 };
 
-getMobileCategories()
+getMobileCategories();
 
 // Home Products Render
 
@@ -483,8 +478,6 @@ const fetchData = async (url) => {
   }
 };
 
-
-
 // Products
 
 const handleProductPaginationClick = async (
@@ -495,7 +488,6 @@ const handleProductPaginationClick = async (
   maxPrice
 ) => {
   try {
-   
     // Get filter and sort parameters for products
 
     // const category = document.getElementById("category").value;
@@ -557,7 +549,9 @@ const handleProductPaginationClick = async (
 
             <div class="showcase-actions">
 
-                <button class="btn-action">
+                <button class="btn-action add-to-wishlist" data-productId='${
+                  product._id
+                }'>
                     <ion-icon name="heart-outline"></ion-icon>
                 </button>
 
@@ -608,10 +602,8 @@ const handleProductPaginationClick = async (
     });
 
     updatePaginationNumbers(data.previous, data.next, pageNumber, "shop");
-    
   } catch (error) {
     console.error(error);
-   
   }
 };
 
@@ -851,7 +843,7 @@ document.addEventListener("click", function (event) {
     const button = event.target.classList.contains("add-to-wishlist")
       ? event.target
       : event.target.closest(".add-to-wishlist");
-    const productId = button.dataset.productid;
+      const productId = button.dataset.productid;
     saveToWishList(productId);
   }
 });
@@ -877,14 +869,13 @@ const getCartCount = () => {
       const cartCountMobile = document.querySelector("#cart_count_mobile");
       cartCount.textContent = response.count;
       cartCountMobile.textContent = response.count;
-      if(response.count>0){
-        cartCount.style.display="block"
-        cartCountMobile.style.display="block"
-      }else{
-        cartCount.style.display="none"
-        cartCountMobile.style.display="none"
+      if (response.count > 0) {
+        cartCount.style.display = "block";
+        cartCountMobile.style.display = "block";
+      } else {
+        cartCount.style.display = "none";
+        cartCountMobile.style.display = "none";
       }
-
     },
     error: function (error) {
       console.error("Error retrieving cart items count", error);
@@ -906,15 +897,13 @@ const getWishListCount = () => {
       );
       wishListCount.textContent = response.count;
       wishListCountMobile.textContent = response.count;
-      if(response.count>0){
-        wishListCount.style.display="block"
-        wishListCountMobile.style.display="block"
-      }else{
-        wishListCount.style.display="none"
-        wishListCountMobile.style.display="none"
+      if (response.count > 0) {
+        wishListCount.style.display = "block";
+        wishListCountMobile.style.display = "block";
+      } else {
+        wishListCount.style.display = "none";
+        wishListCountMobile.style.display = "none";
       }
-
-
     },
     error: function (error) {
       console.error("Error retrieving cart items count", error);

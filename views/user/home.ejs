@@ -203,7 +203,8 @@
               <img src="/src/images/icons/quotes.svg" style="width:26px;" alt="quotation" class="quotation-img">
 
               <p class="testimonial-desc">
-                Shopping at Anon has been an absolute delight! The website offers a wide range of high-quality products that cater to my needs.
+                Shopping at Anon has been an absolute delight! The website offers a wide range of high-quality products
+                that cater to my needs.
               </p>
 
             </div>
@@ -217,7 +218,7 @@
             -->
 
           <div class="cta-container">
-            
+
             <!-- <img src="/src/images/cta-banner.jpg" alt="summer collection" class="cta-banner">
 
             <a href="#" class="cta-content">
@@ -577,6 +578,10 @@
     getBanners();
 
     window.onload = async function () {
+      newArrivals();
+      trending();
+      topRated();
+
       await getHomeProducts()
       await getCategories()
     }
