@@ -2530,6 +2530,15 @@ footer {
     margin-left: 20px;
   }
 
+  .horizontal.timeline .steps .step span{
+  
+    transform: rotate(-90deg) translateX(100px) translateY(-54px);
+    color: #000;
+    opacity: .4;
+    font-size: var(--fs-7);
+    min-width: 110px;
+  }
+
   /* toast 
    */
 
@@ -2655,14 +2664,9 @@ footer {
   }
 
   #orders-history .order_details .details-row .tracking_status {
-    /* width: 100%;
-    min-height: 10vh;
-    font-size: var(--fs-8);
-    text-transform: capitalize;
-    font-weight: var(--weight-500);
-    padding: 10px 20px;
-    text-align: left; */
-    transform: rotate(90deg) translateX(25em) translateY(15em);
+    height: 50vh;
+    padding: 0px 0px;
+    transform: rotate(90deg) translateX(0em) translateY(15em);
   }
 }
 
@@ -2858,6 +2862,7 @@ footer {
   #orders-history .order_details .details-row .address_details {
     width: 100%;
     padding: 10px 0px;
+    line-break: anywhere;
   }
 
   .row > .tracking_status {

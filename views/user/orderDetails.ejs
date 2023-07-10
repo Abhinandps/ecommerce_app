@@ -64,7 +64,7 @@
             position: absolute;
             top: calc(100% + 1em);
             left: 50%;
-            transform: translateX(-50%);
+
             white-space: nowrap;
             color: #000;
             opacity: .4;
@@ -113,7 +113,7 @@
                     <li class="meanu-category"><a class="ajax-link active" href="/orders">Orders</a></li>
                     <li><a class="ajax-link" href="/delivered">Delivered</a></li>
                     <li><a class="ajax-link" href="/cancelled">Cancelled</a></li>
-                    <li><a class="ajax-link" href="/return">Return</a></li>
+
                 </ul>
             </nav>
         </div>
@@ -466,7 +466,7 @@
                             order.items.forEach((product, index) => {
                                 const { product: productID } = product
                                 console.log("product")
-                                
+
 
                                 $.ajax({
                                     type: "GET",
@@ -606,13 +606,13 @@
                     data: JSON.stringify({ orderId: orderId, productId: productId, rating: ratingInput.value }),
                     contentType: "application/json",
                     success: function (response) {
-                     
+
                         showToast()
                         setToastMessage("success", response.message)
 
                         // Store the updated order data back into local storage
                         localStorage.setItem('myorder', JSON.stringify(response.order));
-                        
+
                         // Update the star rating UI
                         const stars = document.querySelectorAll(`#rating-stars-${productId} ion-icon`);
                         stars.forEach(star => {
@@ -662,6 +662,8 @@
 
 
 
+
+
         const form = document.getElementById('reasonForCancel');
 
         let isValid = true;
@@ -693,7 +695,7 @@
                         url: `/api/v1/user/orders/${orderId}`,
                         method: 'PUT',
                         success: function (response) {
-                            // getOrders()
+                            getOrders()
                             showToast()
                             setToastMessage("Cancelled", response.message);
                         },
@@ -753,12 +755,12 @@
             }
         }
 
-
-
         window.onload = function () {
-            getOrders()
+            
             getCategories()
         }
+
+
 
 
 
