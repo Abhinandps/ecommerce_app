@@ -218,10 +218,10 @@ Project Completed and Hosted
 [✔]Search in landing page not working
 [✔]Enter button press to search in search box
 [✔]Sort and filter with search
-[]Reverse proxy
-[]Nginx configuration
-[]PM2 commands
-[]Linux commands for file handling
+[✔]Reverse proxy
+[✔]Nginx configuration
+[✔]PM2 commands
+[✔]Linux commands for file handling
 
 Conceptwise Marks:6
 Programming Part Marks:6"

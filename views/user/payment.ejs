@@ -2,6 +2,25 @@
 
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
+    <style>
+        .payment-options {
+            display: flex;
+            border: 1px solid var(--cultured);
+            border-radius: var(--border-radius-sm);
+            box-shadow: 0px 3px 0px 0px var(--bittersweet);
+            padding: 10px 20px;
+            min-height: 35vh;
+        }
+
+        .payment-group {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 10px;
+        }
+
+       
+    </style>
 
     <div class="container wrapper">
 
@@ -16,14 +35,27 @@
 
             <div class="cart-items">
                 <div class="payment-options">
-                    <input type="radio" id="cod" name="payment-option" value="cod">
-                    <label for="cod">Cash on Delivery</label>
 
-                    <input type="radio" id="card" name="payment-option" value="card">
-                    <label for="card">Credit Card</label>
+                    <div class="payment-banner">
+                        <img src="/src/images/logo/payment.gif" alt="" style="max-width:150px">
+                    </div>
 
-                    <input type="radio" id="upi" name="payment-option" value="upi">
-                    <label for="upi">UPI</label>
+                    <div class="payment-options-list" style="
+                    width: 100%">
+
+                        <div class="payment-group">
+                            <input type="radio" id="cod" name="payment-option" value="cod" style="width: 10%;">
+                            <label for="cod">Cash on Delivery</label>
+                        </div>
+
+                        <div class="payment-group">
+                            <input type="radio" id="upi" name="payment-option" value="upi" style="width: 10%;">
+                            <label for="upi">UPI</label>
+                        </div>
+
+                    </div>
+
+
                 </div>
             </div>
         </div>
@@ -126,15 +158,15 @@
         <div class="custom-container">
             <div class="circle-group">
                 <div class="circle-border"></div>
-            <div class="circle">
-                <div class="success"></div>
-            </div>
+                <div class="circle">
+                    <div class="success"></div>
+                </div>
             </div>
             <div class="message">
                 Order Placed Successfully
             </div>
         </div>
-        
+
     </div>
 
     <script>

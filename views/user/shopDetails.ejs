@@ -159,24 +159,24 @@
 
                                                     <div class="countdown-content">
 
-                                                        <p class="display-number">360</p>
+                                                        <p id="days" class="display-number">360</p>
 
                                                         <p class="display-text">Days</p>
 
                                                     </div>
 
                                                     <div class="countdown-content">
-                                                        <p class="display-number">24</p>
+                                                        <p id="hours" class="display-number">24</p>
                                                         <p class="display-text">Hours</p>
                                                     </div>
 
                                                     <div class="countdown-content">
-                                                        <p class="display-number">59</p>
+                                                        <p id="minutes" class="display-number">59</p>
                                                         <p class="display-text">Min</p>
                                                     </div>
 
                                                     <div class="countdown-content">
-                                                        <p class="display-number">00</p>
+                                                        <p id="seconds" class="display-number">00</p>
                                                         <p class="display-text">Sec</p>
                                                     </div>
 
@@ -480,6 +480,48 @@
 
 
     </script>
+<script>
+    // Get the current date and time
+    var now = new Date().getTime();
+
+    // Set the initial countdown duration (in milliseconds) to 2 days
+    var initialCountdownDuration = 1 * 3 * 60 * 60 * 1000;
+
+    // Calculate the countdown date by adding the initial duration to the current time
+    var countdownDate = now + initialCountdownDuration;
+
+    // Function to update the countdown
+    function updateCountdown() {
+        // Get the current date and time
+        var now = new Date().getTime();
+
+        // Calculate the time remaining
+        var timeRemaining = countdownDate - now;
+
+        // If the countdown is over, set a new countdown for 2 days in the past
+        if (timeRemaining <= 0) {
+            countdownDate = now - initialCountdownDuration;
+            timeRemaining = countdownDate - now;
+        }
+
+        // Calculate the days, hours, minutes, and seconds
+        var days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+        // Update the displayed values
+        document.getElementById("days").innerHTML = days;
+        document.getElementById("hours").innerHTML = hours;
+        document.getElementById("minutes").innerHTML = minutes;
+        document.getElementById("seconds").innerHTML = seconds;
+    }
+
+    // Call the updateCountdown function every 1 second
+    var countdownInterval = setInterval(updateCountdown, 1000); // 1000 milliseconds = 1 second
+</script>
+
+
 
 
 
