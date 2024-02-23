@@ -29,6 +29,6 @@ jobs:
 
     - run: |
         touch config.env
-        echo "${{ secrets.PROD_ENV_FILE}}" > config.env
+        echo "${{ secrets.PROD_ENV_ANON}}" > config.env
     - run: pm2 restart anon_server
         
